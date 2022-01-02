@@ -33,6 +33,8 @@ MskSyntaxParser MskSyntaxParserNew(StringView text) {
     if (token.kind != kMskSyntaxKindBadToken &&
         token.kind != kMskSyntaxKindWhitespaceToken) {
       VEC_PUSH(&parser.tokens, token);
+    } else {
+      MskSyntaxTokenFree(&token);
     }
     if (token.kind == kMskSyntaxKindEndOfFileToken) {
       break;
