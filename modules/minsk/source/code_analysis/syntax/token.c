@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "minsk/runtime/object/object.h"
+#include "minsk/runtime/object.h"
 
 void MskSyntaxTokenFree(MskSyntaxToken* token) {
   StringFree(&token->text);

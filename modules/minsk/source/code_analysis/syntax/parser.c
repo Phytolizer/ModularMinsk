@@ -9,7 +9,7 @@
 #include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "minsk/runtime/object/object.h"
+#include "minsk/runtime/object.h"
 
 static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);
 static MskSyntaxToken* Current(MskSyntaxParser* parser);

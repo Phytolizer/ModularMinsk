@@ -4,7 +4,7 @@
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/node.h"
-#include "minsk/runtime/object/object.h"
+#include "minsk/runtime/object.h"
 #include "string/string.h"
 
 static char Cur(MskLexer* lexer);

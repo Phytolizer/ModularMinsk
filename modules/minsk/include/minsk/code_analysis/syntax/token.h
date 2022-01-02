@@ -6,7 +6,7 @@
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/node.h"
-#include "minsk/runtime/object/object.h"
+#include "minsk/runtime/object.h"
 
 typedef struct {
   MskSyntaxNode base;

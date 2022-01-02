@@ -7,7 +7,7 @@
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "minsk/runtime/object/object.h"
+#include "minsk/runtime/object.h"
 
 const char* const kMskSyntaxKindNames[] = {
 #define X(x) [kMskSyntaxNodeKind##x] = #x,

@@ -1,4 +1,4 @@
-#include "minsk/runtime/object/object.h"
+#include "minsk/runtime/object.h"
 
 #include <inttypes.h>
 #include <stdlib.h>
