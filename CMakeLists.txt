@@ -114,6 +114,7 @@ declare_module(
   DEPENDS span vec
 )
 declare_module(annotate KIND interface)
+declare_module(ansi_esc KIND interface)
 
 # Following is actual Minsk-specific stuff.
 
@@ -131,7 +132,7 @@ declare_module(
           code_analysis/syntax/token.c
           code_analysis/syntax/tree.c
           runtime/object.c
-  DEPENDS vec span string hash annotate
+  DEPENDS vec span string hash annotate ansi_esc
 )
 
 # The main program
@@ -139,5 +140,5 @@ declare_module(
   mc
   KIND executable
   SOURCES main.c
-  DEPENDS minsk
+  DEPENDS minsk ansi_esc
 )

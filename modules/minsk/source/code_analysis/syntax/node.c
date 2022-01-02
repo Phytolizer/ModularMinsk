@@ -1,5 +1,6 @@
 #include "minsk/code_analysis/syntax/node.h"
 
+#include <ansi_esc/ansi_esc.h>
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/binary_expression.h"
@@ -133,24 +134,29 @@ void PrettyPrint(MskSyntaxNode* node,
                  String indent,
                  bool is_last) {
   if (colors) {
-    fprintf(fp, "\x1b[2;37m");
+    fprintf(fp, ANSI_ESC_DIM ANSI_ESC_FG_WHITE);
   }
   fprintf(fp, "%" STRING_FMT, STRING_PRINT(indent));
   StringView marker = StringViewFromC(is_last ? "└── " : "├── ");
   fprintf(fp, "%" STRING_VIEW_FMT, STRING_VIEW_PRINT(marker));
   if (colors) {
-    fprintf(fp, "\x1b[0;35m");
+    fprintf(fp, ANSI_ESC_RESET);
+    if (node->kind == kMskSyntaxNodeKindToken) {
+      fprintf(fp, ANSI_ESC_FG_BLUE);
+    } else {
+      fprintf(fp, ANSI_ESC_FG_GREEN);
+    }
   }
   fprintf(fp, "%" STRING_VIEW_FMT,
           STRING_VIEW_PRINT(MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
   if (colors) {
-    fprintf(fp, "\x1b[0m");
+    fprintf(fp, ANSI_ESC_RESET);
   }
   if (node->kind == kMskSyntaxNodeKindToken &&
       ((MskSyntaxToken*)node)->value.kind != kMskObjectKindNull) {
     MskSyntaxToken* tok = (MskSyntaxToken*)node;
     if (colors) {
-      fprintf(fp, "\x1b[0;36m");
+      fprintf(fp, ANSI_ESC_FG_MAGENTA);
     }
     fprintf(fp, " %" STRING_VIEW_FMT "(",
             STRING_VIEW_PRINT(MskRuntimeObjectKindName(tok->value.kind)));
@@ -159,7 +165,7 @@ void PrettyPrint(MskSyntaxNode* node,
   }
   fprintf(fp, "\n");
   if (colors) {
-    fprintf(fp, "\x1b[0m");
+    fprintf(fp, ANSI_ESC_RESET);
   }
   StringAppendC(&indent, is_last ? "    " : "│   ");
   MskSyntaxNodeChildren children = MskSyntaxNodeGetChildren(node);

@@ -1,3 +1,4 @@
+#include <ansi_esc/ansi_esc.h>
 #include <inttypes.h>
 #include <minsk/code_analysis/syntax/expression.h>
 #include <minsk/code_analysis/syntax/lexer.h>
@@ -27,12 +28,12 @@ int main(void) {
     MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
     if (syntax_tree.diagnostics.size > 0) {
       printf("\n");
-      printf("\x1b[2;31m");
+      printf(ANSI_ESC_DIM ANSI_ESC_FG_RED);
       for (size_t i = 0; i < syntax_tree.diagnostics.size; ++i) {
         String diagnostic = syntax_tree.diagnostics.data[i];
         printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
       }
-      printf("\x1b[0m");
+      printf(ANSI_ESC_RESET);
     }
     MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);
