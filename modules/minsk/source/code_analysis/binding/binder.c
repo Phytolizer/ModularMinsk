@@ -21,7 +21,7 @@ static MskBoundExpression* BindParenthesizedExpression(
 static MskBoundUnaryOperatorKind BindUnaryOperatorKind(MskSyntaxKind kind);
 static MskBoundBinaryOperatorKind BindBinaryOperatorKind(MskSyntaxKind kind);
 
-MskBoundExpression* MskBinderBind(MskExpressionSyntax* syntax) {
+MskBoundExpression* MskBinderBindExpression(MskExpressionSyntax* syntax) {
   switch (syntax->cls) {
 #define X(x)                         \
   case kMskSyntaxExpressionClass##x: \
@@ -41,7 +41,7 @@ MskBoundExpression* BindLiteralExpression(MskExpressionSyntax* syntax) {
 
 MskBoundExpression* BindUnaryExpression(MskExpressionSyntax* syntax) {
   MskUnaryExpressionSyntax* unary = (MskUnaryExpressionSyntax*)syntax;
-  MskBoundExpression* operand = MskBinderBind(unary->operand);
+  MskBoundExpression* operand = MskBinderBindExpression(unary->operand);
   if (operand == NULL) {
     return NULL;
   }
@@ -51,11 +51,11 @@ MskBoundExpression* BindUnaryExpression(MskExpressionSyntax* syntax) {
 
 MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax) {
   MskBinaryExpressionSyntax* binary = (MskBinaryExpressionSyntax*)syntax;
-  MskBoundExpression* left = MskBinderBind(binary->left);
+  MskBoundExpression* left = MskBinderBindExpression(binary->left);
   if (left == NULL) {
     return NULL;
   }
-  MskBoundExpression* right = MskBinderBind(binary->right);
+  MskBoundExpression* right = MskBinderBindExpression(binary->right);
   if (right == NULL) {
     return NULL;
   }
@@ -66,7 +66,7 @@ MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax) {
 MskBoundExpression* BindParenthesizedExpression(MskExpressionSyntax* syntax) {
   MskParenthesizedExpressionSyntax* paren =
       (MskParenthesizedExpressionSyntax*)syntax;
-  return MskBinderBind(paren->expression);
+  return MskBinderBindExpression(paren->expression);
 }
 
 MskBoundUnaryOperatorKind BindUnaryOperatorKind(MskSyntaxKind kind) {
