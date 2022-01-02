@@ -40,11 +40,13 @@ typedef struct {
 #define VEC_POP(V) (V)->data[--(V)->size]
 
 #define VEC_RESERVE(V, Amount) VecReserve(VEC_UNPACK(V), Amount)
+#define VEC_RESIZE(V, Amount) VecResize(VEC_UNPACK(V), Amount)
 
 #define VEC_APPEND(V, Data, Size) VecAppend(VEC_UNPACK(V), Data, Size)
 
 bool VecExpand(VecUnpacked v);
 bool VecReserve(VecUnpacked v, uint64_t amount);
+bool VecResize(VecUnpacked v, uint64_t amount);
 bool VecAppend(VecUnpacked v, const void* data, uint64_t size);
 
 #endif  // VEC_VEC_H_

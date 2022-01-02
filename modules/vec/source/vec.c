@@ -23,6 +23,14 @@ bool VecReserve(VecUnpacked v, uint64_t amount) {
   return true;
 }
 
+bool VecResize(VecUnpacked v, uint64_t amount) {
+  if (VecReserve(v, amount)) {
+    *v.size = amount;
+    return true;
+  }
+  return false;
+}
+
 bool VecAppend(VecUnpacked v, const void* data, uint64_t size) {
   if (!VecReserve(v, *v.size + size)) {
     return false;

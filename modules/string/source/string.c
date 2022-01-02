@@ -64,9 +64,9 @@ String StringFormat(const char* format, ...) {
   if (size < 0) {
     return result;
   }
-  VEC_RESERVE(&result, size + 1);
+  VEC_RESIZE(&result, size);
   va_start(args, format);
-  vsnprintf(result.data, size + 1, format, args);
+  vsnprintf(result.data, size, format, args);
   va_end(args);
   result.size = size;
   return result;
@@ -78,7 +78,8 @@ String StringGetLine(FILE* file) {
   bool hit_eof = true;
   // Keep reading until we get a newline.
   while (fgets(buffer, sizeof(buffer), file) != NULL) {
-    VEC_APPEND(&result, buffer, strlen(buffer));
+    // buffer is a valid C string, since fgets() guarantees it.
+    StringAppendC(&result, buffer);
     if (result.data[result.size - 1] == '\n') {
       hit_eof = false;
       break;
@@ -86,7 +87,7 @@ String StringGetLine(FILE* file) {
   }
   if (hit_eof) {
     // We hit EOF before we found a newline.
-    VEC_APPEND(&result, buffer, strlen(buffer));
+    StringAppendC(&result, buffer);
   }
   return result;
 }
