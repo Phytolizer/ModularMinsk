@@ -1,5 +1,7 @@
 #include "minsk_private/code_analysis/binding/binder.h"
 
+#include <assert.h>
+
 #include "minsk/code_analysis/syntax/binary_expression.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
@@ -42,7 +44,7 @@ MskBoundExpression* MskBinderBindExpression(MskBinder* binder,
     MSK__EXPRESSION_CLASSES
 #undef X
     default:
-      return NULL;
+      assert(false && "corrupt syntax class");
   }
 }
 
@@ -61,9 +63,6 @@ MskBoundExpression* BindUnaryExpression(MskBinder* binder,
                                         MskExpressionSyntax* syntax) {
   MskUnaryExpressionSyntax* unary = (MskUnaryExpressionSyntax*)syntax;
   MskBoundExpression* operand = MskBinderBindExpression(binder, unary->operand);
-  if (operand == NULL) {
-    return NULL;
-  }
   MskBoundUnaryOperatorKind operator_kind = BindUnaryOperatorKind(
       unary->operator_token.kind, MskBoundExpressionGetType(operand));
   if (operator_kind == kMskBoundUnaryOperatorKindInvalid) {
@@ -83,13 +82,7 @@ MskBoundExpression* BindBinaryExpression(MskBinder* binder,
                                          MskExpressionSyntax* syntax) {
   MskBinaryExpressionSyntax* binary = (MskBinaryExpressionSyntax*)syntax;
   MskBoundExpression* left = MskBinderBindExpression(binder, binary->left);
-  if (left == NULL) {
-    return NULL;
-  }
   MskBoundExpression* right = MskBinderBindExpression(binder, binary->right);
-  if (right == NULL) {
-    return NULL;
-  }
   MskBoundBinaryOperatorKind operator_kind = BindBinaryOperatorKind(
       binary->operator_token.kind, MskBoundExpressionGetType(left),
       MskBoundExpressionGetType(right));
