@@ -1,4 +1,4 @@
-#include "minsk/code_analysis/syntax/lexer.h"
+#include "minsk_private/code_analysis/syntax/lexer.h"
 
 #include <stdint.h>
 

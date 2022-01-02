@@ -1,4 +1,4 @@
-#include "minsk/code_analysis/syntax/parser.h"
+#include "minsk_private/code_analysis/syntax/parser.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -6,12 +6,12 @@
 #include "minsk/code_analysis/syntax/binary_expression.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/kind.h"
-#include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
+#include "minsk_private/code_analysis/syntax/lexer.h"
 #include "string/string.h"
 
 static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);

@@ -2,9 +2,7 @@
 #include <inttypes.h>
 #include <minsk/code_analysis/evaluator.h>
 #include <minsk/code_analysis/syntax/expression.h>
-#include <minsk/code_analysis/syntax/lexer.h>
 #include <minsk/code_analysis/syntax/node.h>
-#include <minsk/code_analysis/syntax/parser.h>
 #include <minsk/code_analysis/syntax/token.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/runtime/object.h>

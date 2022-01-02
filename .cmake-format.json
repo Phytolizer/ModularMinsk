@@ -6,6 +6,7 @@
     ],
     "additional_commands": {
       "declare_module": {
+        "flags": ["INTERNAL_INCLUDE"],
         "kwargs": {
           "KIND": 1,
           "OUTPUT_NAME": 1,

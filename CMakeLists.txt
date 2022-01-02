@@ -10,7 +10,7 @@ project(
 
 function(declare_module NAME)
   cmake_parse_arguments(
-    PARSE_ARGV 0 "DM" "" "KIND;OUTPUT_NAME"
+    PARSE_ARGV 0 "DM" "INTERNAL_INCLUDE" "KIND;OUTPUT_NAME"
     "SOURCES;ABSOLUTE_SOURCES;DEPENDS;INCLUDES"
   )
   if(NOT DM_KIND)
@@ -36,6 +36,11 @@ function(declare_module NAME)
   target_include_directories(
     ${NAME} ${DM_PUBLICITY} ${DM_INCLUDES} "modules/${NAME}/include"
   )
+  if(DM_INTERNAL_INCLUDE)
+    target_include_directories(
+      ${NAME} PRIVATE "modules/${NAME}/internal_include"
+    )
+  endif()
   if(DM_OUTPUT_NAME)
     set_target_properties(${NAME} PROPERTIES OUTPUT_NAME ${DM_OUTPUT_NAME})
   endif()
@@ -135,6 +140,7 @@ declare_module(
           code_analysis/syntax/tree.c
           runtime/object.c
   DEPENDS vec span string hash annotate ansi_esc
+  INTERNAL_INCLUDE
 )
 
 # The main program
