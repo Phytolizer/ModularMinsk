@@ -23,8 +23,6 @@ typedef struct {
       .sizeof_t = sizeof(*(S)->begin),     \
   })
 
-#define SPAN_SIZE(S) SpanSize(SPAN_UNPACK(S))
-
-size_t SpanSize(SpanUnpacked s);
+#define SPAN_SIZE(S) ((S)->end - (S)->begin)
 
 #endif  // SPAN_SPAN_H_
