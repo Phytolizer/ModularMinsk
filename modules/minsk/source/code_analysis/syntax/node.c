@@ -7,6 +7,7 @@
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
+#include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
 
@@ -24,12 +25,16 @@ static MskSyntaxKind GetExpressionKind(MskSyntaxNode* node);
 static MskSyntaxKind GetTokenKind(MskSyntaxNode* node);
 static MskSyntaxKind GetBinaryExpressionKind(MskExpressionSyntax* syntax);
 static MskSyntaxKind GetLiteralExpressionKind(MskExpressionSyntax* syntax);
+static MskSyntaxKind GetParenthesizedExpressionKind(
+    MskExpressionSyntax* syntax);
 
 static MskSyntaxNodeChildren GetExpressionChildren(MskSyntaxNode* node);
 static MskSyntaxNodeChildren GetTokenChildren(MskSyntaxNode* node);
 static MskSyntaxNodeChildren GetBinaryExpressionChildren(
     MskExpressionSyntax* syntax);
 static MskSyntaxNodeChildren GetLiteralExpressionChildren(
+    MskExpressionSyntax* syntax);
+static MskSyntaxNodeChildren GetParenthesizedExpressionChildren(
     MskExpressionSyntax* syntax);
 
 static void PrettyPrint(MskSyntaxNode* node,
@@ -94,6 +99,11 @@ MskSyntaxKind GetLiteralExpressionKind(MskExpressionSyntax* syntax) {
   return kMskSyntaxKindLiteralExpression;
 }
 
+MskSyntaxKind GetParenthesizedExpressionKind(MskExpressionSyntax* syntax) {
+  (void)syntax;
+  return kMskSyntaxKindParenthesizedExpression;
+}
+
 MskSyntaxNodeChildren GetExpressionChildren(MskSyntaxNode* node) {
   switch (((MskExpressionSyntax*)node)->kind) {
 #define X(x)                        \
@@ -125,6 +135,17 @@ MskSyntaxNodeChildren GetLiteralExpressionChildren(
   MskLiteralExpressionSyntax* literal = (MskLiteralExpressionSyntax*)syntax;
   MskSyntaxNodeChildren children = {0};
   VEC_PUSH(&children, &literal->literal_token.base);
+  return children;
+}
+
+MskSyntaxNodeChildren GetParenthesizedExpressionChildren(
+    MskExpressionSyntax* syntax) {
+  MskParenthesizedExpressionSyntax* parenthesized =
+      (MskParenthesizedExpressionSyntax*)syntax;
+  MskSyntaxNodeChildren children = {0};
+  VEC_PUSH(&children, &parenthesized->open_parenthesis_token.base);
+  VEC_PUSH(&children, &parenthesized->expression->base);
+  VEC_PUSH(&children, &parenthesized->close_parenthesis_token.base);
   return children;
 }
 
@@ -170,6 +191,8 @@ void PrettyPrint(MskSyntaxNode* node,
   StringAppendC(&indent, is_last ? "    " : "│   ");
   MskSyntaxNodeChildren children = MskSyntaxNodeGetChildren(node);
   for (uint64_t i = 0; i < children.size; ++i) {
-    PrettyPrint(children.data[i], fp, colors, indent, i == children.size - 1);
+    PrettyPrint(children.data[i], fp, colors, StringDuplicate(indent),
+                i == children.size - 1);
   }
+  StringFree(&indent);
 }

@@ -129,6 +129,7 @@ declare_module(
           code_analysis/syntax/lexer.c
           code_analysis/syntax/literal_expression.c
           code_analysis/syntax/node.c
+          code_analysis/syntax/parenthesized_expression.c
           code_analysis/syntax/parser.c
           code_analysis/syntax/token.c
           code_analysis/syntax/tree.c

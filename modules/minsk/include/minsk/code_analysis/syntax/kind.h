@@ -17,7 +17,8 @@
   X(CloseParenthesisToken) \
                            \
   X(LiteralExpression)     \
-  X(BinaryExpression)
+  X(BinaryExpression)      \
+  X(ParenthesizedExpression)
 
 typedef enum {
 #define X(x) kMskSyntaxKind##x,

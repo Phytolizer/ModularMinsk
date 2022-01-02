@@ -9,6 +9,7 @@
 #include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/node.h"
+#include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
 #include "string/string.h"
@@ -134,6 +135,15 @@ MskExpressionSyntax* ParseFactor(MskSyntaxParser* parser) {
 }
 
 MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser) {
+  if (Current(parser)->kind == kMskSyntaxKindOpenParenthesisToken) {
+    MskSyntaxToken open_parenthesis_token =
+        MatchToken(parser, kMskSyntaxKindOpenParenthesisToken);
+    MskExpressionSyntax* expression = ParseBinaryExpression(parser);
+    MskSyntaxToken close_parenthesis_token =
+        MatchToken(parser, kMskSyntaxKindCloseParenthesisToken);
+    return (MskExpressionSyntax*)MskParenthesizedExpressionSyntaxNew(
+        open_parenthesis_token, expression, close_parenthesis_token);
+  }
   MskSyntaxToken number_token =
       MskSyntaxTokenDuplicate(MatchToken(parser, kMskSyntaxKindNumberToken));
   return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(number_token);

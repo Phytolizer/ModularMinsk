@@ -5,7 +5,8 @@
 
 #define MSK__EXPRESSION_KINDS \
   X(Binary)                   \
-  X(Literal)
+  X(Literal)                  \
+  X(Parenthesized)
 
 typedef enum {
 #define X(x) kMskSyntaxExpressionKind##x,
