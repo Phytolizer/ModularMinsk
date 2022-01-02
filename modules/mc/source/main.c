@@ -1,5 +1,7 @@
 #include <inttypes.h>
+#include <minsk/code_analysis/syntax/expression.h>
 #include <minsk/code_analysis/syntax/lexer.h>
+#include <minsk/code_analysis/syntax/node.h>
 #include <minsk/code_analysis/syntax/parser.h>
 #include <minsk/code_analysis/syntax/token.h>
 #include <minsk/runtime/object/object.h>
@@ -21,6 +23,9 @@ int main(void) {
     }
 
     MskSyntaxParser parser = MskSyntaxParserNew(StringAsView(text));
+    MskExpressionSyntax* syntax_tree = MskSyntaxParserParse(&parser);
+    MskSyntaxNodePrettyPrint(&syntax_tree->base, stdout, true);
+    MskExpressionSyntaxFree(syntax_tree);
     MskSyntaxParserFree(&parser);
     StringFree(&text);
   }

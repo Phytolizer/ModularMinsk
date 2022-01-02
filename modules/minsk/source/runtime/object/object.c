@@ -6,8 +6,8 @@
 static void FreeInteger(MskRuntimeObject* i);
 static void FreeNull(MskRuntimeObject* n);
 
-static void PrintInteger(MskRuntimeObject* i);
-static void PrintNull(MskRuntimeObject* n);
+static void PrintInteger(MskRuntimeObject* i, FILE* fp);
+static void PrintNull(MskRuntimeObject* n, FILE* fp);
 
 StringView MskRuntimeObjectKindName(MskRuntimeObjectKind kind) {
   switch (kind) {
@@ -43,16 +43,27 @@ void MskRuntimeObjectFree(MskRuntimeObject* object) {
   object->kind = kMskObjectKindNull;
 }
 
-void MskRuntimeObjectPrint(MskRuntimeObject* object) {
+void MskRuntimeObjectPrint(MskRuntimeObject* object, FILE* fp) {
   switch (object->kind) {
 #define X(x)              \
   case kMskObjectKind##x: \
-    Print##x(object);     \
+    Print##x(object, fp); \
     break;
     MSK__OBJECT_KINDS
 #undef X
     default:
       break;
+  }
+}
+
+MskRuntimeObject MskRuntimeObjectDuplicate(MskRuntimeObject* object) {
+  // you aren't allowed to pass NULL to this function, so i won't check.
+  switch (object->kind) {
+    case kMskObjectKindInteger:
+      return MskRuntimeObjectNewInteger(object->value.integer);
+    case kMskObjectKindNull:
+    default:
+      return MSK_RUNTIME_OBJECT_NULL;
   }
 }
 
@@ -66,10 +77,10 @@ void FreeNull(MskRuntimeObject* n) {
   (void)n;
 }
 
-void PrintInteger(MskRuntimeObject* i) {
-  printf("%" PRId64, i->value.integer);
+void PrintInteger(MskRuntimeObject* i, FILE* fp) {
+  fprintf(fp, "%" PRId64, i->value.integer);
 }
 
-void PrintNull(MskRuntimeObject* n) {
-  printf("<Null>");
+void PrintNull(MskRuntimeObject* n, FILE* fp) {
+  fprintf(fp, "<Null>");
 }

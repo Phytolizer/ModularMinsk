@@ -84,7 +84,11 @@ declare_module(
 )
 
 # Test framework
-declare_module(test KIND interface)
+declare_module(
+  test
+  KIND interface
+  DEPENDS nonstd
+)
 
 # Useful libraries
 declare_module(
@@ -117,8 +121,14 @@ declare_module(annotate KIND interface)
 declare_module(
   minsk
   KIND library
-  SOURCES code_analysis/syntax/kind.c code_analysis/syntax/lexer.c
-          code_analysis/syntax/parser.c code_analysis/syntax/token.c
+  SOURCES code_analysis/syntax/binary_expression.c
+          code_analysis/syntax/expression.c
+          code_analysis/syntax/kind.c
+          code_analysis/syntax/lexer.c
+          code_analysis/syntax/literal_expression.c
+          code_analysis/syntax/node.c
+          code_analysis/syntax/parser.c
+          code_analysis/syntax/token.c
           runtime/object/object.c
   DEPENDS vec span string hash annotate
 )

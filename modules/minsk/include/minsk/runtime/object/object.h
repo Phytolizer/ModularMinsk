@@ -3,6 +3,7 @@
 
 #include <annotate/annotate.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string/string.h>
 
 #define MSK__OBJECT_KINDS \
@@ -27,6 +28,7 @@ typedef struct {
 #define MSK_RUNTIME_OBJECT_NULL ((MskRuntimeObject){.kind = kMskObjectKindNull})
 MskRuntimeObject MskRuntimeObjectNewInteger(int64_t value);
 void MskRuntimeObjectFree(MskRuntimeObject* object) ANNOTATE_NONNULL(1);
-void MskRuntimeObjectPrint(MskRuntimeObject* object);
+void MskRuntimeObjectPrint(MskRuntimeObject* object, FILE* fp);
+MskRuntimeObject MskRuntimeObjectDuplicate(MskRuntimeObject* object);
 
 #endif  // MINSK_RUNTIME_OBJECT_H_

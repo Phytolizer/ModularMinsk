@@ -8,3 +8,10 @@ void MskSyntaxTokenFree(MskSyntaxToken* token) {
   StringFree(&token->text);
   MskRuntimeObjectFree(&token->value);
 }
+
+MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
+  MskSyntaxToken duplicate = token;
+  duplicate.text = StringDuplicate(token.text);
+  duplicate.value = MskRuntimeObjectDuplicate(&token.value);
+  return duplicate;
+}

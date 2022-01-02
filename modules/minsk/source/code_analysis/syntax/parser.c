@@ -86,7 +86,7 @@ MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser) {
 
   while (Current(parser)->kind == kMskSyntaxKindPlusToken ||
          Current(parser)->kind == kMskSyntaxKindMinusToken) {
-    MskSyntaxToken operator_token = NextToken(parser);
+    MskSyntaxToken operator_token = MskSyntaxTokenDuplicate(NextToken(parser));
     MskExpressionSyntax* right = ParsePrimaryExpression(parser);
     left = (MskExpressionSyntax*)MskBinaryExpressionSyntaxNew(
         left, operator_token, right);
@@ -96,6 +96,7 @@ MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser) {
 }
 
 MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser) {
-  MskSyntaxToken number_token = MatchToken(parser, kMskSyntaxKindNumberToken);
+  MskSyntaxToken number_token =
+      MskSyntaxTokenDuplicate(MatchToken(parser, kMskSyntaxKindNumberToken));
   return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(number_token);
 }

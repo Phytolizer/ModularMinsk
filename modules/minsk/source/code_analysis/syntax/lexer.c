@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/node.h"
 #include "minsk/runtime/object/object.h"
 #include "string/string.h"
 
@@ -94,6 +95,7 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
   }
 
   return (MskSyntaxToken){
+      .base = {.kind = kMskSyntaxNodeKindToken},
       .kind = kind,
       .text = text,
       .position = position,
