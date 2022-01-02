@@ -21,5 +21,7 @@ typedef struct {
 
 /// Dispatches on the node class to determine the kind.
 MskBoundNodeKind MskBoundNodeGetKind(MskBoundNode* node);
+/// Dispatches on the node class to free the node.
+void MskBoundNodeFree(MskBoundNode* node);
 
 #endif  // MINSK_CODE_ANALYSIS_BINDING_NODE_H_
