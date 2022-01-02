@@ -36,6 +36,40 @@ StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
   return (StringView){.begin = str.begin + begin, .end = str.begin + end};
 }
 
+void StringViewPrint(StringView view) {
+  fwrite(view.begin, 1, SPAN_SIZE(&view), stdout);
+}
+
+uint64_t StringViewSize(StringView view) {
+  return SPAN_SIZE(&view);
+}
+
+StringView StringViewFindSubstring(StringView haystack, StringView needle) {
+  uint64_t haystack_size = StringViewSize(haystack);
+  uint64_t needle_size = StringViewSize(needle);
+  if (needle_size == 0) {
+    // Empty needle.
+    return (StringView){0};
+  }
+  if (haystack_size < needle_size) {
+    // Needle is longer than haystack.
+    return (StringView){0};
+  }
+  for (uint64_t i = 0; i <= haystack_size - needle_size; ++i) {
+    if (memcmp(haystack.begin + i, needle.begin, needle_size) == 0) {
+      return StringViewFromPtr(haystack.begin + i, needle_size);
+    }
+  }
+  return (StringView){0};
+}
+
+StringView StringViewFromPtr(const char* ptr, uint64_t size) {
+  return (StringView){
+      .begin = ptr,
+      .end = ptr + size,
+  };
+}
+
 String StringFromC(const char* cstr) {
   String s = {0};
   VEC_APPEND(&s, cstr, strlen(cstr));
