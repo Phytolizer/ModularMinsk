@@ -26,16 +26,13 @@ typedef struct {
       sizeof(*(V)->data),    \
   })
 
-#define VEC_FREE(V)    \
-  do {                 \
-    free((V)->data);   \
-    (V)->data = NULL;  \
-    (V)->size = 0;     \
-    (V)->capacity = 0; \
-  } while (false)
+#define VEC_FREE(V) VecFree(VEC_UNPACK(V))
 
-#define VEC_PUSH(V, Value) \
-  (VecExpand(VEC_UNPACK(V)) ? ((V)->data[(V)->size++] = (Value), true) : false)
+#define VEC_PUSH(V, Value)      \
+  ({                            \
+    typeof(Value) v = Value;    \
+    VecPush(VEC_UNPACK(V), &v); \
+  })
 
 #define VEC_POP(V) (V)->data[--(V)->size]
 
@@ -48,5 +45,7 @@ bool VecExpand(VecUnpacked v);
 bool VecReserve(VecUnpacked v, uint64_t amount);
 bool VecResize(VecUnpacked v, uint64_t amount);
 bool VecAppend(VecUnpacked v, const void* data, uint64_t size);
+bool VecPush(VecUnpacked v, const void* data);
+void VecFree(VecUnpacked v);
 
 #endif  // VEC_VEC_H_

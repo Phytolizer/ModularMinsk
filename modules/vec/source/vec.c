@@ -39,3 +39,19 @@ bool VecAppend(VecUnpacked v, const void* data, uint64_t size) {
   *v.size += size;
   return true;
 }
+
+bool VecPush(VecUnpacked v, const void* data) {
+  if (!VecExpand(v)) {
+    return false;
+  }
+  memcpy(*v.data + *v.size * v.sizeof_t, data, v.sizeof_t);
+  ++*v.size;
+  return true;
+}
+
+void VecFree(VecUnpacked v) {
+  free(*v.data);
+  *v.data = NULL;
+  *v.size = 0;
+  *v.capacity = 0;
+}
