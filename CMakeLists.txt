@@ -118,7 +118,8 @@ declare_module(
   minsk
   KIND library
   SOURCES code_analysis/syntax/kind.c code_analysis/syntax/lexer.c
-          code_analysis/syntax/token.c runtime/object/object.c
+          code_analysis/syntax/parser.c code_analysis/syntax/token.c
+          runtime/object/object.c
   DEPENDS vec span string hash annotate
 )
 
