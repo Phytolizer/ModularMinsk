@@ -16,6 +16,7 @@ MskSyntaxTree MskSyntaxTreeParse(StringView text) {
 
 void MskSyntaxTreeFree(MskSyntaxTree* tree) {
   MskExpressionSyntaxFree(tree->root);
+  free(tree->root);
   tree->root = NULL;
   MskSyntaxTokenFree(&tree->end_of_file_token);
   MskDiagnosticsFree(&tree->diagnostics);

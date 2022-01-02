@@ -157,5 +157,5 @@ declare_module(
   mc
   KIND executable
   SOURCES main.c
-  DEPENDS minsk ansi_esc
+  DEPENDS minsk ansi_esc asan
 )

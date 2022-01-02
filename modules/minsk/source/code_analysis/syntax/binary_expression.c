@@ -18,7 +18,8 @@ MskBinaryExpressionSyntax* MskBinaryExpressionSyntaxNew(
 
 void MskBinaryExpressionSyntaxFree(MskBinaryExpressionSyntax* syntax) {
   MskExpressionSyntaxFree(syntax->left);
+  free(syntax->left);
   MskExpressionSyntaxFree(syntax->right);
+  free(syntax->right);
   MskSyntaxTokenFree(&syntax->operator_token);
-  free(syntax);
 }
