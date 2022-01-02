@@ -9,7 +9,7 @@
 typedef struct {
   StringView text;
   uint64_t position;
-  Diagnostics diagnostics;
+  MskDiagnostics diagnostics;
 } MskSyntaxLexer;
 
 MskSyntaxLexer MskNewSyntaxLexer(StringView text);

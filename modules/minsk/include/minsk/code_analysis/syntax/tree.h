@@ -8,7 +8,7 @@
 typedef struct {
   MskExpressionSyntax* root;
   MskSyntaxToken end_of_file_token;
-  Diagnostics diagnostics;
+  MskDiagnostics diagnostics;
 } MskSyntaxTree;
 
 MskSyntaxTree MskSyntaxTreeParse(StringView text);

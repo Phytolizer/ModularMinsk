@@ -15,7 +15,7 @@ typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
 typedef struct {
   MskSyntaxTokens tokens;
   uint64_t position;
-  Diagnostics diagnostics;
+  MskDiagnostics diagnostics;
 } MskSyntaxParser;
 
 MskSyntaxParser MskSyntaxParserNew(StringView text);

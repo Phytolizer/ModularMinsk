@@ -14,10 +14,14 @@
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 #include "minsk_private/code_analysis/binding/unary_operator_kind.h"
 
-static MskBoundExpression* BindLiteralExpression(MskExpressionSyntax* syntax);
-static MskBoundExpression* BindUnaryExpression(MskExpressionSyntax* syntax);
-static MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax);
+static MskBoundExpression* BindLiteralExpression(MskBinder* binder,
+                                                 MskExpressionSyntax* syntax);
+static MskBoundExpression* BindUnaryExpression(MskBinder* binder,
+                                               MskExpressionSyntax* syntax);
+static MskBoundExpression* BindBinaryExpression(MskBinder* binder,
+                                                MskExpressionSyntax* syntax);
 static MskBoundExpression* BindParenthesizedExpression(
+    MskBinder* binder,
     MskExpressionSyntax* syntax);
 
 static MskBoundUnaryOperatorKind BindUnaryOperatorKind(
@@ -28,11 +32,12 @@ static MskBoundBinaryOperatorKind BindBinaryOperatorKind(
     MskRuntimeObjectKind left_type,
     MskRuntimeObjectKind right_type);
 
-MskBoundExpression* MskBinderBindExpression(MskExpressionSyntax* syntax) {
+MskBoundExpression* MskBinderBindExpression(MskBinder* binder,
+                                            MskExpressionSyntax* syntax) {
   switch (syntax->cls) {
 #define X(x)                         \
   case kMskSyntaxExpressionClass##x: \
-    return Bind##x##Expression(syntax);
+    return Bind##x##Expression(binder, syntax);
     MSK__EXPRESSION_CLASSES
 #undef X
     default:
@@ -40,15 +45,17 @@ MskBoundExpression* MskBinderBindExpression(MskExpressionSyntax* syntax) {
   }
 }
 
-MskBoundExpression* BindLiteralExpression(MskExpressionSyntax* syntax) {
+MskBoundExpression* BindLiteralExpression(MskBinder* binder,
+                                          MskExpressionSyntax* syntax) {
   MskLiteralExpressionSyntax* lit = (MskLiteralExpressionSyntax*)syntax;
   return (MskBoundExpression*)MskBoundLiteralExpressionNew(
       lit->literal_token.value);
 }
 
-MskBoundExpression* BindUnaryExpression(MskExpressionSyntax* syntax) {
+MskBoundExpression* BindUnaryExpression(MskBinder* binder,
+                                        MskExpressionSyntax* syntax) {
   MskUnaryExpressionSyntax* unary = (MskUnaryExpressionSyntax*)syntax;
-  MskBoundExpression* operand = MskBinderBindExpression(unary->operand);
+  MskBoundExpression* operand = MskBinderBindExpression(binder, unary->operand);
   if (operand == NULL) {
     return NULL;
   }
@@ -63,13 +70,14 @@ MskBoundExpression* BindUnaryExpression(MskExpressionSyntax* syntax) {
                                                          operand);
 }
 
-MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax) {
+MskBoundExpression* BindBinaryExpression(MskBinder* binder,
+                                         MskExpressionSyntax* syntax) {
   MskBinaryExpressionSyntax* binary = (MskBinaryExpressionSyntax*)syntax;
-  MskBoundExpression* left = MskBinderBindExpression(binary->left);
+  MskBoundExpression* left = MskBinderBindExpression(binder, binary->left);
   if (left == NULL) {
     return NULL;
   }
-  MskBoundExpression* right = MskBinderBindExpression(binary->right);
+  MskBoundExpression* right = MskBinderBindExpression(binder, binary->right);
   if (right == NULL) {
     return NULL;
   }
@@ -87,10 +95,11 @@ MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax) {
                                                           right);
 }
 
-MskBoundExpression* BindParenthesizedExpression(MskExpressionSyntax* syntax) {
+MskBoundExpression* BindParenthesizedExpression(MskBinder* binder,
+                                                MskExpressionSyntax* syntax) {
   MskParenthesizedExpressionSyntax* paren =
       (MskParenthesizedExpressionSyntax*)syntax;
-  return MskBinderBindExpression(paren->expression);
+  return MskBinderBindExpression(binder, paren->expression);
 }
 
 MskBoundUnaryOperatorKind BindUnaryOperatorKind(
