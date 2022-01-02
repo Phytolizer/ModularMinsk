@@ -42,15 +42,15 @@ String StringFromC(const char* cstr) {
   return s;
 }
 
-String StringFromView(StringView span) {
+String StringFromView(StringView view) {
   String s = {0};
-  VEC_APPEND(&s, span.begin, span.end - span.begin);
+  StringAppendView(&s, view);
   return s;
 }
 
 String StringDuplicate(const String s) {
   String result = {0};
-  VEC_APPEND(&result, s.data, s.size);
+  StringAppendView(&result, StringAsView(s));
   return result;
 }
 

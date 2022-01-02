@@ -25,7 +25,7 @@ StringView StringViewFromC(const char* cstr);
 StringConversionResultI64 StringViewToI64(StringView str);
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end);
 String StringFromC(const char* cstr);
-String StringFromView(StringView span);
+String StringFromView(StringView view);
 String StringDuplicate(const String s);
 String StringFormat(const char* format, ...) STRING_ATTR_PRINTF;
 String StringGetLine(FILE* file);
