@@ -9,7 +9,7 @@
 #include "minsk_private/code_analysis/binding/literal_expression.h"
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 
-static MskBoundNodeKind BoundExpressionGetKind(MskBoundNode* node);
+static MskBoundNodeKind GetExpressionKind(MskBoundNode* node);
 static void FreeExpression(MskBoundNode* node);
 
 static void FreeLiteralExpression(MskBoundExpression* exp);
@@ -22,7 +22,7 @@ MskBoundNodeKind MskBoundNodeGetKind(MskBoundNode* node) {
       return kMskBoundNodeKindInvalid;
 #define X(x)                  \
   case kMskBoundNodeClass##x: \
-    return Bound##x##GetKind(node);
+    return Get##x##Kind(node);
       MINSK__BOUND_NODE_CLASSES
 #undef X
     default:
@@ -45,7 +45,7 @@ void MskBoundNodeFree(MskBoundNode* node) {
   }
 }
 
-MskBoundNodeKind BoundExpressionGetKind(MskBoundNode* node) {
+MskBoundNodeKind GetExpressionKind(MskBoundNode* node) {
   MskBoundExpression* exp = (MskBoundExpression*)node;
   switch (exp->cls) {
     case kMskBoundExpressionClassInvalid:
