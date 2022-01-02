@@ -1,5 +1,6 @@
 #include <ansi_esc/ansi_esc.h>
 #include <inttypes.h>
+#include <minsk/code_analysis/evaluator.h>
 #include <minsk/code_analysis/syntax/expression.h>
 #include <minsk/code_analysis/syntax/lexer.h>
 #include <minsk/code_analysis/syntax/node.h>
@@ -34,6 +35,11 @@ int main(void) {
         printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
       }
       printf(ANSI_ESC_RESET);
+    } else {
+      MskEvaluator evaluator = MskEvaluatorNew(syntax_tree.root);
+      MskRuntimeObject result = MskEvaluatorEvaluate(&evaluator);
+      MskRuntimeObjectPrint(&result, stdout);
+      printf("\n");
     }
     MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);

@@ -122,7 +122,8 @@ declare_module(ansi_esc KIND interface)
 declare_module(
   minsk
   KIND library
-  SOURCES code_analysis/syntax/binary_expression.c
+  SOURCES code_analysis/evaluator.c
+          code_analysis/syntax/binary_expression.c
           code_analysis/syntax/expression.c
           code_analysis/syntax/kind.c
           code_analysis/syntax/lexer.c
