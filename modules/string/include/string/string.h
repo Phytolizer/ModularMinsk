@@ -66,6 +66,8 @@ StringView StringAsSubView(const String s, uint64_t begin, uint64_t end);
 bool StringEqual(const String a, const String b);
 /// Returns true if the String is equal to the StringView.
 bool StringEqualView(const String a, StringView b);
+/// Returns true if the String is equal to the C string.
+bool StringEqualC(const String a, const char* b);
 
 #define STRING_VIEW_PRINT(S) (int)((S).end - (S).begin), (S).begin
 #define STRING_VIEW_FMT ".*s"

@@ -166,3 +166,7 @@ bool StringEqual(const String a, const String b) {
 bool StringEqualView(const String a, StringView b) {
   return a.size == SPAN_SIZE(&b) && memcmp(a.data, b.begin, a.size) == 0;
 }
+
+bool StringEqualC(const String a, const char* b) {
+  return a.size == strlen(b) && memcmp(a.data, b, a.size) == 0;
+}
