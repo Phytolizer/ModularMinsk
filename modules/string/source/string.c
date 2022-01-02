@@ -12,21 +12,20 @@ StringView StringViewFromC(const char* cstr) {
   return (StringView){.begin = cstr, .end = cstr + strlen(cstr)};
 }
 
-bool StringViewToI64(StringView str, int64_t* out_value) {
+StringConversionResultI64 StringViewToI64(StringView str) {
   int64_t value = 0;
   for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
-      return false;
+      return (StringConversionResultI64){.success = false};
     }
     // Detect overflow.
     if (value > INT64_MAX / 10 ||
         (value == INT64_MAX / 10 && str.begin[i] - '0' > INT64_MAX % 10)) {
-      return false;
+      return (StringConversionResultI64){.success = false};
     }
     value = value * 10 + (str.begin[i] - '0');
   }
-  *out_value = value;
-  return true;
+  return (StringConversionResultI64){.success = true, .value = value};
 }
 
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {

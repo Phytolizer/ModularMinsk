@@ -16,8 +16,13 @@ typedef SPAN_TYPE(char) StringView;
 #define STRING_ATTR_PRINTF
 #endif
 
+typedef struct {
+  bool success;
+  int64_t value;
+} StringConversionResultI64;
+
 StringView StringViewFromC(const char* cstr);
-bool StringViewToI64(StringView str, int64_t* out_value);
+StringConversionResultI64 StringViewToI64(StringView str);
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end);
 String StringFromC(const char* cstr);
 String StringFromSpan(StringView span);

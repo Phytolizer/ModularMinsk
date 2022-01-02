@@ -52,12 +52,11 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
       // Create the text early. It's needed for StringViewToI64.
       text = StringFromSpan(
           StringViewSubstring(lexer->text, position, lexer->position));
-      int64_t ivalue;
-      if (!StringViewToI64(StringAsView(text), &ivalue)) {
+      StringConversionResultI64 result = StringViewToI64(StringAsView(text));
+      if (!result.success) {
         // TODO: Report error.
-        ivalue = 0;
       }
-      value = MskRuntimeObjectNewInteger(ivalue);
+      value = MskRuntimeObjectNewInteger(result.value);
     } break;
     case '+':
       kind = kMskSyntaxKindPlusToken;
