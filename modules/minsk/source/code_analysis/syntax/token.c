@@ -5,6 +5,6 @@
 #include "minsk/runtime/object/object.h"
 
 void MskSyntaxTokenFree(MskSyntaxToken* token) {
-  VEC_FREE(&token->text);
+  StringFree(&token->text);
   MskRuntimeObjectFree(&token->value);
 }

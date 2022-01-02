@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vec/vec.h>
 
@@ -88,6 +89,22 @@ String StringGetLine(FILE* file) {
     VEC_APPEND(&result, buffer, strlen(buffer));
   }
   return result;
+}
+
+void StringPushChar(String* s, char c) {
+  VEC_PUSH(s, c);
+}
+
+void StringAppendView(String* s, StringView view) {
+  VEC_APPEND(s, view.begin, view.end - view.begin);
+}
+
+void StringAppendC(String* s, const char* cstr) {
+  VEC_APPEND(s, cstr, strlen(cstr));
+}
+
+void StringFree(String* s) {
+  VEC_FREE(s);
 }
 
 StringView StringAsView(const String s) {

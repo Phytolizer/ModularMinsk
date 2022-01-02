@@ -35,6 +35,6 @@ int main(void) {
       printf("\n");
       MskSyntaxTokenFree(&token);
     }
-    VEC_FREE(&text);
+    StringFree(&text);
   }
 }
