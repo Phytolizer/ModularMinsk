@@ -3,21 +3,21 @@
 
 #include "minsk/code_analysis/syntax/node.h"
 
-#define MSK__EXPRESSION_KINDS \
+#define MSK__EXPRESSION_CLASSES \
   X(Binary)                   \
   X(Literal)                  \
   X(Parenthesized)            \
   X(Unary)
 
 typedef enum {
-#define X(x) kMskSyntaxExpressionKind##x,
-  MSK__EXPRESSION_KINDS
+#define X(x) kMskSyntaxExpressionClass##x,
+  MSK__EXPRESSION_CLASSES
 #undef X
-} MskExpressionSyntaxKind;
+} MskExpressionSyntaxClass;
 
 typedef struct {
   MskSyntaxNode base;
-  MskExpressionSyntaxKind kind;
+  MskExpressionSyntaxClass cls;
 } MskExpressionSyntax;
 
 void MskExpressionSyntaxFree(MskExpressionSyntax* syntax);

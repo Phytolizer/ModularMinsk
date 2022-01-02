@@ -7,21 +7,24 @@
 
 #include "minsk/code_analysis/syntax/kind.h"
 
-#define MSK__SYNTAX_NODES \
+#define MSK__SYNTAX_NODE_CLASSES \
   X(Expression)           \
   X(Token)
 
+/// The actual type of the node, in the C "class" hierarchy.
+///
+/// \see MskSyntaxNodeKind for the flattened list of all node kinds.
 typedef enum {
-#define X(x) kMskSyntaxNodeKind##x,
-  MSK__SYNTAX_NODES
+#define X(x) kMskSyntaxNodeClass##x,
+  MSK__SYNTAX_NODE_CLASSES
 #undef X
-} MskSyntaxNodeKind;
+} MskSyntaxNodeClass;
 
-StringView MskSyntaxNodeKindName(MskSyntaxNodeKind kind);
+StringView MskSyntaxNodeClassName(MskSyntaxNodeClass kind);
 
 /// This struct is pretty much empty, as it's meant to be inherited from.
 typedef struct {
-  MskSyntaxNodeKind kind;
+  MskSyntaxNodeClass cls;
 } MskSyntaxNode;
 
 typedef VEC_TYPE(MskSyntaxNode*) MskSyntaxNodeChildren;

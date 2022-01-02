@@ -12,14 +12,14 @@
 #include "minsk/code_analysis/syntax/unary_expression.h"
 #include "minsk/runtime/object.h"
 
-const char* const kMskSyntaxKindNames[] = {
-#define X(x) [kMskSyntaxNodeKind##x] = #x,
-    MSK__SYNTAX_NODES
+const char* const kMskSyntaxClassNames[] = {
+#define X(x) [kMskSyntaxNodeClass##x] = #x,
+    MSK__SYNTAX_NODE_CLASSES
 #undef X
 };
 
-StringView MskSyntaxNodeKindName(MskSyntaxNodeKind kind) {
-  return StringViewFromC(kMskSyntaxKindNames[kind]);
+StringView MskSyntaxNodeClassName(MskSyntaxNodeClass kind) {
+  return StringViewFromC(kMskSyntaxClassNames[kind]);
 }
 
 static MskSyntaxKind GetExpressionKind(MskSyntaxNode* node);
@@ -48,11 +48,11 @@ static void PrettyPrint(MskSyntaxNode* node,
                         bool is_last);
 
 MskSyntaxKind MskSyntaxNodeGetKind(MskSyntaxNode* node) {
-  switch (node->kind) {
-#define X(x)                  \
-  case kMskSyntaxNodeKind##x: \
+  switch (node->cls) {
+#define X(x)                   \
+  case kMskSyntaxNodeClass##x: \
     return Get##x##Kind(node);
-    MSK__SYNTAX_NODES
+    MSK__SYNTAX_NODE_CLASSES
 #undef X
     default:
       return kMskSyntaxKindInvalid;
@@ -60,11 +60,11 @@ MskSyntaxKind MskSyntaxNodeGetKind(MskSyntaxNode* node) {
 }
 
 MskSyntaxNodeChildren MskSyntaxNodeGetChildren(MskSyntaxNode* node) {
-  switch (node->kind) {
-#define X(x)                  \
-  case kMskSyntaxNodeKind##x: \
+  switch (node->cls) {
+#define X(x)                   \
+  case kMskSyntaxNodeClass##x: \
     return Get##x##Children(node);
-    MSK__SYNTAX_NODES
+    MSK__SYNTAX_NODE_CLASSES
 #undef X
     default:
       return (MskSyntaxNodeChildren){0};
@@ -77,11 +77,11 @@ void MskSyntaxNodePrettyPrint(MskSyntaxNode* node, FILE* fp, bool colors) {
 
 MskSyntaxKind GetExpressionKind(MskSyntaxNode* node) {
   MskExpressionSyntax* syntax = (MskExpressionSyntax*)node;
-  switch (syntax->kind) {
-#define X(x)                        \
-  case kMskSyntaxExpressionKind##x: \
+  switch (syntax->cls) {
+#define X(x)                         \
+  case kMskSyntaxExpressionClass##x: \
     return Get##x##ExpressionKind(syntax);
-    MSK__EXPRESSION_KINDS
+    MSK__EXPRESSION_CLASSES
 #undef X
     default:
       return kMskSyntaxKindInvalid;
@@ -114,11 +114,11 @@ MskSyntaxKind GetUnaryExpressionKind(MskExpressionSyntax* syntax) {
 }
 
 MskSyntaxNodeChildren GetExpressionChildren(MskSyntaxNode* node) {
-  switch (((MskExpressionSyntax*)node)->kind) {
-#define X(x)                        \
-  case kMskSyntaxExpressionKind##x: \
+  switch (((MskExpressionSyntax*)node)->cls) {
+#define X(x)                         \
+  case kMskSyntaxExpressionClass##x: \
     return Get##x##ExpressionChildren((MskExpressionSyntax*)node);
-    MSK__EXPRESSION_KINDS
+    MSK__EXPRESSION_CLASSES
 #undef X
     default:
       return (MskSyntaxNodeChildren){0};
@@ -179,7 +179,7 @@ void PrettyPrint(MskSyntaxNode* node,
   fprintf(fp, "%" STRING_VIEW_FMT, STRING_VIEW_PRINT(marker));
   if (colors) {
     fprintf(fp, ANSI_ESC_RESET);
-    if (node->kind == kMskSyntaxNodeKindToken) {
+    if (node->cls == kMskSyntaxNodeClassToken) {
       fprintf(fp, ANSI_ESC_FG_CYAN);
     } else {
       fprintf(fp, ANSI_ESC_FG_BLUE);
@@ -190,7 +190,7 @@ void PrettyPrint(MskSyntaxNode* node,
   if (colors) {
     fprintf(fp, ANSI_ESC_RESET);
   }
-  if (node->kind == kMskSyntaxNodeKindToken &&
+  if (node->cls == kMskSyntaxNodeClassToken &&
       ((MskSyntaxToken*)node)->value.kind != kMskObjectKindNull) {
     MskSyntaxToken* tok = (MskSyntaxToken*)node;
     if (colors) {

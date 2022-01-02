@@ -11,6 +11,7 @@
   X(Integer)
 
 typedef enum {
+  kMskObjectKindInvalid,
 #define X(x) kMskObjectKind##x,
   MSK__OBJECT_KINDS
 #undef X

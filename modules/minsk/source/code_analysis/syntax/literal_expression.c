@@ -10,8 +10,8 @@ MskLiteralExpressionSyntax* MskLiteralExpressionSyntaxNew(
     MskSyntaxToken literal_token) {
   MskLiteralExpressionSyntax* syntax =
       calloc(1, sizeof(MskLiteralExpressionSyntax));
-  syntax->base.base.kind = kMskSyntaxNodeKindExpression;
-  syntax->base.kind = kMskSyntaxExpressionKindLiteral;
+  syntax->base.base.cls = kMskSyntaxNodeClassExpression;
+  syntax->base.cls = kMskSyntaxExpressionClassLiteral;
   syntax->literal_token = literal_token;
   return syntax;
 }

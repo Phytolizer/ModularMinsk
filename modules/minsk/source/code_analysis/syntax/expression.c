@@ -4,11 +4,11 @@
 #include "minsk/code_analysis/syntax/literal_expression.h"
 
 void MskExpressionSyntaxFree(MskExpressionSyntax* syntax) {
-  switch (syntax->kind) {
-    case kMskSyntaxExpressionKindLiteral:
+  switch (syntax->cls) {
+    case kMskSyntaxExpressionClassLiteral:
       MskLiteralExpressionSyntaxFree((MskLiteralExpressionSyntax*)syntax);
       break;
-    case kMskSyntaxExpressionKindBinary:
+    case kMskSyntaxExpressionClassBinary:
       MskBinaryExpressionSyntaxFree((MskBinaryExpressionSyntax*)syntax);
       break;
     default:

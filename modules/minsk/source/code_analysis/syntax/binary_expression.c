@@ -8,8 +8,8 @@ MskBinaryExpressionSyntax* MskBinaryExpressionSyntaxNew(
     MskExpressionSyntax* right) {
   MskBinaryExpressionSyntax* syntax =
       calloc(1, sizeof(MskBinaryExpressionSyntax));
-  syntax->base.base.kind = kMskSyntaxNodeKindExpression;
-  syntax->base.kind = kMskSyntaxExpressionKindBinary;
+  syntax->base.base.cls = kMskSyntaxNodeClassExpression;
+  syntax->base.cls = kMskSyntaxExpressionClassBinary;
   syntax->left = left;
   syntax->operator_token = operator_token;
   syntax->right = right;

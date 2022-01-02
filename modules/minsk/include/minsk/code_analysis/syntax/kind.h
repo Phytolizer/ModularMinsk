@@ -21,6 +21,10 @@
   X(ParenthesizedExpression) \
   X(UnaryExpression)
 
+/// The concrete syntax kind.
+///
+/// \see MskSyntaxNodeClass for the hierarchical syntax kind (i.e. Expression
+/// vs. Statement).
 typedef enum {
 #define X(x) kMskSyntaxKind##x,
   MSK__SYNTAX_KINDS

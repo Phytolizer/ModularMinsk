@@ -100,7 +100,7 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   }
 
   return (MskSyntaxToken){
-      .base = {.kind = kMskSyntaxNodeKindToken},
+      .base = {.cls = kMskSyntaxNodeClassToken},
       .kind = kind,
       .text = text,
       .position = position,

@@ -96,7 +96,7 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
                STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
                STRING_VIEW_PRINT(MskSyntaxKindName(Current(parser)->kind))));
   return (MskSyntaxToken){
-      .base = {.kind = kMskSyntaxNodeKindToken},
+      .base = {.cls = kMskSyntaxNodeClassToken},
       .kind = kind,
       .position = Current(parser)->position,
       .text = {0},

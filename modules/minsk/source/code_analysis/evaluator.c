@@ -31,15 +31,15 @@ MskRuntimeObject MskEvaluatorEvaluate(MskEvaluator* evaluator) {
 }
 
 MskRuntimeObject EvaluateExpression(MskExpressionSyntax* expression) {
-  switch (expression->kind) {
-    case kMskSyntaxExpressionKindLiteral:
+  switch (expression->cls) {
+    case kMskSyntaxExpressionClassLiteral:
       return EvaluateLiteralExpression((MskLiteralExpressionSyntax*)expression);
-    case kMskSyntaxExpressionKindBinary:
+    case kMskSyntaxExpressionClassBinary:
       return EvaluateBinaryExpression((MskBinaryExpressionSyntax*)expression);
-    case kMskSyntaxExpressionKindParenthesized:
+    case kMskSyntaxExpressionClassParenthesized:
       return EvaluateParenthesizedExpression(
           (MskParenthesizedExpressionSyntax*)expression);
-    case kMskSyntaxExpressionKindUnary:
+    case kMskSyntaxExpressionClassUnary:
       return EvaluateUnaryExpression((MskUnaryExpressionSyntax*)expression);
     default:
       return (MskRuntimeObject){0};
