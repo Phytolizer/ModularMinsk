@@ -1,0 +1,8 @@
+{
+  "[cmake]": {
+    "editor.tabSize": 2
+  },
+  "[c]": {
+    "editor.tabSize": 2
+  }
+}
