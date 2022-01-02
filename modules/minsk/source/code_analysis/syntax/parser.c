@@ -45,8 +45,15 @@ void MskSyntaxParserFree(MskSyntaxParser* parser) {
   VEC_FREE(&parser->tokens);
 }
 
-MskExpressionSyntax* MskSyntaxParserParse(MskSyntaxParser* parser) {
-  return ParseBinaryExpression(parser);
+MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser) {
+  MskExpressionSyntax* root = ParseBinaryExpression(parser);
+  MskSyntaxToken end_of_file_token =
+      MatchToken(parser, kMskSyntaxKindEndOfFileToken);
+  return (MskSyntaxTree){
+      .root = root,
+      .end_of_file_token = end_of_file_token,
+      .diagnostics = parser->diagnostics,
+  };
 }
 
 MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset) {

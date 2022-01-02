@@ -4,6 +4,7 @@
 #include <minsk/code_analysis/syntax/node.h>
 #include <minsk/code_analysis/syntax/parser.h>
 #include <minsk/code_analysis/syntax/token.h>
+#include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/runtime/object.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,20 +23,18 @@ int main(void) {
       break;
     }
 
-    MskSyntaxParser parser = MskSyntaxParserNew(StringAsView(text));
-    MskExpressionSyntax* syntax_tree = MskSyntaxParserParse(&parser);
-    MskSyntaxNodePrettyPrint(&syntax_tree->base, stdout, true);
-    if (parser.diagnostics.size > 0) {
+    MskSyntaxTree syntax_tree = MskSyntaxTreeParse(StringAsView(text));
+    MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
+    if (syntax_tree.diagnostics.size > 0) {
       printf("\n");
       printf("\x1b[2;31m");
-      for (size_t i = 0; i < parser.diagnostics.size; ++i) {
-        String diagnostic = parser.diagnostics.data[i];
+      for (size_t i = 0; i < syntax_tree.diagnostics.size; ++i) {
+        String diagnostic = syntax_tree.diagnostics.data[i];
         printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
       }
       printf("\x1b[0m");
     }
-    MskExpressionSyntaxFree(syntax_tree);
-    MskSyntaxParserFree(&parser);
+    MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);
   }
 }

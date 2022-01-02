@@ -8,6 +8,7 @@
 #include "minsk/code_analysis/diagnostic.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/syntax/tree.h"
 
 typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
 
@@ -19,6 +20,6 @@ typedef struct {
 
 MskSyntaxParser MskSyntaxParserNew(StringView text);
 void MskSyntaxParserFree(MskSyntaxParser* parser);
-MskExpressionSyntax* MskSyntaxParserParse(MskSyntaxParser* parser);
+MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_PARSER_H_

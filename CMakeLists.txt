@@ -129,6 +129,7 @@ declare_module(
           code_analysis/syntax/node.c
           code_analysis/syntax/parser.c
           code_analysis/syntax/token.c
+          code_analysis/syntax/tree.c
           runtime/object.c
   DEPENDS vec span string hash annotate
 )
