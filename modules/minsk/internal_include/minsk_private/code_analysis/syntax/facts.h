@@ -6,5 +6,6 @@
 #include "minsk/code_analysis/syntax/kind.h"
 
 uint64_t MskSyntaxFactsBinaryOperatorPrecedence(MskSyntaxKind kind);
+uint64_t MskSyntaxFactsUnaryOperatorPrecedence(MskSyntaxKind kind);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_FACTS_H_

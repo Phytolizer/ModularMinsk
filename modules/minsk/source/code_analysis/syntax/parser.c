@@ -10,6 +10,7 @@
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/syntax/unary_expression.h"
 #include "minsk/runtime/object.h"
 #include "minsk_private/code_analysis/syntax/facts.h"
 #include "minsk_private/code_analysis/syntax/lexer.h"
@@ -81,7 +82,7 @@ MskSyntaxToken* Current(MskSyntaxParser* parser) {
 MskSyntaxToken NextToken(MskSyntaxParser* parser) {
   MskSyntaxToken token = *Current(parser);
   ++parser->position;
-  return token;
+  return MskSyntaxTokenDuplicate(token);
 }
 
 MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
@@ -109,14 +110,25 @@ MskExpressionSyntax* ParseExpression(MskSyntaxParser* parser) {
 
 MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser,
                                            uint64_t parent_precedence) {
-  MskExpressionSyntax* left = ParsePrimaryExpression(parser);
+  MskExpressionSyntax* left;
+  uint64_t unary_operator_precedence =
+      MskSyntaxFactsUnaryOperatorPrecedence(Current(parser)->kind);
+  if (unary_operator_precedence >= parent_precedence) {
+    MskSyntaxToken operator_token = MatchToken(parser, Current(parser)->kind);
+    MskExpressionSyntax* operand =
+        ParseBinaryExpression(parser, unary_operator_precedence);
+    left = (MskExpressionSyntax*)MskUnaryExpressionSyntaxNew(operator_token,
+                                                             operand);
+  } else {
+    left = ParsePrimaryExpression(parser);
+  }
   while (true) {
     uint64_t precedence =
         MskSyntaxFactsBinaryOperatorPrecedence(Current(parser)->kind);
     if (precedence == 0 || precedence <= parent_precedence) {
       break;
     }
-    MskSyntaxToken operator_token = MskSyntaxTokenDuplicate(NextToken(parser));
+    MskSyntaxToken operator_token = NextToken(parser);
     MskExpressionSyntax* right = ParseBinaryExpression(parser, precedence);
     left = (MskExpressionSyntax*)MskBinaryExpressionSyntaxNew(
         left, operator_token, right);
@@ -134,7 +146,6 @@ MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser) {
     return (MskExpressionSyntax*)MskParenthesizedExpressionSyntaxNew(
         open_parenthesis_token, expression, close_parenthesis_token);
   }
-  MskSyntaxToken number_token =
-      MskSyntaxTokenDuplicate(MatchToken(parser, kMskSyntaxKindNumberToken));
+  MskSyntaxToken number_token = MatchToken(parser, kMskSyntaxKindNumberToken);
   return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(number_token);
 }

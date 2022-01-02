@@ -14,3 +14,13 @@ uint64_t MskSyntaxFactsBinaryOperatorPrecedence(MskSyntaxKind kind) {
       return 0;
   }
 }
+
+uint64_t MskSyntaxFactsUnaryOperatorPrecedence(MskSyntaxKind kind) {
+  switch (kind) {
+    case kMskSyntaxKindPlusToken:
+    case kMskSyntaxKindMinusToken:
+      return 3;
+    default:
+      return 0;
+  }
+}
