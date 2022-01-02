@@ -142,9 +142,9 @@ void PrettyPrint(MskSyntaxNode* node,
   if (colors) {
     fprintf(fp, ANSI_ESC_RESET);
     if (node->kind == kMskSyntaxNodeKindToken) {
-      fprintf(fp, ANSI_ESC_FG_BLUE);
+      fprintf(fp, ANSI_ESC_FG_CYAN);
     } else {
-      fprintf(fp, ANSI_ESC_FG_GREEN);
+      fprintf(fp, ANSI_ESC_FG_BLUE);
     }
   }
   fprintf(fp, "%" STRING_VIEW_FMT,
