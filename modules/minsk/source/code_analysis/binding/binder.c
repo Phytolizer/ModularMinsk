@@ -5,10 +5,12 @@
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/unary_expression.h"
+#include "minsk/runtime/object.h"
 #include "minsk_private/code_analysis/binding/binary_expression.h"
 #include "minsk_private/code_analysis/binding/binary_operator_kind.h"
 #include "minsk_private/code_analysis/binding/expression.h"
 #include "minsk_private/code_analysis/binding/literal_expression.h"
+#include "minsk_private/code_analysis/binding/node.h"
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 #include "minsk_private/code_analysis/binding/unary_operator_kind.h"
 
@@ -18,8 +20,13 @@ static MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax);
 static MskBoundExpression* BindParenthesizedExpression(
     MskExpressionSyntax* syntax);
 
-static MskBoundUnaryOperatorKind BindUnaryOperatorKind(MskSyntaxKind kind);
-static MskBoundBinaryOperatorKind BindBinaryOperatorKind(MskSyntaxKind kind);
+static MskBoundUnaryOperatorKind BindUnaryOperatorKind(
+    MskSyntaxKind kind,
+    MskRuntimeObjectKind operand_type);
+static MskBoundBinaryOperatorKind BindBinaryOperatorKind(
+    MskSyntaxKind kind,
+    MskRuntimeObjectKind left_type,
+    MskRuntimeObjectKind right_type);
 
 MskBoundExpression* MskBinderBindExpression(MskExpressionSyntax* syntax) {
   switch (syntax->cls) {
@@ -45,8 +52,15 @@ MskBoundExpression* BindUnaryExpression(MskExpressionSyntax* syntax) {
   if (operand == NULL) {
     return NULL;
   }
-  return (MskBoundExpression*)MskBoundUnaryExpressionNew(
-      BindUnaryOperatorKind(unary->operator_token.kind), operand);
+  MskBoundUnaryOperatorKind operator_kind = BindUnaryOperatorKind(
+      unary->operator_token.kind, MskBoundExpressionGetType(operand));
+  if (operator_kind == kMskBoundUnaryOperatorKindInvalid) {
+    MskBoundNodeFree(&operand->base);
+    free(operand);
+    return NULL;
+  }
+  return (MskBoundExpression*)MskBoundUnaryExpressionNew(operator_kind,
+                                                         operand);
 }
 
 MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax) {
@@ -59,8 +73,18 @@ MskBoundExpression* BindBinaryExpression(MskExpressionSyntax* syntax) {
   if (right == NULL) {
     return NULL;
   }
-  return (MskBoundExpression*)MskBoundBinaryExpressionNew(
-      left, BindBinaryOperatorKind(binary->operator_token.kind), right);
+  MskBoundBinaryOperatorKind operator_kind = BindBinaryOperatorKind(
+      binary->operator_token.kind, MskBoundExpressionGetType(left),
+      MskBoundExpressionGetType(right));
+  if (operator_kind == kMskBoundBinaryOperatorKindInvalid) {
+    MskBoundNodeFree(&left->base);
+    MskBoundNodeFree(&right->base);
+    free(left);
+    free(right);
+    return NULL;
+  }
+  return (MskBoundExpression*)MskBoundBinaryExpressionNew(left, operator_kind,
+                                                          right);
 }
 
 MskBoundExpression* BindParenthesizedExpression(MskExpressionSyntax* syntax) {
@@ -69,7 +93,12 @@ MskBoundExpression* BindParenthesizedExpression(MskExpressionSyntax* syntax) {
   return MskBinderBindExpression(paren->expression);
 }
 
-MskBoundUnaryOperatorKind BindUnaryOperatorKind(MskSyntaxKind kind) {
+MskBoundUnaryOperatorKind BindUnaryOperatorKind(
+    MskSyntaxKind kind,
+    MskRuntimeObjectKind operand_type) {
+  if (operand_type != kMskObjectKindInteger) {
+    return kMskBoundUnaryOperatorKindInvalid;
+  }
   switch (kind) {
     case kMskSyntaxKindPlusToken:
       return kMskBoundUnaryOperatorKindIdentity;
@@ -80,17 +109,24 @@ MskBoundUnaryOperatorKind BindUnaryOperatorKind(MskSyntaxKind kind) {
   }
 }
 
-MskBoundBinaryOperatorKind BindBinaryOperatorKind(MskSyntaxKind kind) {
-  switch (kind) {
-    case kMskSyntaxKindPlusToken:
-      return kMskBoundBinaryOperatorKindAddition;
-    case kMskSyntaxKindMinusToken:
-      return kMskBoundBinaryOperatorKindSubtraction;
-    case kMskSyntaxKindStarToken:
-      return kMskBoundBinaryOperatorKindMultiplication;
-    case kMskSyntaxKindSlashToken:
-      return kMskBoundBinaryOperatorKindDivision;
-    default:
-      return kMskBoundBinaryOperatorKindInvalid;
+MskBoundBinaryOperatorKind BindBinaryOperatorKind(
+    MskSyntaxKind kind,
+    MskRuntimeObjectKind left_type,
+    MskRuntimeObjectKind right_type) {
+  if (left_type == kMskObjectKindInteger &&
+      right_type == kMskObjectKindInteger) {
+    switch (kind) {
+      case kMskSyntaxKindPlusToken:
+        return kMskBoundBinaryOperatorKindAddition;
+      case kMskSyntaxKindMinusToken:
+        return kMskBoundBinaryOperatorKindSubtraction;
+      case kMskSyntaxKindStarToken:
+        return kMskBoundBinaryOperatorKindMultiplication;
+      case kMskSyntaxKindSlashToken:
+        return kMskBoundBinaryOperatorKindDivision;
+      default:
+        return kMskBoundBinaryOperatorKindInvalid;
+    }
   }
+  return kMskBoundBinaryOperatorKindInvalid;
 }
