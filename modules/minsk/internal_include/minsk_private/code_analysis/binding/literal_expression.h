@@ -6,10 +6,10 @@
 
 typedef struct {
   MskBoundExpression base;
-  MskRuntimeObject* value;
+  MskRuntimeObject value;
 } MskBoundLiteralExpression;
 
 MskBoundLiteralExpression* MskBoundLiteralExpressionNew(
-    MskRuntimeObject* value);
+    MskRuntimeObject value);
 
 #endif  // MINSK_CODE_ANALYSIS_BINDING_LITERAL_EXPRESSION_H_

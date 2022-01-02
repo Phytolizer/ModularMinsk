@@ -75,14 +75,14 @@ void FreeExpression(MskBoundNode* node) {
 
 void FreeLiteralExpression(MskBoundExpression* exp) {
   MskBoundLiteralExpression* lit = (MskBoundLiteralExpression*)exp;
-  MskRuntimeObjectFree(lit->value);
-  free(lit->value);
+  MskRuntimeObjectFree(&lit->value);
 }
 
 void FreeUnaryExpression(MskBoundExpression* exp) {
   MskBoundUnaryExpression* unary = (MskBoundUnaryExpression*)exp;
   FreeExpression(&unary->operand->base);
   free(unary->operand);
+  unary->operand = NULL;
 }
 
 void FreeBinaryExpression(MskBoundExpression* exp) {
@@ -91,4 +91,6 @@ void FreeBinaryExpression(MskBoundExpression* exp) {
   FreeExpression(&binary->right->base);
   free(binary->left);
   free(binary->right);
+  binary->left = NULL;
+  binary->right = NULL;
 }

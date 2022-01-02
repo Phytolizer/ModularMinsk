@@ -30,7 +30,7 @@ MskRuntimeObjectKind UnaryExpressionGetType(MskBoundUnaryExpression* exp) {
 }
 
 MskRuntimeObjectKind LiteralExpressionGetType(MskBoundLiteralExpression* exp) {
-  return exp->value->kind;
+  return exp->value.kind;
 }
 
 MskRuntimeObjectKind BinaryExpressionGetType(MskBoundBinaryExpression* exp) {
