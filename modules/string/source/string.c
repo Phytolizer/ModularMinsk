@@ -42,7 +42,7 @@ String StringFromC(const char* cstr) {
   return s;
 }
 
-String StringFromSpan(StringView span) {
+String StringFromView(StringView span) {
   String s = {0};
   VEC_APPEND(&s, span.begin, span.end - span.begin);
   return s;

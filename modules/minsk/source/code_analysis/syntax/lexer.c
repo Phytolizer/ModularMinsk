@@ -50,7 +50,7 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
         lexer->position++;
       }
       // Create the text early. It's needed for StringViewToI64.
-      text = StringFromSpan(
+      text = StringFromView(
           StringViewSubstring(lexer->text, position, lexer->position));
       StringConversionResultI64 result = StringViewToI64(StringAsView(text));
       if (!result.success) {
@@ -89,7 +89,7 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
 
   // The text could have been created already.
   if (text.size == 0) {
-    text = StringFromSpan(
+    text = StringFromView(
         StringViewSubstring(lexer->text, position, lexer->position));
   }
 
