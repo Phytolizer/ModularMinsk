@@ -113,7 +113,8 @@ MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser,
   MskExpressionSyntax* left;
   uint64_t unary_operator_precedence =
       MskSyntaxFactsUnaryOperatorPrecedence(Current(parser)->kind);
-  if (unary_operator_precedence >= parent_precedence) {
+  if (unary_operator_precedence != 0 &&
+      unary_operator_precedence >= parent_precedence) {
     MskSyntaxToken operator_token = MatchToken(parser, Current(parser)->kind);
     MskExpressionSyntax* operand =
         ParseBinaryExpression(parser, unary_operator_precedence);
