@@ -18,6 +18,8 @@ static MskSyntaxToken* Current(MskSyntaxParser* parser);
 static MskSyntaxToken NextToken(MskSyntaxParser* parser);
 static MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind);
 static MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser);
+static MskExpressionSyntax* ParseTerm(MskSyntaxParser* parser);
+static MskExpressionSyntax* ParseFactor(MskSyntaxParser* parser);
 static MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser);
 
 MskSyntaxParser MskSyntaxParserNew(StringView text) {
@@ -100,10 +102,28 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
 }
 
 MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser) {
-  MskExpressionSyntax* left = ParsePrimaryExpression(parser);
+  return ParseTerm(parser);
+}
+
+MskExpressionSyntax* ParseTerm(MskSyntaxParser* parser) {
+  MskExpressionSyntax* left = ParseFactor(parser);
 
   while (Current(parser)->kind == kMskSyntaxKindPlusToken ||
          Current(parser)->kind == kMskSyntaxKindMinusToken) {
+    MskSyntaxToken operator_token = MskSyntaxTokenDuplicate(NextToken(parser));
+    MskExpressionSyntax* right = ParseFactor(parser);
+    left = (MskExpressionSyntax*)MskBinaryExpressionSyntaxNew(
+        left, operator_token, right);
+  }
+
+  return left;
+}
+
+MskExpressionSyntax* ParseFactor(MskSyntaxParser* parser) {
+  MskExpressionSyntax* left = ParsePrimaryExpression(parser);
+
+  while (Current(parser)->kind == kMskSyntaxKindStarToken ||
+         Current(parser)->kind == kMskSyntaxKindSlashToken) {
     MskSyntaxToken operator_token = MskSyntaxTokenDuplicate(NextToken(parser));
     MskExpressionSyntax* right = ParsePrimaryExpression(parser);
     left = (MskExpressionSyntax*)MskBinaryExpressionSyntaxNew(
