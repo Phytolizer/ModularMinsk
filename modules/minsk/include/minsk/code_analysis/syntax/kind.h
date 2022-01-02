@@ -3,17 +3,21 @@
 
 #include <string/string.h>
 
-#define MSK__SYNTAX_KINDS \
-  X(BadToken)             \
-  X(EndOfFileToken)       \
-  X(NumberToken)          \
-  X(WhitespaceToken)      \
-  X(PlusToken)            \
-  X(MinusToken)           \
-  X(StarToken)            \
-  X(SlashToken)           \
-  X(OpenParenthesisToken) \
-  X(CloseParenthesisToken)
+#define MSK__SYNTAX_KINDS  \
+  X(Invalid)               \
+  X(BadToken)              \
+  X(EndOfFileToken)        \
+  X(NumberToken)           \
+  X(WhitespaceToken)       \
+  X(PlusToken)             \
+  X(MinusToken)            \
+  X(StarToken)             \
+  X(SlashToken)            \
+  X(OpenParenthesisToken)  \
+  X(CloseParenthesisToken) \
+                           \
+  X(LiteralExpression)     \
+  X(BinaryExpression)
 
 typedef enum {
 #define X(x) kMskSyntaxKind##x,

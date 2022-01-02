@@ -7,13 +7,5 @@ static const char* const kMskSyntaxKindNames[] = {
 };
 
 StringView MskSyntaxKindName(MskSyntaxKind kind) {
-  switch (kind) {
-#define X(x)              \
-  case kMskSyntaxKind##x: \
-    return StringViewFromC(kMskSyntaxKindNames[kMskSyntaxKind##x]);
-    MSK__SYNTAX_KINDS
-#undef X
-    default:
-      return StringViewFromC("<unknown>");
-  }
+  return StringViewFromC(kMskSyntaxKindNames[kind]);
 }
