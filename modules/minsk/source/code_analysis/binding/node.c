@@ -10,7 +10,7 @@
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 
 static MskBoundNodeKind BoundExpressionGetKind(MskBoundNode* node);
-static void FreeExpressionNode(MskBoundNode* node);
+static void FreeExpression(MskBoundNode* node);
 
 static void FreeLiteralExpression(MskBoundExpression* exp);
 static void FreeUnaryExpression(MskBoundExpression* exp);
@@ -37,7 +37,7 @@ void MskBoundNodeFree(MskBoundNode* node) {
   switch (node->cls) {
 #define X(x)                  \
   case kMskBoundNodeClass##x: \
-    return Free##x##Node(node);
+    return Free##x(node);
     MINSK__BOUND_NODE_CLASSES
 #undef X
     default:
@@ -60,7 +60,7 @@ MskBoundNodeKind BoundExpressionGetKind(MskBoundNode* node) {
   }
 }
 
-void FreeExpressionNode(MskBoundNode* node) {
+void FreeExpression(MskBoundNode* node) {
   MskBoundExpression* exp = (MskBoundExpression*)node;
   switch (exp->cls) {
 #define X(x)                        \
@@ -81,14 +81,14 @@ void FreeLiteralExpression(MskBoundExpression* exp) {
 
 void FreeUnaryExpression(MskBoundExpression* exp) {
   MskBoundUnaryExpression* unary = (MskBoundUnaryExpression*)exp;
-  FreeExpressionNode(&unary->operand->base);
+  FreeExpression(&unary->operand->base);
   free(unary->operand);
 }
 
 void FreeBinaryExpression(MskBoundExpression* exp) {
   MskBoundBinaryExpression* binary = (MskBoundBinaryExpression*)exp;
-  FreeExpressionNode(&binary->left->base);
-  FreeExpressionNode(&binary->right->base);
+  FreeExpression(&binary->left->base);
+  FreeExpression(&binary->right->base);
   free(binary->left);
   free(binary->right);
 }
