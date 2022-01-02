@@ -9,16 +9,14 @@ static void FreeNull(MskRuntimeObject* n);
 static void PrintInteger(MskRuntimeObject* i, FILE* fp);
 static void PrintNull(MskRuntimeObject* n, FILE* fp);
 
-StringView MskRuntimeObjectKindName(MskRuntimeObjectKind kind) {
-  switch (kind) {
-#define X(x)              \
-  case kMskObjectKind##x: \
-    return StringViewFromC(#x);
+static const char* const kMskObjectKindNames[] = {
+#define X(x) [kMskObjectKind##x] = #x,
     MSK__OBJECT_KINDS
 #undef X
-    default:
-      return StringViewFromC("<unknown>");
-  }
+};
+
+StringView MskRuntimeObjectKindName(MskRuntimeObjectKind kind) {
+  return StringViewFromC(kMskObjectKindNames[kind]);
 }
 
 MskRuntimeObject MskRuntimeObjectNewInteger(int64_t value) {

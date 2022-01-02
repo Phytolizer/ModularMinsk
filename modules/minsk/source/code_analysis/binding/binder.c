@@ -13,6 +13,7 @@
 #include "minsk_private/code_analysis/binding/node.h"
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 #include "minsk_private/code_analysis/binding/unary_operator_kind.h"
+#include "string/string.h"
 
 static MskBoundExpression* BindLiteralExpression(MskBinder* binder,
                                                  MskExpressionSyntax* syntax);
@@ -66,9 +67,13 @@ MskBoundExpression* BindUnaryExpression(MskBinder* binder,
   MskBoundUnaryOperatorKind operator_kind = BindUnaryOperatorKind(
       unary->operator_token.kind, MskBoundExpressionGetType(operand));
   if (operator_kind == kMskBoundUnaryOperatorKindInvalid) {
-    MskBoundNodeFree(&operand->base);
-    free(operand);
-    return NULL;
+    VEC_PUSH(&binder->diagnostics,
+             StringFormat("Unary operator '%" STRING_FMT
+                          "' is not defined for type %" STRING_VIEW_FMT ".",
+                          STRING_PRINT(unary->operator_token.text),
+                          STRING_VIEW_PRINT(MskRuntimeObjectKindName(
+                              MskBoundExpressionGetType(operand)))));
+    return operand;
   }
   return (MskBoundExpression*)MskBoundUnaryExpressionNew(operator_kind,
                                                          operand);
@@ -89,11 +94,18 @@ MskBoundExpression* BindBinaryExpression(MskBinder* binder,
       binary->operator_token.kind, MskBoundExpressionGetType(left),
       MskBoundExpressionGetType(right));
   if (operator_kind == kMskBoundBinaryOperatorKindInvalid) {
-    MskBoundNodeFree(&left->base);
+    VEC_PUSH(&binder->diagnostics,
+             StringFormat("Binary operator '%" STRING_FMT
+                          "' is not defined for types %" STRING_VIEW_FMT
+                          " and %" STRING_VIEW_FMT ".",
+                          STRING_PRINT(binary->operator_token.text),
+                          STRING_VIEW_PRINT(MskRuntimeObjectKindName(
+                              MskBoundExpressionGetType(left))),
+                          STRING_VIEW_PRINT(MskRuntimeObjectKindName(
+                              MskBoundExpressionGetType(right)))));
     MskBoundNodeFree(&right->base);
-    free(left);
     free(right);
-    return NULL;
+    return left;
   }
   return (MskBoundExpression*)MskBoundBinaryExpressionNew(left, operator_kind,
                                                           right);
