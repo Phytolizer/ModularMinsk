@@ -109,3 +109,23 @@ declare_module(
   SOURCES hash.c
   DEPENDS span vec
 )
+declare_module(annotate KIND interface)
+
+# Following is actual Minsk-specific stuff.
+
+# The core language as a library
+declare_module(
+  minsk
+  KIND library
+  SOURCES code_analysis/syntax/kind.c code_analysis/syntax/lexer.c
+          code_analysis/syntax/token.c runtime/object/object.c
+  DEPENDS vec span string hash annotate
+)
+
+# The main program
+declare_module(
+  mc
+  KIND executable
+  SOURCES main.c
+  DEPENDS minsk
+)

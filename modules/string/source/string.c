@@ -2,12 +2,38 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <vec/vec.h>
 
 StringView StringViewFromC(const char* cstr) {
   return (StringView){.begin = cstr, .end = cstr + strlen(cstr)};
+}
+
+bool StringViewToI64(StringView str, int64_t* out_value) {
+  int64_t value = 0;
+  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+    if (str.begin[i] < '0' || str.begin[i] > '9') {
+      return false;
+    }
+    // Detect overflow.
+    if (value > INT64_MAX / 10 ||
+        (value == INT64_MAX / 10 && str.begin[i] - '0' > INT64_MAX % 10)) {
+      return false;
+    }
+    value = value * 10 + (str.begin[i] - '0');
+  }
+  *out_value = value;
+  return true;
+}
+
+StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
+  if (begin >= SPAN_SIZE(&str) || end > SPAN_SIZE(&str) || begin >= end) {
+    // An invalid range was specified. Return something sane.
+    return (StringView){0};
+  }
+  return (StringView){.begin = str.begin + begin, .end = str.begin + end};
 }
 
 String StringFromC(const char* cstr) {
@@ -43,6 +69,43 @@ String StringFormat(const char* format, ...) {
   va_end(args);
   result.size = size;
   return result;
+}
+
+String StringGetLine(FILE* file) {
+  String result = {0};
+  char buffer[1024] = {0};
+  bool hit_eof = true;
+  // Keep reading until we get a newline.
+  while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    VEC_APPEND(&result, buffer, strlen(buffer));
+    if (result.data[result.size - 1] == '\n') {
+      hit_eof = false;
+      break;
+    }
+  }
+  if (hit_eof) {
+    // We hit EOF before we found a newline.
+    VEC_APPEND(&result, buffer, strlen(buffer));
+  }
+  return result;
+}
+
+StringView StringAsView(const String s) {
+  return (StringView){
+      .begin = s.data,
+      .end = s.data + s.size,
+  };
+}
+
+StringView StringAsSubView(const String s, uint64_t begin, uint64_t end) {
+  if (begin >= s.size || end > s.size || begin >= end) {
+    // An invalid range was specified. Return something sane.
+    return (StringView){0};
+  }
+  return (StringView){
+      .begin = s.data + begin,
+      .end = s.data + end,
+  };
 }
 
 bool StringEqual(const String a, const String b) {
