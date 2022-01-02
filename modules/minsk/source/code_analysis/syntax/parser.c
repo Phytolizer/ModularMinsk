@@ -11,6 +11,7 @@
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
+#include "minsk_private/code_analysis/syntax/facts.h"
 #include "minsk_private/code_analysis/syntax/lexer.h"
 #include "string/string.h"
 
@@ -18,9 +19,9 @@ static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);
 static MskSyntaxToken* Current(MskSyntaxParser* parser);
 static MskSyntaxToken NextToken(MskSyntaxParser* parser);
 static MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind);
-static MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser);
-static MskExpressionSyntax* ParseTerm(MskSyntaxParser* parser);
-static MskExpressionSyntax* ParseFactor(MskSyntaxParser* parser);
+static MskExpressionSyntax* ParseExpression(MskSyntaxParser* parser);
+static MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser,
+                                                  uint64_t parent_precedence);
 static MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser);
 
 MskSyntaxParser MskSyntaxParserNew(StringView text) {
@@ -49,7 +50,7 @@ void MskSyntaxParserFree(MskSyntaxParser* parser) {
 }
 
 MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser) {
-  MskExpressionSyntax* root = ParseBinaryExpression(parser);
+  MskExpressionSyntax* root = ParseExpression(parser);
   MskSyntaxToken end_of_file_token =
       MatchToken(parser, kMskSyntaxKindEndOfFileToken);
   return (MskSyntaxTree){
@@ -102,35 +103,24 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
   };
 }
 
-MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser) {
-  return ParseTerm(parser);
+MskExpressionSyntax* ParseExpression(MskSyntaxParser* parser) {
+  return ParseBinaryExpression(parser, 0);
 }
 
-MskExpressionSyntax* ParseTerm(MskSyntaxParser* parser) {
-  MskExpressionSyntax* left = ParseFactor(parser);
-
-  while (Current(parser)->kind == kMskSyntaxKindPlusToken ||
-         Current(parser)->kind == kMskSyntaxKindMinusToken) {
-    MskSyntaxToken operator_token = MskSyntaxTokenDuplicate(NextToken(parser));
-    MskExpressionSyntax* right = ParseFactor(parser);
-    left = (MskExpressionSyntax*)MskBinaryExpressionSyntaxNew(
-        left, operator_token, right);
-  }
-
-  return left;
-}
-
-MskExpressionSyntax* ParseFactor(MskSyntaxParser* parser) {
+MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser,
+                                           uint64_t parent_precedence) {
   MskExpressionSyntax* left = ParsePrimaryExpression(parser);
-
-  while (Current(parser)->kind == kMskSyntaxKindStarToken ||
-         Current(parser)->kind == kMskSyntaxKindSlashToken) {
+  while (true) {
+    uint64_t precedence =
+        MskSyntaxFactsBinaryOperatorPrecedence(Current(parser)->kind);
+    if (precedence == 0 || precedence <= parent_precedence) {
+      break;
+    }
     MskSyntaxToken operator_token = MskSyntaxTokenDuplicate(NextToken(parser));
-    MskExpressionSyntax* right = ParsePrimaryExpression(parser);
+    MskExpressionSyntax* right = ParseBinaryExpression(parser, precedence);
     left = (MskExpressionSyntax*)MskBinaryExpressionSyntaxNew(
         left, operator_token, right);
   }
-
   return left;
 }
 
@@ -138,7 +128,7 @@ MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser) {
   if (Current(parser)->kind == kMskSyntaxKindOpenParenthesisToken) {
     MskSyntaxToken open_parenthesis_token =
         MatchToken(parser, kMskSyntaxKindOpenParenthesisToken);
-    MskExpressionSyntax* expression = ParseBinaryExpression(parser);
+    MskExpressionSyntax* expression = ParseBinaryExpression(parser, 0);
     MskSyntaxToken close_parenthesis_token =
         MatchToken(parser, kMskSyntaxKindCloseParenthesisToken);
     return (MskExpressionSyntax*)MskParenthesizedExpressionSyntaxNew(

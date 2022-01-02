@@ -130,6 +130,7 @@ declare_module(
   SOURCES code_analysis/evaluator.c
           code_analysis/syntax/binary_expression.c
           code_analysis/syntax/expression.c
+          code_analysis/syntax/facts.c
           code_analysis/syntax/kind.c
           code_analysis/syntax/lexer.c
           code_analysis/syntax/literal_expression.c
