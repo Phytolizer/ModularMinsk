@@ -133,6 +133,7 @@ declare_module(
           code_analysis/binding/literal_expression.c
           code_analysis/binding/node.c
           code_analysis/binding/unary_expression.c
+          code_analysis/diagnostics.c
           code_analysis/evaluator.c
           code_analysis/syntax/binary_expression.c
           code_analysis/syntax/expression.c

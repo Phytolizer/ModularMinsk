@@ -45,6 +45,10 @@ MskBoundExpression* MskBinderBindExpression(MskBinder* binder,
   }
 }
 
+void MskBinderFree(MskBinder* binder) {
+  MskDiagnosticsFree(&binder->diagnostics);
+}
+
 MskBoundExpression* BindLiteralExpression(MskBinder* binder,
                                           MskExpressionSyntax* syntax) {
   MskLiteralExpressionSyntax* lit = (MskLiteralExpressionSyntax*)syntax;
