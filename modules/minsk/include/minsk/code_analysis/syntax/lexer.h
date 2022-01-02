@@ -10,9 +10,9 @@ typedef struct {
   StringView text;
   uint64_t position;
   Diagnostics diagnostics;
-} MskLexer;
+} MskSyntaxLexer;
 
-MskLexer MskNewLexer(StringView text);
-MskSyntaxToken MskLexerLex(MskLexer* lexer);
+MskSyntaxLexer MskNewSyntaxLexer(StringView text);
+MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_LEXER_H_

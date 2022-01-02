@@ -21,10 +21,10 @@ static MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser);
 static MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser);
 
 MskSyntaxParser MskSyntaxParserNew(StringView text) {
-  MskLexer lexer = MskNewLexer(text);
+  MskSyntaxLexer lexer = MskNewSyntaxLexer(text);
   MskSyntaxParser parser = {0};
   while (true) {
-    MskSyntaxToken token = MskLexerLex(&lexer);
+    MskSyntaxToken token = MskSyntaxLexerLex(&lexer);
     if (token.kind != kMskSyntaxKindBadToken &&
         token.kind != kMskSyntaxKindWhitespaceToken) {
       VEC_PUSH(&parser.tokens, token);

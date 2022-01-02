@@ -7,16 +7,16 @@
 #include "minsk/runtime/object.h"
 #include "string/string.h"
 
-static char Cur(MskLexer* lexer);
+static char Cur(MskSyntaxLexer* lexer);
 
-MskLexer MskNewLexer(StringView text) {
-  return (MskLexer){
+MskSyntaxLexer MskNewSyntaxLexer(StringView text) {
+  return (MskSyntaxLexer){
       .text = text,
       .position = 0,
   };
 }
 
-MskSyntaxToken MskLexerLex(MskLexer* lexer) {
+MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   MskSyntaxKind kind = kMskSyntaxKindBadToken;
   String text = {0};
   uint64_t position = lexer->position;
@@ -108,7 +108,7 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
   };
 }
 
-char Cur(MskLexer* lexer) {
+char Cur(MskSyntaxLexer* lexer) {
   if (lexer->position >= SPAN_SIZE(&lexer->text)) {
     return '\0';
   }
