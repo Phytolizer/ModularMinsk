@@ -25,6 +25,15 @@ int main(void) {
     MskSyntaxParser parser = MskSyntaxParserNew(StringAsView(text));
     MskExpressionSyntax* syntax_tree = MskSyntaxParserParse(&parser);
     MskSyntaxNodePrettyPrint(&syntax_tree->base, stdout, true);
+    if (parser.diagnostics.size > 0) {
+      printf("\n");
+      printf("\x1b[2;31m");
+      for (size_t i = 0; i < parser.diagnostics.size; ++i) {
+        String diagnostic = parser.diagnostics.data[i];
+        printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
+      }
+      printf("\x1b[0m");
+    }
     MskExpressionSyntaxFree(syntax_tree);
     MskSyntaxParserFree(&parser);
     StringFree(&text);

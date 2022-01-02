@@ -97,9 +97,9 @@ String StringFormat(const char* format, ...) {
   if (size < 0) {
     return result;
   }
-  VEC_RESIZE(&result, size);
+  VEC_RESIZE(&result, size + 1);
   va_start(args, format);
-  vsnprintf(result.data, size, format, args);
+  vsnprintf(result.data, size + 1, format, args);
   va_end(args);
   result.size = size;
   return result;

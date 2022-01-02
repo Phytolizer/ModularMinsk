@@ -5,6 +5,7 @@
 #include <string/string.h>
 #include <vec/vec.h>
 
+#include "minsk/code_analysis/diagnostic.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 
@@ -13,6 +14,7 @@ typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
 typedef struct {
   MskSyntaxTokens tokens;
   uint64_t position;
+  Diagnostics diagnostics;
 } MskSyntaxParser;
 
 MskSyntaxParser MskSyntaxParserNew(StringView text);

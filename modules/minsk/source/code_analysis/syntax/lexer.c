@@ -55,7 +55,10 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
           StringViewSubstring(lexer->text, position, lexer->position));
       StringConversionResultI64 result = StringViewToI64(StringAsView(text));
       if (!result.success) {
-        // TODO: Report error.
+        VEC_PUSH(&lexer->diagnostics,
+                 StringFormat("The number '%" STRING_FMT
+                              "' is too large for an int64_t.",
+                              STRING_PRINT(text)));
       }
       value = MskRuntimeObjectNewInteger(result.value);
     } break;
@@ -84,6 +87,8 @@ MskSyntaxToken MskLexerLex(MskLexer* lexer) {
       lexer->position++;
       break;
     default:
+      VEC_PUSH(&lexer->diagnostics,
+               StringFormat("Unexpected character '%c'", Cur(lexer)));
       lexer->position++;
       break;
   }

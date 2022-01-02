@@ -8,8 +8,10 @@
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
+#include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
+#include "string/string.h"
 
 static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);
 static MskSyntaxToken* Current(MskSyntaxParser* parser);
@@ -31,6 +33,8 @@ MskSyntaxParser MskSyntaxParserNew(StringView text) {
       break;
     }
   }
+  VEC_APPEND(&parser.diagnostics, lexer.diagnostics.data,
+             lexer.diagnostics.size);
   return parser;
 }
 
@@ -73,7 +77,14 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
   if (Current(parser)->kind == kind) {
     return NextToken(parser);
   }
+  VEC_PUSH(&parser->diagnostics,
+           StringFormat(
+               "expected next token to be %" STRING_VIEW_FMT
+               ", got %" STRING_VIEW_FMT ".",
+               STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
+               STRING_VIEW_PRINT(MskSyntaxKindName(Current(parser)->kind))));
   return (MskSyntaxToken){
+      .base = {.kind = kMskSyntaxNodeKindToken},
       .kind = kind,
       .position = Current(parser)->position,
       .text = {0},
