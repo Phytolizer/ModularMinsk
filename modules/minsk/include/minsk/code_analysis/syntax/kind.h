@@ -22,6 +22,9 @@
   X(SlashToken)              \
   X(OpenParenthesisToken)    \
   X(CloseParenthesisToken)   \
+  X(BangToken)               \
+  X(AmpersandAmpersandToken) \
+  X(PipePipeToken)           \
                              \
   /* Keywords. */            \
   X(TrueKeyword)             \

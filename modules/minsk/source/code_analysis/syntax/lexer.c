@@ -8,7 +8,9 @@
 #include "minsk_private/code_analysis/syntax/facts.h"
 #include "string/string.h"
 
+static char Look(MskSyntaxLexer* lexer, uint64_t offset);
 static char Cur(MskSyntaxLexer* lexer);
+static char Peek(MskSyntaxLexer* lexer);
 static bool IsLetter(char c);
 static bool IsLetterOrDigit(char c);
 
@@ -89,6 +91,20 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
       kind = kMskSyntaxKindCloseParenthesisToken;
       lexer->position++;
       break;
+    case '!':
+      kind = kMskSyntaxKindBangToken;
+      lexer->position++;
+      break;
+    case '&':
+      if (Peek(lexer) == '&') {
+        kind = kMskSyntaxKindAmpersandAmpersandToken;
+        lexer->position += 2;
+      }
+    case '|':
+      if (Peek(lexer) == '|') {
+        kind = kMskSyntaxKindPipePipeToken;
+        lexer->position += 2;
+      }
     default:
       if (IsLetter(Cur(lexer))) {
         while (IsLetterOrDigit(Cur(lexer))) {
@@ -97,12 +113,14 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
         text = StringFromView(
             StringViewSubstring(lexer->text, position, lexer->position));
         kind = MskSyntaxFactsKeywordKind(StringAsView(text));
-      } else {
-        VEC_PUSH(&lexer->diagnostics,
-                 StringFormat("Unexpected character '%c'", Cur(lexer)));
-        lexer->position++;
       }
       break;
+  }
+
+  if (kind == kMskSyntaxKindBadToken) {
+    VEC_PUSH(&lexer->diagnostics,
+             StringFormat("Unexpected character '%c'", Cur(lexer)));
+    lexer->position++;
   }
 
   // The text could have been created already.
@@ -120,11 +138,19 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   };
 }
 
-char Cur(MskSyntaxLexer* lexer) {
-  if (lexer->position >= SPAN_SIZE(&lexer->text)) {
+char Look(MskSyntaxLexer* lexer, uint64_t offset) {
+  if (lexer->position + offset >= StringViewSize(lexer->text)) {
     return '\0';
   }
-  return lexer->text.begin[lexer->position];
+  return lexer->text.begin[lexer->position + offset];
+}
+
+char Cur(MskSyntaxLexer* lexer) {
+  return Look(lexer, 0);
+}
+
+char Peek(MskSyntaxLexer* lexer) {
+  return Look(lexer, 1);
 }
 
 bool IsLetter(char c) {
