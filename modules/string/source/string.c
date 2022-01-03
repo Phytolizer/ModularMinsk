@@ -117,6 +117,52 @@ StringConversionResultF64 StringViewToF64(StringView str) {
 
 #undef GET
 
+StringConversionResultIMax StringViewToIMax(StringView str) {
+  intmax_t value = 0;
+  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+    if (str.begin[i] < '0' || str.begin[i] > '9') {
+      return (StringConversionResultIMax){.success = false};
+    }
+    // Detect overflow.
+    if (value > INTMAX_MAX / 10 ||
+        (value == INTMAX_MAX / 10 && str.begin[i] - '0' > INTMAX_MAX % 10)) {
+      return (StringConversionResultIMax){.success = false};
+    }
+    value = value * 10 + (str.begin[i] - '0');
+  }
+  return (StringConversionResultIMax){.success = true, .value = value};
+}
+
+StringConversionResultUMax StringViewToUMax(StringView str) {
+  uintmax_t value = 0;
+  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+    if (str.begin[i] < '0' || str.begin[i] > '9') {
+      return (StringConversionResultUMax){.success = false};
+    }
+    // Detect overflow.
+    if (value > UINTMAX_MAX / 10 ||
+        (value == UINTMAX_MAX / 10 && str.begin[i] - '0' > UINTMAX_MAX % 10)) {
+      return (StringConversionResultUMax){.success = false};
+    }
+    value = value * 10 + (str.begin[i] - '0');
+  }
+  return (StringConversionResultUMax){.success = true, .value = value};
+}
+
+StringCompareResult StringViewCompare(StringView a, StringView b) {
+  if (StringViewSize(a) != StringViewSize(b)) {
+    return StringViewSize(a) > StringViewSize(b) ? kStringCompareGreater
+                                                 : kStringCompareLesser;
+  }
+  for (size_t i = 0; i < StringViewSize(a); ++i) {
+    if (a.begin[i] != b.begin[i]) {
+      return a.begin[i] > b.begin[i] ? kStringCompareGreater
+                                     : kStringCompareLesser;
+    }
+  }
+  return kStringCompareEqual;
+}
+
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
   if (begin >= SPAN_SIZE(&str) || end > SPAN_SIZE(&str) || begin >= end) {
     // An invalid range was specified. Return something sane.

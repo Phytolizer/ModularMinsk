@@ -26,10 +26,18 @@ typedef STRING_CONVERSION_RESULT(int32_t) StringConversionResultI32;
 typedef STRING_CONVERSION_RESULT(int64_t) StringConversionResultI64;
 typedef STRING_CONVERSION_RESULT(uint32_t) StringConversionResultU32;
 typedef STRING_CONVERSION_RESULT(uint64_t) StringConversionResultU64;
+typedef STRING_CONVERSION_RESULT(intmax_t) StringConversionResultIMax;
+typedef STRING_CONVERSION_RESULT(uintmax_t) StringConversionResultUMax;
 typedef STRING_CONVERSION_RESULT(float) StringConversionResultF32;
 typedef STRING_CONVERSION_RESULT(double) StringConversionResultF64;
 
 #undef STRING_CONVERSION_RESULT
+
+typedef enum {
+  kStringCompareGreater,
+  kStringCompareLesser,
+  kStringCompareEqual,
+} StringCompareResult;
 
 // StringView functions.
 
@@ -47,6 +55,12 @@ StringConversionResultU64 StringViewToU64(StringView str);
 StringConversionResultF32 StringViewToF32(StringView str);
 /// Attempts to convert a StringView to a double.
 StringConversionResultF64 StringViewToF64(StringView str);
+/// Attempts to convert a StringView to an intmax_t.
+StringConversionResultIMax StringViewToIMax(StringView str);
+/// Attempts to convert a StringView to a uintmax_t.
+StringConversionResultUMax StringViewToUMax(StringView str);
+/// Compares two StringViews.
+StringCompareResult StringViewCompare(StringView a, StringView b);
 /// Returns a StringView that is a substring of str.
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end);
 /// Prints a StringView to stdout.
