@@ -92,8 +92,13 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
       lexer->position++;
       break;
     case '!':
-      kind = kMskSyntaxKindBangToken;
-      lexer->position++;
+      if (Peek(lexer) == '=') {
+        kind = kMskSyntaxKindBangEqualsToken;
+        lexer->position += 2;
+      } else {
+        kind = kMskSyntaxKindBangToken;
+        lexer->position++;
+      }
       break;
     case '&':
       if (Peek(lexer) == '&') {
@@ -103,6 +108,11 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
     case '|':
       if (Peek(lexer) == '|') {
         kind = kMskSyntaxKindPipePipeToken;
+        lexer->position += 2;
+      }
+    case '=':
+      if (Peek(lexer) == '=') {
+        kind = kMskSyntaxKindEqualsEqualsToken;
         lexer->position += 2;
       }
     default:

@@ -47,6 +47,34 @@ static const MskBoundBinaryOperator kOperators[] = {
         .right_type = kMskObjectKindBoolean,
         .result_type = kMskObjectKindBoolean,
     },
+    {
+        .syntax_kind = kMskSyntaxKindEqualsEqualsToken,
+        .kind = kMskBoundBinaryOperatorKindEquality,
+        .left_type = kMskObjectKindInteger,
+        .right_type = kMskObjectKindInteger,
+        .result_type = kMskObjectKindBoolean,
+    },
+    {
+        .syntax_kind = kMskSyntaxKindEqualsEqualsToken,
+        .kind = kMskBoundBinaryOperatorKindEquality,
+        .left_type = kMskObjectKindBoolean,
+        .right_type = kMskObjectKindBoolean,
+        .result_type = kMskObjectKindBoolean,
+    },
+    {
+        .syntax_kind = kMskSyntaxKindBangEqualsToken,
+        .kind = kMskBoundBinaryOperatorKindInequality,
+        .left_type = kMskObjectKindInteger,
+        .right_type = kMskObjectKindInteger,
+        .result_type = kMskObjectKindBoolean,
+    },
+    {
+        .syntax_kind = kMskSyntaxKindBangEqualsToken,
+        .kind = kMskBoundBinaryOperatorKindInequality,
+        .left_type = kMskObjectKindBoolean,
+        .right_type = kMskObjectKindBoolean,
+        .result_type = kMskObjectKindBoolean,
+    },
 };
 
 const MskBoundBinaryOperator* MskBindBinaryOperator(

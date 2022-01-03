@@ -6,9 +6,12 @@ uint64_t MskSyntaxFactsBinaryOperatorPrecedence(MskSyntaxKind kind) {
   switch (kind) {
     case kMskSyntaxKindStarToken:
     case kMskSyntaxKindSlashToken:
-      return 4;
+      return 5;
     case kMskSyntaxKindPlusToken:
     case kMskSyntaxKindMinusToken:
+      return 4;
+    case kMskSyntaxKindEqualsEqualsToken:
+    case kMskSyntaxKindBangEqualsToken:
       return 3;
     case kMskSyntaxKindAmpersandAmpersandToken:
       return 2;
@@ -24,7 +27,7 @@ uint64_t MskSyntaxFactsUnaryOperatorPrecedence(MskSyntaxKind kind) {
     case kMskSyntaxKindPlusToken:
     case kMskSyntaxKindMinusToken:
     case kMskSyntaxKindBangToken:
-      return 5;
+      return 6;
     default:
       return 0;
   }

@@ -25,6 +25,8 @@
   X(BangToken)               \
   X(AmpersandAmpersandToken) \
   X(PipePipeToken)           \
+  X(EqualsEqualsToken)       \
+  X(BangEqualsToken)         \
                              \
   /* Keywords. */            \
   X(TrueKeyword)             \
