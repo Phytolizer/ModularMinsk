@@ -4,11 +4,18 @@
 #include <string/string.h>
 
 #define MSK__SYNTAX_KINDS    \
+  /* The zero value. */      \
   X(Invalid)                 \
+                             \
+  /* Special tokens. */      \
   X(BadToken)                \
   X(EndOfFileToken)          \
+                             \
+  /* "Dynamic" tokens. */    \
   X(NumberToken)             \
   X(WhitespaceToken)         \
+                             \
+  /* "Static" tokens. */     \
   X(PlusToken)               \
   X(MinusToken)              \
   X(StarToken)               \
@@ -16,6 +23,7 @@
   X(OpenParenthesisToken)    \
   X(CloseParenthesisToken)   \
                              \
+  /* Syntax tree nodes. */   \
   X(LiteralExpression)       \
   X(BinaryExpression)        \
   X(ParenthesizedExpression) \
