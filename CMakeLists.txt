@@ -121,13 +121,6 @@ declare_module(
 declare_module(annotate KIND interface)
 declare_module(ansi_esc KIND interface)
 
-declare_module(
-  string_test
-  KIND executable
-  SOURCES main.c
-  DEPENDS string test
-)
-
 # Following is actual Minsk-specific stuff.
 
 # The core language as a library
