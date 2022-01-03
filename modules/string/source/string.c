@@ -1,6 +1,7 @@
 #include "string/string.h"
 
 #include <ctype.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -93,6 +94,10 @@ StringConversionResultF32 StringViewToF32(StringView str) {
   char* end;
   float value = strtof(text, &end);
   bool success = end != text && *end == '\0';
+  if (errno != 0) {
+    success = false;
+    errno = 0;
+  }
   free(text);
   return (StringConversionResultF32){.success = success, .value = value};
 }
@@ -102,6 +107,10 @@ StringConversionResultF64 StringViewToF64(StringView str) {
   char* end;
   double value = strtod(text, &end);
   bool success = end != text && *end == '\0';
+  if (errno != 0) {
+    success = false;
+    errno = 0;
+  }
   free(text);
   return (StringConversionResultF64){.success = success, .value = value};
 }
