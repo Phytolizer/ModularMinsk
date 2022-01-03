@@ -61,6 +61,7 @@ int main(void) {
     } else {
       MskEvaluator evaluator = MskEvaluatorNew(syntax_tree.root);
       MskRuntimeObject result = MskEvaluatorEvaluate(&evaluator);
+      MskEvaluatorFree(&evaluator);
       MskRuntimeObjectPrint(&result, stdout);
       printf("\n");
     }

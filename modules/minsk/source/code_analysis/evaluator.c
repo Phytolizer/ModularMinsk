@@ -9,92 +9,114 @@
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/unary_expression.h"
 #include "minsk/runtime/object.h"
+#include "minsk_private/code_analysis/binding/binary_expression.h"
+#include "minsk_private/code_analysis/binding/binary_operator_kind.h"
+#include "minsk_private/code_analysis/binding/binder.h"
+#include "minsk_private/code_analysis/binding/expression.h"
+#include "minsk_private/code_analysis/binding/literal_expression.h"
+#include "minsk_private/code_analysis/binding/node.h"
+#include "minsk_private/code_analysis/binding/unary_expression.h"
+#include "minsk_private/code_analysis/binding/unary_operator_kind.h"
 
-static MskRuntimeObject EvaluateExpression(MskExpressionSyntax* expression);
+struct MskEvaluatorImpl {
+  MskBoundExpression* root;
+};
+
+static MskEvaluatorImpl* MskEvaluatorImplNew(MskExpressionSyntax* root);
+static void MskEvaluatorImplFree(MskEvaluatorImpl* impl);
+
+static MskRuntimeObject EvaluateExpression(MskBoundExpression* expression);
 static MskRuntimeObject EvaluateLiteralExpression(
-    MskLiteralExpressionSyntax* expression);
+    MskBoundLiteralExpression* expression);
 static MskRuntimeObject EvaluateBinaryExpression(
-    MskBinaryExpressionSyntax* expression);
-static MskRuntimeObject EvaluateParenthesizedExpression(
-    MskParenthesizedExpressionSyntax* expression);
+    MskBoundBinaryExpression* expression);
 static MskRuntimeObject EvaluateUnaryExpression(
-    MskUnaryExpressionSyntax* expression);
+    MskBoundUnaryExpression* expression);
 
 MskEvaluator MskEvaluatorNew(MskExpressionSyntax* root) {
   return (MskEvaluator){
-      .root = root,
+      .impl = MskEvaluatorImplNew(root),
   };
 }
 
 MskRuntimeObject MskEvaluatorEvaluate(MskEvaluator* evaluator) {
-  return EvaluateExpression(evaluator->root);
+  return EvaluateExpression(evaluator->impl->root);
 }
 
-MskRuntimeObject EvaluateExpression(MskExpressionSyntax* expression) {
+void MskEvaluatorFree(MskEvaluator* e) {
+  MskEvaluatorImplFree(e->impl);
+  free(e->impl);
+  e->impl = NULL;
+}
+
+MskEvaluatorImpl* MskEvaluatorImplNew(MskExpressionSyntax* root) {
+  MskBinder binder = {0};
+  MskBoundExpression* bound_root = MskBinderBindExpression(&binder, root);
+  MskBinderFree(&binder);
+  MskEvaluatorImpl* impl = calloc(1, sizeof(MskEvaluatorImpl));
+  impl->root = bound_root;
+  return impl;
+}
+
+void MskEvaluatorImplFree(MskEvaluatorImpl* impl) {
+  MskBoundNodeFree(&impl->root->base);
+  free(impl->root);
+}
+
+MskRuntimeObject EvaluateExpression(MskBoundExpression* expression) {
   switch (expression->cls) {
-    case kMskSyntaxExpressionClassLiteral:
-      return EvaluateLiteralExpression((MskLiteralExpressionSyntax*)expression);
-    case kMskSyntaxExpressionClassBinary:
-      return EvaluateBinaryExpression((MskBinaryExpressionSyntax*)expression);
-    case kMskSyntaxExpressionClassParenthesized:
-      return EvaluateParenthesizedExpression(
-          (MskParenthesizedExpressionSyntax*)expression);
-    case kMskSyntaxExpressionClassUnary:
-      return EvaluateUnaryExpression((MskUnaryExpressionSyntax*)expression);
+    case kMskBoundExpressionClassLiteral:
+      return EvaluateLiteralExpression((MskBoundLiteralExpression*)expression);
+    case kMskBoundExpressionClassBinary:
+      return EvaluateBinaryExpression((MskBoundBinaryExpression*)expression);
+    case kMskBoundExpressionClassUnary:
+      return EvaluateUnaryExpression((MskBoundUnaryExpression*)expression);
     default:
+      assert(false && "corrupt bound expression");
       return (MskRuntimeObject){0};
   }
 }
 
 MskRuntimeObject EvaluateLiteralExpression(
-    MskLiteralExpressionSyntax* expression) {
-  return expression->literal_token.value;
+    MskBoundLiteralExpression* expression) {
+  return expression->value;
 }
 
 MskRuntimeObject EvaluateBinaryExpression(
-    MskBinaryExpressionSyntax* expression) {
+    MskBoundBinaryExpression* expression) {
   MskRuntimeObject left = EvaluateExpression(expression->left);
   MskRuntimeObject right = EvaluateExpression(expression->right);
   assert(left.kind == kMskObjectKindInteger &&
          right.kind == kMskObjectKindInteger && "invalid operands");
-  switch (expression->operator_token.kind) {
-    case kMskSyntaxKindPlusToken:
+  switch (expression->operator_kind) {
+    case kMskBoundBinaryOperatorKindAddition:
       return MskRuntimeObjectNewInteger(left.value.integer +
                                         right.value.integer);
-    case kMskSyntaxKindMinusToken:
+    case kMskBoundBinaryOperatorKindSubtraction:
       return MskRuntimeObjectNewInteger(left.value.integer -
                                         right.value.integer);
-    case kMskSyntaxKindStarToken:
+    case kMskBoundBinaryOperatorKindMultiplication:
       return MskRuntimeObjectNewInteger(left.value.integer *
                                         right.value.integer);
-    case kMskSyntaxKindSlashToken:
+    case kMskBoundBinaryOperatorKindDivision:
       return MskRuntimeObjectNewInteger(left.value.integer /
                                         right.value.integer);
     default:
-      fprintf(stderr, "Unexpected binary operator %" STRING_VIEW_FMT "\n",
-              STRING_VIEW_PRINT(
-                  MskSyntaxKindName(expression->operator_token.kind)));
-      assert(false);
+      assert(false && "corrupt binary operator kind");
+      return (MskRuntimeObject){0};
   }
 }
 
-MskRuntimeObject EvaluateParenthesizedExpression(
-    MskParenthesizedExpressionSyntax* expression) {
-  return EvaluateExpression(expression->expression);
-}
-
-MskRuntimeObject EvaluateUnaryExpression(MskUnaryExpressionSyntax* expression) {
+MskRuntimeObject EvaluateUnaryExpression(MskBoundUnaryExpression* expression) {
   MskRuntimeObject operand = EvaluateExpression(expression->operand);
   assert(operand.kind == kMskObjectKindInteger && "invalid operand");
-  switch (expression->operator_token.kind) {
-    case kMskSyntaxKindPlusToken:
+  switch (expression->operator_kind) {
+    case kMskBoundUnaryOperatorKindIdentity:
       return MskRuntimeObjectNewInteger(operand.value.integer);
-    case kMskSyntaxKindMinusToken:
+    case kMskBoundUnaryOperatorKindNegation:
       return MskRuntimeObjectNewInteger(-operand.value.integer);
     default:
-      fprintf(stderr, "Unexpected unary operator %" STRING_VIEW_FMT "\n",
-              STRING_VIEW_PRINT(
-                  MskSyntaxKindName(expression->operator_token.kind)));
-      assert(false);
+      assert(false && "corrupt unary operator kind");
+      return (MskRuntimeObject){0};
   }
 }
