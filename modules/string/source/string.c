@@ -41,7 +41,7 @@ StringConversionResultI32 StringViewToI32(StringView str) {
 
 StringConversionResultI64 StringViewToI64(StringView str) {
   int64_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultI64){.success = false};
     }
@@ -57,7 +57,7 @@ StringConversionResultI64 StringViewToI64(StringView str) {
 
 StringConversionResultU32 StringViewToU32(StringView str) {
   uint32_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultU32){.success = false};
     }
@@ -73,7 +73,7 @@ StringConversionResultU32 StringViewToU32(StringView str) {
 
 StringConversionResultU64 StringViewToU64(StringView str) {
   uint64_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultU64){.success = false};
     }
@@ -119,7 +119,7 @@ StringConversionResultF64 StringViewToF64(StringView str) {
 
 StringConversionResultIMax StringViewToIMax(StringView str) {
   intmax_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultIMax){.success = false};
     }
@@ -135,7 +135,7 @@ StringConversionResultIMax StringViewToIMax(StringView str) {
 
 StringConversionResultUMax StringViewToUMax(StringView str) {
   uintmax_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultUMax){.success = false};
     }
@@ -164,7 +164,7 @@ StringCompareResult StringViewCompare(StringView a, StringView b) {
 }
 
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
-  if (begin >= SPAN_SIZE(&str) || end > SPAN_SIZE(&str) || begin >= end) {
+  if (begin >= SPAN_SIZE(str) || end > SPAN_SIZE(str) || begin >= end) {
     // An invalid range was specified. Return something sane.
     return (StringView){0};
   }
@@ -172,11 +172,11 @@ StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
 }
 
 void StringViewPrint(StringView view) {
-  fwrite(view.begin, 1, SPAN_SIZE(&view), stdout);
+  fwrite(view.begin, 1, SPAN_SIZE(view), stdout);
 }
 
 uint64_t StringViewSize(StringView view) {
-  return SPAN_SIZE(&view);
+  return SPAN_SIZE(view);
 }
 
 StringView StringViewFindSubstring(StringView haystack, StringView needle) {
@@ -311,7 +311,7 @@ bool StringEqual(const String a, const String b) {
 }
 
 bool StringEqualView(const String a, StringView b) {
-  return a.size == SPAN_SIZE(&b) && memcmp(a.data, b.begin, a.size) == 0;
+  return a.size == SPAN_SIZE(b) && memcmp(a.data, b.begin, a.size) == 0;
 }
 
 bool StringEqualC(const String a, const char* b) {

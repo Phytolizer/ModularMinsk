@@ -18,11 +18,11 @@ typedef struct {
 
 #define SPAN_UNPACK(S)                     \
   ((SpanUnpacked){                         \
-      .begin = (const uint8_t*)(S)->begin, \
-      .end = (const uint8_t*)(S)->end,     \
-      .sizeof_t = sizeof(*(S)->begin),     \
+      .begin = (const uint8_t*)(S).begin, \
+      .end = (const uint8_t*)(S).end,     \
+      .sizeof_t = sizeof(*(S).begin),     \
   })
 
-#define SPAN_SIZE(S) ((S)->end - (S)->begin)
+#define SPAN_SIZE(S) ((S).end - (S).begin)
 
 #endif  // SPAN_SPAN_H_
