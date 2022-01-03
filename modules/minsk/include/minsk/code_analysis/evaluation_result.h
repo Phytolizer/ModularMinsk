@@ -1,7 +1,7 @@
 #ifndef MINSK_CODE_ANALYSIS_EVALUATION_RESULT_H_
 #define MINSK_CODE_ANALYSIS_EVALUATION_RESULT_H_
 
-#include "minsk/code_analysis/text/diagnostics.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
 
 typedef enum {
@@ -13,7 +13,7 @@ typedef struct {
   MskEvaluationResultKind kind;
   union {
     MskRuntimeObject ok;
-    MskDiagnostics err;
+    MskDiagnosticBag err;
   } value;
 } MskEvaluationResult;
 

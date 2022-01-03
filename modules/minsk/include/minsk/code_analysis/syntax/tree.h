@@ -1,14 +1,14 @@
 #ifndef MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_
 #define MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_
 
-#include "minsk/code_analysis/text/diagnostics.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 
 typedef struct {
   MskExpressionSyntax* root;
   MskSyntaxToken end_of_file_token;
-  MskDiagnostics diagnostics;
+  MskDiagnosticBag diagnostics;
 } MskSyntaxTree;
 
 MskSyntaxTree MskSyntaxTreeParse(StringView text);

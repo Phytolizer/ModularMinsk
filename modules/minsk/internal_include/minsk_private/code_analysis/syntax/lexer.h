@@ -3,13 +3,14 @@
 
 #include <stdint.h>
 #include <string/string.h>
-#include "minsk/code_analysis/text/diagnostics.h"
+
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 
 typedef struct {
   StringView text;
   uint64_t position;
-  MskDiagnostics diagnostics;
+  MskDiagnosticBag diagnostics;
 } MskSyntaxLexer;
 
 MskSyntaxLexer MskNewSyntaxLexer(StringView text);

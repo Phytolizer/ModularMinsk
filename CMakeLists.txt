@@ -149,7 +149,8 @@ declare_module(
           code_analysis/syntax/token.c
           code_analysis/syntax/tree.c
           code_analysis/syntax/unary_expression.c
-          code_analysis/text/diagnostics.c
+          code_analysis/text/diagnostic_bag.c
+          code_analysis/text/diagnostic.c
           code_analysis/text/span.c
           runtime/object.c
   DEPENDS vec span string hash annotate ansi_esc

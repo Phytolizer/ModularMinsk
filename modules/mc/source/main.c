@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string/string.h>
 
+#include "minsk/code_analysis/text/diagnostic.h"
+
 int main(void) {
   bool show_tree = false;
   while (true) {
@@ -48,8 +50,8 @@ int main(void) {
 
     MskSyntaxTree syntax_tree = MskSyntaxTreeParse(StringAsView(text));
     // move out the diagnostics because they aren't limited to the syntax tree
-    MskDiagnostics diagnostics = syntax_tree.diagnostics;
-    syntax_tree.diagnostics = (MskDiagnostics){0};
+    MskDiagnosticBag diagnostics = syntax_tree.diagnostics;
+    syntax_tree.diagnostics = (MskDiagnosticBag){0};
     if (show_tree) {
       MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
     }
@@ -74,12 +76,12 @@ int main(void) {
       printf("\n");
       printf(ANSI_ESC_DIM ANSI_ESC_FG_RED);
       for (size_t i = 0; i < diagnostics.size; ++i) {
-        String diagnostic = diagnostics.data[i];
-        printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
+        MskDiagnostic diagnostic = diagnostics.data[i];
+        printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic.message));
       }
       printf(ANSI_ESC_RESET);
     }
-    MskDiagnosticsFree(&diagnostics);
+    MskDiagnosticBagFree(&diagnostics);
     MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);
   }
