@@ -16,17 +16,37 @@ typedef SPAN_TYPE(char) StringView;
 #define STRING_ATTR_PRINTF
 #endif
 
-typedef struct {
-  bool success;
-  int64_t value;
-} StringConversionResultI64;
+#define STRING_CONVERSION_RESULT(DestType) \
+  struct {                                 \
+    bool success;                          \
+    DestType value;                        \
+  }
+
+typedef STRING_CONVERSION_RESULT(int32_t) StringConversionResultI32;
+typedef STRING_CONVERSION_RESULT(int64_t) StringConversionResultI64;
+typedef STRING_CONVERSION_RESULT(uint32_t) StringConversionResultU32;
+typedef STRING_CONVERSION_RESULT(uint64_t) StringConversionResultU64;
+typedef STRING_CONVERSION_RESULT(float) StringConversionResultF32;
+typedef STRING_CONVERSION_RESULT(double) StringConversionResultF64;
+
+#undef STRING_CONVERSION_RESULT
 
 // StringView functions.
 
 /// Returns a StringView over a C string.
 StringView StringViewFromC(const char* cstr);
+/// Attempts to convert a StringView to an int32_t.
+StringConversionResultI32 StringViewToI32(StringView str);
 /// Attempts to convert a StringView to an int64_t.
 StringConversionResultI64 StringViewToI64(StringView str);
+/// Attempts to convert a StringView to a uint32_t.
+StringConversionResultU32 StringViewToU32(StringView str);
+/// Attempts to convert a StringView to a uint64_t.
+StringConversionResultU64 StringViewToU64(StringView str);
+/// Attempts to convert a StringView to a float.
+StringConversionResultF32 StringViewToF32(StringView str);
+/// Attempts to convert a StringView to a double.
+StringConversionResultF64 StringViewToF64(StringView str);
 /// Returns a StringView that is a substring of str.
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end);
 /// Prints a StringView to stdout.

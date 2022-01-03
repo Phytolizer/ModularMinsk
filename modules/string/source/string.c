@@ -1,5 +1,6 @@
 #include "string/string.h"
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -8,8 +9,33 @@
 #include <string.h>
 #include <vec/vec.h>
 
+static uint64_t PowerU64(uint64_t base, uint64_t exponent) {
+  uint64_t result = 1;
+  for (uint64_t i = 0; i < exponent; ++i) {
+    result *= base;
+  }
+  return result;
+}
+
 StringView StringViewFromC(const char* cstr) {
   return (StringView){.begin = cstr, .end = cstr + strlen(cstr)};
+}
+
+StringConversionResultI32 StringViewToI32(StringView str) {
+  int32_t value = 0;
+  for (size_t i = 0; i < str.end - str.begin; ++i) {
+    char c = str.begin[i];
+    if (c < '0' || c > '9') {
+      return (StringConversionResultI32){.success = false};
+    }
+    // Detect overflow.
+    if (value > INT32_MAX / 10 ||
+        (value == INT32_MAX / 10 && c - '0' > INT32_MAX % 10)) {
+      return (StringConversionResultI32){.success = false};
+    }
+    value = value * 10 + (c - '0');
+  }
+  return (StringConversionResultI32){.success = true, .value = value};
 }
 
 StringConversionResultI64 StringViewToI64(StringView str) {
@@ -27,6 +53,144 @@ StringConversionResultI64 StringViewToI64(StringView str) {
   }
   return (StringConversionResultI64){.success = true, .value = value};
 }
+
+StringConversionResultU32 StringViewToU32(StringView str) {
+  uint32_t value = 0;
+  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+    if (str.begin[i] < '0' || str.begin[i] > '9') {
+      return (StringConversionResultU32){.success = false};
+    }
+    // Detect overflow.
+    if (value > UINT32_MAX / 10 ||
+        (value == UINT32_MAX / 10 && str.begin[i] - '0' > UINT32_MAX % 10)) {
+      return (StringConversionResultU32){.success = false};
+    }
+    value = value * 10 + (str.begin[i] - '0');
+  }
+  return (StringConversionResultU32){.success = true, .value = value};
+}
+
+StringConversionResultU64 StringViewToU64(StringView str) {
+  uint64_t value = 0;
+  for (size_t i = 0; i < SPAN_SIZE(&str); ++i) {
+    if (str.begin[i] < '0' || str.begin[i] > '9') {
+      return (StringConversionResultU64){.success = false};
+    }
+    // Detect overflow.
+    if (value > UINT64_MAX / 10 ||
+        (value == UINT64_MAX / 10 && str.begin[i] - '0' > UINT64_MAX % 10)) {
+      return (StringConversionResultU64){.success = false};
+    }
+    value = value * 10 + (str.begin[i] - '0');
+  }
+  return (StringConversionResultU64){.success = true, .value = value};
+}
+
+#define GET(str, i) ((i) >= SPAN_SIZE(&str) ? '\0' : str.begin[i])
+
+StringConversionResultF32 StringViewToF32(StringView str) {
+  uint64_t cursor = 0;
+  float value = 0;
+  bool negative = false;
+  if (GET(str, cursor) == '-') {
+    negative = true;
+    ++cursor;
+  }
+  // decimal part
+  while (isdigit(GET(str, cursor))) {
+    value = value * 10 + (GET(str, cursor) - '0');
+    ++cursor;
+  }
+  if (GET(str, cursor) == '.') {
+    ++cursor;
+    float factor = 0.1;
+    while (isdigit(GET(str, cursor))) {
+      value += (GET(str, cursor) - '0') * factor;
+      factor *= 0.1;
+      ++cursor;
+    }
+  }
+
+  // exponent part
+  if (GET(str, cursor) == 'e' || GET(str, cursor) == 'E') {
+    ++cursor;
+    bool exponent_negative = false;
+    if (GET(str, cursor) == '-') {
+      exponent_negative = true;
+      ++cursor;
+    } else if (GET(str, cursor) == '+') {
+      ++cursor;
+    }
+    uint64_t exponent = 0;
+    while (isdigit(GET(str, cursor))) {
+      exponent = exponent * 10 + (GET(str, cursor) - '0');
+      ++cursor;
+    }
+    if (exponent_negative) {
+      value /= PowerU64(10, exponent);
+    } else {
+      value *= PowerU64(10, exponent);
+    }
+  }
+
+  if (negative) {
+    value = -value;
+  }
+  return (StringConversionResultF32){.success = true, .value = value};
+}
+
+StringConversionResultF64 StringViewToF64(StringView str) {
+  uint64_t cursor = 0;
+  double value = 0;
+  bool negative = false;
+  if (GET(str, cursor) == '-') {
+    negative = true;
+    ++cursor;
+  }
+  // decimal part
+  while (isdigit(GET(str, cursor))) {
+    value = value * 10 + (GET(str, cursor) - '0');
+    ++cursor;
+  }
+  if (GET(str, cursor) == '.') {
+    ++cursor;
+    double factor = 0.1;
+    while (isdigit(GET(str, cursor))) {
+      value += (GET(str, cursor) - '0') * factor;
+      factor *= 0.1;
+      ++cursor;
+    }
+  }
+
+  // exponent part
+  if (GET(str, cursor) == 'e' || GET(str, cursor) == 'E') {
+    ++cursor;
+    bool exponent_negative = false;
+    if (GET(str, cursor) == '-') {
+      exponent_negative = true;
+      ++cursor;
+    } else if (GET(str, cursor) == '+') {
+      ++cursor;
+    }
+    uint64_t exponent = 0;
+    while (isdigit(GET(str, cursor))) {
+      exponent = exponent * 10 + (GET(str, cursor) - '0');
+      ++cursor;
+    }
+    if (exponent_negative) {
+      value /= PowerU64(10, exponent);
+    } else {
+      value *= PowerU64(10, exponent);
+    }
+  }
+
+  if (negative) {
+    value = -value;
+  }
+  return (StringConversionResultF64){.success = true, .value = value};
+}
+
+#undef GET
 
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
   if (begin >= SPAN_SIZE(&str) || end > SPAN_SIZE(&str) || begin >= end) {
