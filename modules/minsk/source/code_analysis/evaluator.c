@@ -101,12 +101,13 @@ MskRuntimeObject EvaluateBinaryExpression(
 
 MskRuntimeObject EvaluateUnaryExpression(MskBoundUnaryExpression* expression) {
   MskRuntimeObject operand = EvaluateExpression(expression->operand);
-  assert(operand.kind == kMskObjectKindInteger && "invalid operand");
   switch (expression->operator_kind) {
     case kMskBoundUnaryOperatorKindIdentity:
       return MskRuntimeObjectNewInteger(operand.value.integer);
     case kMskBoundUnaryOperatorKindNegation:
       return MskRuntimeObjectNewInteger(-operand.value.integer);
+    case kMskBoundUnaryOperatorKindLogicalNegation:
+      return MskRuntimeObjectNewBoolean(!operand.value.boolean);
     default:
       assert(false && "corrupt unary operator kind");
       return (MskRuntimeObject){0};

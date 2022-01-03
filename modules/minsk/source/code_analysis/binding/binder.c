@@ -113,17 +113,25 @@ MskBoundExpression* BindParenthesizedExpression(MskBinder* binder,
 MskBoundUnaryOperatorKind BindUnaryOperatorKind(
     MskSyntaxKind kind,
     MskRuntimeObjectKind operand_type) {
-  if (operand_type != kMskObjectKindInteger) {
-    return kMskBoundUnaryOperatorKindInvalid;
+  if (operand_type == kMskObjectKindInteger) {
+    switch (kind) {
+      case kMskSyntaxKindPlusToken:
+        return kMskBoundUnaryOperatorKindIdentity;
+      case kMskSyntaxKindMinusToken:
+        return kMskBoundUnaryOperatorKindNegation;
+      default:
+        return kMskBoundUnaryOperatorKindInvalid;
+    }
   }
-  switch (kind) {
-    case kMskSyntaxKindPlusToken:
-      return kMskBoundUnaryOperatorKindIdentity;
-    case kMskSyntaxKindMinusToken:
-      return kMskBoundUnaryOperatorKindNegation;
-    default:
-      return kMskBoundUnaryOperatorKindInvalid;
+  if (operand_type == kMskObjectKindBoolean) {
+    switch (kind) {
+      case kMskSyntaxKindBangToken:
+        return kMskBoundUnaryOperatorKindLogicalNegation;
+      default:
+        return kMskBoundUnaryOperatorKindInvalid;
+    }
   }
+  return kMskBoundUnaryOperatorKindInvalid;
 }
 
 MskBoundBinaryOperatorKind BindBinaryOperatorKind(

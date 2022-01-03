@@ -3,7 +3,8 @@
 
 #define MINSK__BOUND_UNARY_OPERATOR_KINDS \
   X(Identity)                             \
-  X(Negation)
+  X(Negation)                             \
+  X(LogicalNegation)
 
 typedef enum {
   kMskBoundUnaryOperatorKindInvalid,
