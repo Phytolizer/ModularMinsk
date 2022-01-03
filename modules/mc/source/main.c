@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <string/string.h>
 
-#include "minsk/code_analysis/diagnostics.h"
-
 int main(void) {
   bool show_tree = false;
   while (true) {

@@ -136,7 +136,6 @@ declare_module(
           code_analysis/binding/unary_expression.c
           code_analysis/binding/unary_operator.c
           code_analysis/compilation.c
-          code_analysis/diagnostics.c
           code_analysis/evaluator.c
           code_analysis/syntax/binary_expression.c
           code_analysis/syntax/expression.c
@@ -150,6 +149,8 @@ declare_module(
           code_analysis/syntax/token.c
           code_analysis/syntax/tree.c
           code_analysis/syntax/unary_expression.c
+          code_analysis/text/diagnostics.c
+          code_analysis/text/span.c
           runtime/object.c
   DEPENDS vec span string hash annotate ansi_esc
   INTERNAL_INCLUDE

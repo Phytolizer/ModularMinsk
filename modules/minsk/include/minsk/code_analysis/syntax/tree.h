@@ -1,7 +1,7 @@
 #ifndef MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_
 #define MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_
 
-#include "minsk/code_analysis/diagnostics.h"
+#include "minsk/code_analysis/text/diagnostics.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 

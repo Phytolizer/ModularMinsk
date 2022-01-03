@@ -1,4 +1,4 @@
-#include "minsk/code_analysis/diagnostics.h"
+#include "minsk/code_analysis/text/diagnostics.h"
 
 #include <stdint.h>
 

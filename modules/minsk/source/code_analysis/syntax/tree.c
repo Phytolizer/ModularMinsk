@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "minsk/code_analysis/diagnostics.h"
+#include "minsk/code_analysis/text/diagnostics.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk_private/code_analysis/syntax/parser.h"
 

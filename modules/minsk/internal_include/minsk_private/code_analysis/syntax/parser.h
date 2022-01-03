@@ -5,7 +5,7 @@
 #include <string/string.h>
 #include <vec/vec.h>
 
-#include "minsk/code_analysis/diagnostics.h"
+#include "minsk/code_analysis/text/diagnostics.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/code_analysis/syntax/tree.h"

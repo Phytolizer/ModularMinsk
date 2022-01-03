@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <string/string.h>
-#include "minsk/code_analysis/diagnostics.h"
+#include "minsk/code_analysis/text/diagnostics.h"
 #include "minsk/code_analysis/syntax/token.h"
 
 typedef struct {
