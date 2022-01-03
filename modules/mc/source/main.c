@@ -49,6 +49,7 @@ int main(void) {
     }
 
     MskSyntaxTree syntax_tree = MskSyntaxTreeParse(StringAsView(text));
+    // move out the diagnostics because they aren't limited to the syntax tree
     MskDiagnostics diagnostics = syntax_tree.diagnostics;
     syntax_tree.diagnostics = (MskDiagnostics){0};
     if (show_tree) {
@@ -63,6 +64,7 @@ int main(void) {
       if (result.kind == kMskEvaluationResultFailure) {
         show_diagnostics = true;
         VEC_APPEND(&diagnostics, result.value.err.data, result.value.err.size);
+        // shallow free -- the diagnostics vector owns the strings now
         VEC_FREE(&result.value.err);
       } else {
         MskRuntimeObjectPrint(&result.value.ok, stdout);
@@ -78,8 +80,8 @@ int main(void) {
         printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
       }
       printf(ANSI_ESC_RESET);
-      MskDiagnosticsFree(&diagnostics);
     }
+    MskDiagnosticsFree(&diagnostics);
     MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);
   }
