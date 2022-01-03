@@ -4,73 +4,47 @@
 #include <string/string.h>
 #include <test/test.h>
 
+TEST_SUBTEST_FUNC(CheckVsAtof, const char* cstr) {
+  float a = atof(cstr);
+  StringConversionResultF32 b = StringViewToF32(StringViewFromC(cstr));
+  TEST_ASSERT(b.success, (void)0, "Failed to convert '%s'", cstr);
+  TEST_ASSERT(a == b.value, (void)0, "Expected '%s' to be %f, but got %f", cstr,
+              a, b.value);
+  TEST_PASS();
+}
+
 TEST_FUNC(LeadingDot) {
-  StringView text = StringViewFromC(".1");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof(".1");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, ".1");
   TEST_PASS();
 }
 
 TEST_FUNC(Simple) {
-  StringView text = StringViewFromC("1");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof("1");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, "1");
   TEST_PASS();
 }
 
 TEST_FUNC(DecimalPoint) {
-  StringView text = StringViewFromC("1.1");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof("1.1");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, "1.1");
   TEST_PASS();
 }
 
 TEST_FUNC(Exponent) {
-  StringView text = StringViewFromC("1.1e2");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof("1.1e2");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, "1.1e2");
   TEST_PASS();
 }
 
 TEST_FUNC(ExponentWithSign) {
-  StringView text = StringViewFromC("1.1e+2");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof("1.1e+2");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, "1.1e+2");
   TEST_PASS();
 }
 
 TEST_FUNC(Sign) {
-  StringView text = StringViewFromC("-1.1");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof("-1.1");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, "-1.1");
   TEST_PASS();
 }
 
 TEST_FUNC(Precision) {
-  StringView text = StringViewFromC("0.9999999999999999999999999999999999");
-  StringConversionResultF32 result = StringViewToF32(text);
-  TEST_ASSERT(result.success, (void)0, "Expected success.");
-  float expected_result = atof("0.9999999999999999999999999999999999");
-  TEST_ASSERT(result.value == expected_result, (void)0, "Expected %f, got %f.",
-              expected_result, result.value);
+  TEST_RUN_SUBTEST(CheckVsAtof, (void)0, "0.999999999999999999999999999999999");
   TEST_PASS();
 }
 
