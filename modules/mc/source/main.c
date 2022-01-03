@@ -1,6 +1,6 @@
 #include <ansi_esc/ansi_esc.h>
 #include <inttypes.h>
-#include <minsk/code_analysis/evaluator.h>
+#include <minsk/code_analysis/compilation.h>
 #include <minsk/code_analysis/syntax/expression.h>
 #include <minsk/code_analysis/syntax/node.h>
 #include <minsk/code_analysis/syntax/token.h>
@@ -59,8 +59,8 @@ int main(void) {
     if (diagnostics.size > 0) {
       show_diagnostics = true;
     } else {
-      MskEvaluator evaluator = MskEvaluatorNew(syntax_tree.root);
-      MskEvaluationResult result = MskEvaluatorEvaluate(&evaluator);
+      MskCompilation compilation = MskCompilationNew(syntax_tree);
+      MskEvaluationResult result = MskCompilationEvaluate(&compilation);
       if (result.kind == kMskEvaluationResultFailure) {
         show_diagnostics = true;
         VEC_APPEND(&diagnostics, result.value.err.data, result.value.err.size);

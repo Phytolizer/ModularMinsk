@@ -1,4 +1,4 @@
-#include "minsk/code_analysis/evaluator.h"
+#include "minsk_private/code_analysis/evaluator.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -26,29 +26,14 @@ static MskRuntimeObject EvaluateBinaryExpression(
 static MskRuntimeObject EvaluateUnaryExpression(
     MskBoundUnaryExpression* expression);
 
-MskEvaluator MskEvaluatorNew(MskExpressionSyntax* root) {
+MskEvaluator MskEvaluatorNew(MskBoundExpression* root) {
   return (MskEvaluator){
       .root = root,
   };
 }
 
-MskEvaluationResult MskEvaluatorEvaluate(MskEvaluator* evaluator) {
-  MskBinder binder = {0};
-  MskBoundExpression* bound_expression =
-      MskBinderBindExpression(&binder, evaluator->root);
-  if (binder.diagnostics.size > 0) {
-    MskBoundNodeFree(&bound_expression->base);
-    return (MskEvaluationResult){
-        .kind = kMskEvaluationResultFailure,
-        .value = {.err = binder.diagnostics},
-    };
-  }
-  MskRuntimeObject result = EvaluateExpression(bound_expression);
-  MskBoundNodeFree(&bound_expression->base);
-  return (MskEvaluationResult){
-      .kind = kMskEvaluationResultSuccess,
-      .value = {.ok = result},
-  };
+MskRuntimeObject MskEvaluatorEvaluate(MskEvaluator* evaluator) {
+  return EvaluateExpression(evaluator->root);
 }
 
 MskRuntimeObject EvaluateExpression(MskBoundExpression* expression) {

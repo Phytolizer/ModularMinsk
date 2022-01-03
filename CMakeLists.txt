@@ -135,6 +135,7 @@ declare_module(
           code_analysis/binding/node.c
           code_analysis/binding/unary_expression.c
           code_analysis/binding/unary_operator.c
+          code_analysis/compilation.c
           code_analysis/diagnostics.c
           code_analysis/evaluator.c
           code_analysis/syntax/binary_expression.c
