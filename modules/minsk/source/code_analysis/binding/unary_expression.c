@@ -3,12 +3,12 @@
 #include "minsk_private/code_analysis/binding/node.h"
 
 MskBoundUnaryExpression* MskBoundUnaryExpressionNew(
-    MskBoundUnaryOperatorKind operator_kind,
+    MskBoundUnaryOperator op,
     MskBoundExpression* operand) {
   MskBoundUnaryExpression* exp = calloc(1, sizeof(MskBoundUnaryExpression));
   exp->base.base.cls = kMskBoundNodeClassExpression;
   exp->base.cls = kMskBoundExpressionClassUnary;
-  exp->operator_kind = operator_kind;
+  exp->op = op;
   exp->operand = operand;
   return exp;
 }

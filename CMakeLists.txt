@@ -128,11 +128,13 @@ declare_module(
   minsk
   KIND library
   SOURCES code_analysis/binding/binary_expression.c
+          code_analysis/binding/binary_operator.c
           code_analysis/binding/binder.c
           code_analysis/binding/expression.c
           code_analysis/binding/literal_expression.c
           code_analysis/binding/node.c
           code_analysis/binding/unary_expression.c
+          code_analysis/binding/unary_operator.c
           code_analysis/diagnostics.c
           code_analysis/evaluator.c
           code_analysis/syntax/binary_expression.c

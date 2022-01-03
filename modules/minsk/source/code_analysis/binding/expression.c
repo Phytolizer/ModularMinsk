@@ -26,7 +26,7 @@ MskRuntimeObjectKind MskBoundExpressionGetType(MskBoundExpression* exp) {
 }
 
 MskRuntimeObjectKind UnaryExpressionGetType(MskBoundUnaryExpression* exp) {
-  return MskBoundExpressionGetType(exp->operand);
+  return exp->op.result_type;
 }
 
 MskRuntimeObjectKind LiteralExpressionGetType(MskBoundLiteralExpression* exp) {
@@ -34,5 +34,5 @@ MskRuntimeObjectKind LiteralExpressionGetType(MskBoundLiteralExpression* exp) {
 }
 
 MskRuntimeObjectKind BinaryExpressionGetType(MskBoundBinaryExpression* exp) {
-  return MskBoundExpressionGetType(exp->left);
+  return exp->op.result_type;
 }

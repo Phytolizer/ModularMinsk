@@ -62,9 +62,9 @@ MskBoundExpression* BindUnaryExpression(MskBinder* binder,
                                         MskExpressionSyntax* syntax) {
   MskUnaryExpressionSyntax* unary = (MskUnaryExpressionSyntax*)syntax;
   MskBoundExpression* operand = MskBinderBindExpression(binder, unary->operand);
-  MskBoundUnaryOperatorKind operator_kind = BindUnaryOperatorKind(
+  const MskBoundUnaryOperator* op = MskBindUnaryOperator(
       unary->operator_token.kind, MskBoundExpressionGetType(operand));
-  if (operator_kind == kMskBoundUnaryOperatorKindInvalid) {
+  if (op == NULL) {
     VEC_PUSH(&binder->diagnostics,
              StringFormat("Unary operator '%" STRING_FMT
                           "' is not defined for type %" STRING_VIEW_FMT ".",
@@ -73,8 +73,7 @@ MskBoundExpression* BindUnaryExpression(MskBinder* binder,
                               MskBoundExpressionGetType(operand)))));
     return operand;
   }
-  return (MskBoundExpression*)MskBoundUnaryExpressionNew(operator_kind,
-                                                         operand);
+  return (MskBoundExpression*)MskBoundUnaryExpressionNew(*op, operand);
 }
 
 MskBoundExpression* BindBinaryExpression(MskBinder* binder,
@@ -82,10 +81,10 @@ MskBoundExpression* BindBinaryExpression(MskBinder* binder,
   MskBinaryExpressionSyntax* binary = (MskBinaryExpressionSyntax*)syntax;
   MskBoundExpression* left = MskBinderBindExpression(binder, binary->left);
   MskBoundExpression* right = MskBinderBindExpression(binder, binary->right);
-  MskBoundBinaryOperatorKind operator_kind = BindBinaryOperatorKind(
+  const MskBoundBinaryOperator* op = MskBindBinaryOperator(
       binary->operator_token.kind, MskBoundExpressionGetType(left),
       MskBoundExpressionGetType(right));
-  if (operator_kind == kMskBoundBinaryOperatorKindInvalid) {
+  if (op == NULL) {
     VEC_PUSH(&binder->diagnostics,
              StringFormat("Binary operator '%" STRING_FMT
                           "' is not defined for types %" STRING_VIEW_FMT
@@ -99,8 +98,7 @@ MskBoundExpression* BindBinaryExpression(MskBinder* binder,
     free(right);
     return left;
   }
-  return (MskBoundExpression*)MskBoundBinaryExpressionNew(left, operator_kind,
-                                                          right);
+  return (MskBoundExpression*)MskBoundBinaryExpressionNew(left, *op, right);
 }
 
 MskBoundExpression* BindParenthesizedExpression(MskBinder* binder,

@@ -74,7 +74,7 @@ MskRuntimeObject EvaluateBinaryExpression(
     MskBoundBinaryExpression* expression) {
   MskRuntimeObject left = EvaluateExpression(expression->left);
   MskRuntimeObject right = EvaluateExpression(expression->right);
-  switch (expression->operator_kind) {
+  switch (expression->op.kind) {
     case kMskBoundBinaryOperatorKindAddition:
       return MskRuntimeObjectNewInteger(left.value.integer +
                                         right.value.integer);
@@ -101,7 +101,7 @@ MskRuntimeObject EvaluateBinaryExpression(
 
 MskRuntimeObject EvaluateUnaryExpression(MskBoundUnaryExpression* expression) {
   MskRuntimeObject operand = EvaluateExpression(expression->operand);
-  switch (expression->operator_kind) {
+  switch (expression->op.kind) {
     case kMskBoundUnaryOperatorKindIdentity:
       return MskRuntimeObjectNewInteger(operand.value.integer);
     case kMskBoundUnaryOperatorKindNegation:
