@@ -74,8 +74,6 @@ MskRuntimeObject EvaluateBinaryExpression(
     MskBoundBinaryExpression* expression) {
   MskRuntimeObject left = EvaluateExpression(expression->left);
   MskRuntimeObject right = EvaluateExpression(expression->right);
-  assert(left.kind == kMskObjectKindInteger &&
-         right.kind == kMskObjectKindInteger && "invalid operands");
   switch (expression->operator_kind) {
     case kMskBoundBinaryOperatorKindAddition:
       return MskRuntimeObjectNewInteger(left.value.integer +
@@ -89,6 +87,12 @@ MskRuntimeObject EvaluateBinaryExpression(
     case kMskBoundBinaryOperatorKindDivision:
       return MskRuntimeObjectNewInteger(left.value.integer /
                                         right.value.integer);
+    case kMskBoundBinaryOperatorKindLogicalAnd:
+      return MskRuntimeObjectNewBoolean(left.value.boolean &&
+                                        right.value.boolean);
+    case kMskBoundBinaryOperatorKindLogicalOr:
+      return MskRuntimeObjectNewBoolean(left.value.boolean ||
+                                        right.value.boolean);
     default:
       assert(false && "corrupt binary operator kind");
       return (MskRuntimeObject){0};

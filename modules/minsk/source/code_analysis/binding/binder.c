@@ -145,5 +145,16 @@ MskBoundBinaryOperatorKind BindBinaryOperatorKind(
         return kMskBoundBinaryOperatorKindInvalid;
     }
   }
+  if (left_type == kMskObjectKindBoolean &&
+      right_type == kMskObjectKindBoolean) {
+    switch (kind) {
+      case kMskSyntaxKindAmpersandAmpersandToken:
+        return kMskBoundBinaryOperatorKindLogicalAnd;
+      case kMskSyntaxKindPipePipeToken:
+        return kMskBoundBinaryOperatorKindLogicalOr;
+      default:
+        return kMskBoundBinaryOperatorKindInvalid;
+    }
+  }
   return kMskBoundBinaryOperatorKindInvalid;
 }

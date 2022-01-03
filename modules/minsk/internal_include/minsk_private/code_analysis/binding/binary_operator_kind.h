@@ -5,7 +5,9 @@
   X(Addition)                              \
   X(Subtraction)                           \
   X(Multiplication)                        \
-  X(Division)
+  X(Division)                              \
+  X(LogicalAnd)                            \
+  X(LogicalOr)
 
 typedef enum {
   kMskBoundBinaryOperatorKindInvalid,
