@@ -7,6 +7,7 @@
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/unary_expression.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
 #include "minsk_private/code_analysis/binding/binary_expression.h"
 #include "minsk_private/code_analysis/binding/binary_operator_kind.h"
@@ -57,12 +58,10 @@ MskBoundExpression* BindUnaryExpression(MskBinder* binder,
   const MskBoundUnaryOperator* op = MskBindUnaryOperator(
       unary->operator_token.kind, MskBoundExpressionGetType(operand));
   if (op == NULL) {
-    VEC_PUSH(&binder->diagnostics,
-             StringFormat("Unary operator '%" STRING_FMT
-                          "' is not defined for type %" STRING_VIEW_FMT ".",
-                          STRING_PRINT(unary->operator_token.text),
-                          STRING_VIEW_PRINT(MskRuntimeObjectKindName(
-                              MskBoundExpressionGetType(operand)))));
+    MskDiagnosticBagReportUndefinedUnaryOperator(
+        &binder->diagnostics, MskSyntaxTokenGetSpan(&unary->operator_token),
+        StringAsView(unary->operator_token.text),
+        MskBoundExpressionGetType(operand));
     return operand;
   }
   return (MskBoundExpression*)MskBoundUnaryExpressionNew(*op, operand);
@@ -77,15 +76,10 @@ MskBoundExpression* BindBinaryExpression(MskBinder* binder,
       binary->operator_token.kind, MskBoundExpressionGetType(left),
       MskBoundExpressionGetType(right));
   if (op == NULL) {
-    VEC_PUSH(&binder->diagnostics,
-             StringFormat("Binary operator '%" STRING_FMT
-                          "' is not defined for types %" STRING_VIEW_FMT
-                          " and %" STRING_VIEW_FMT ".",
-                          STRING_PRINT(binary->operator_token.text),
-                          STRING_VIEW_PRINT(MskRuntimeObjectKindName(
-                              MskBoundExpressionGetType(left))),
-                          STRING_VIEW_PRINT(MskRuntimeObjectKindName(
-                              MskBoundExpressionGetType(right)))));
+    MskDiagnosticBagReportUndefinedBinaryOperator(
+        &binder->diagnostics, MskSyntaxTokenGetSpan(&binary->operator_token),
+        StringAsView(binary->operator_token.text),
+        MskBoundExpressionGetType(left), MskBoundExpressionGetType(right));
     MskBoundNodeFree(&right->base);
     free(right);
     return left;

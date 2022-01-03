@@ -15,3 +15,10 @@ MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
   duplicate.value = MskRuntimeObjectDuplicate(&token.value);
   return duplicate;
 }
+
+MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken* token) {
+  return (MskTextSpan){
+      .start = token->position,
+      .length = token->text.size,
+  };
+}

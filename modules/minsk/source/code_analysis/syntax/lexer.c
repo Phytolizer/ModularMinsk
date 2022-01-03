@@ -4,6 +4,7 @@
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/node.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
 #include "minsk_private/code_analysis/syntax/facts.h"
 #include "string/string.h"
@@ -60,10 +61,9 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
           StringViewSubstring(lexer->text, position, lexer->position));
       StringConversionResultI64 result = StringViewToI64(StringAsView(text));
       if (!result.success) {
-        VEC_PUSH(&lexer->diagnostics,
-                 StringFormat("The number '%" STRING_FMT
-                              "' is too large for an int64_t.",
-                              STRING_PRINT(text)));
+        MskDiagnosticBagReportInvalidNumber(
+            &lexer->diagnostics, MskTextSpanNew(position, lexer->position),
+            StringAsView(text), StringViewFromC("int64_t"));
       }
       value = MskRuntimeObjectNewInteger(result.value);
     } break;
@@ -128,8 +128,8 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   }
 
   if (kind == kMskSyntaxKindBadToken) {
-    VEC_PUSH(&lexer->diagnostics,
-             StringFormat("Unexpected character '%c'", Cur(lexer)));
+    MskDiagnosticBagReportBadCharacter(&lexer->diagnostics, position,
+                                       Cur(lexer));
     lexer->position++;
   }
 

@@ -11,6 +11,7 @@
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/code_analysis/syntax/unary_expression.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
 #include "minsk_private/code_analysis/syntax/facts.h"
 #include "minsk_private/code_analysis/syntax/lexer.h"
@@ -91,12 +92,9 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
   if (Current(parser)->kind == kind) {
     return NextToken(parser);
   }
-  VEC_PUSH(&parser->diagnostics,
-           StringFormat(
-               "expected next token to be %" STRING_VIEW_FMT
-               ", got %" STRING_VIEW_FMT ".",
-               STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
-               STRING_VIEW_PRINT(MskSyntaxKindName(Current(parser)->kind))));
+  MskDiagnosticBagReportUnexpectedToken(&parser->diagnostics,
+                                        MskSyntaxTokenGetSpan(Current(parser)),
+                                        kind, Current(parser)->kind);
   return (MskSyntaxToken){
       .base = {.cls = kMskSyntaxNodeClassToken},
       .kind = kind,
