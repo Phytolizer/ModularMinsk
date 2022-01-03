@@ -12,6 +12,7 @@
 #include <string/string.h>
 
 #include "minsk/code_analysis/text/diagnostic.h"
+#include "minsk/code_analysis/text/span.h"
 
 int main(void) {
   bool show_tree = false;
@@ -74,12 +75,23 @@ int main(void) {
     }
     if (show_diagnostics) {
       printf("\n");
-      printf(ANSI_ESC_DIM ANSI_ESC_FG_RED);
       for (size_t i = 0; i < diagnostics.size; ++i) {
+        StringView prefix =
+            StringAsSubView(text, 0, diagnostics.data[i].span.start);
+        StringView error =
+            StringAsSubView(text, diagnostics.data[i].span.start,
+                            MskTextSpanEnd(diagnostics.data[i].span));
+        StringView suffix = StringAsSubView(
+            text, MskTextSpanEnd(diagnostics.data[i].span), text.size);
+        printf("%" STRING_VIEW_FMT ANSI_ESC_FG_RED
+               "%" STRING_VIEW_FMT ANSI_ESC_RESET "%" STRING_VIEW_FMT "\n",
+               STRING_VIEW_PRINT(prefix), STRING_VIEW_PRINT(error),
+               STRING_VIEW_PRINT(suffix));
         MskDiagnostic diagnostic = diagnostics.data[i];
+        printf(ANSI_ESC_FG_RED);
         printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic.message));
+        printf(ANSI_ESC_RESET);
       }
-      printf(ANSI_ESC_RESET);
     }
     MskDiagnosticBagFree(&diagnostics);
     MskSyntaxTreeFree(&syntax_tree);
