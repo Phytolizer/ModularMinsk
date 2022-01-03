@@ -61,6 +61,25 @@ StringConversionResultIMax StringViewToIMax(StringView str);
 StringConversionResultUMax StringViewToUMax(StringView str);
 /// Compares two StringViews.
 StringCompareResult StringViewCompare(StringView a, StringView b);
+/// Returns a pointer to the found char, or str.end if it wasn't found.
+const char* StringViewFindChar(StringView str, char c);
+/// Returns a pointer to the found char, or str.end if it wasn't found.
+const char* StringViewFindCharReverse(StringView str, char c);
+/// Returns the length of the span containing only the characters in chars.
+uint64_t StringViewFindSpan(StringView str, StringView chars);
+/// Returns the length of the span containing only characters not in chars.
+uint64_t StringViewFindSpanReject(StringView str, StringView chars);
+/// Searches the string for the first occurrence of any char in breaks.
+/// Returns a pointer to the found char, or str.end if it wasn't found.
+const char* StringViewFindBreak(StringView str, StringView breaks);
+/// Searches the string for the first occurrence of sub.
+/// Returns a pointer to the found substring, or an empty span if it wasn't
+/// found.
+StringView StringViewFind(StringView str, StringView sub);
+/// Tokenizes the string using breaks.
+StringView StringViewTokenize(StringView str,
+                              StringView breaks,
+                              StringView* save);
 /// Returns a StringView that is a substring of str.
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end);
 /// Prints a StringView to stdout.

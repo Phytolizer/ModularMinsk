@@ -163,6 +163,98 @@ StringCompareResult StringViewCompare(StringView a, StringView b) {
   return kStringCompareEqual;
 }
 
+const char* StringViewFindChar(StringView str, char c) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+    if (str.begin[i] == c) {
+      return &str.begin[i];
+    }
+  }
+  return str.end;
+}
+
+const char* StringViewFindCharReverse(StringView str, char c) {
+  for (size_t i = SPAN_SIZE(str); i > 0; --i) {
+    if (str.begin[i - 1] == c) {
+      return &str.begin[i - 1];
+    }
+  }
+  return str.end;
+}
+
+uint64_t StringViewFindSpan(StringView str, StringView chars) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+    if (StringViewFindChar(chars, str.begin[i]) == chars.end) {
+      return i;
+    }
+  }
+  return SPAN_SIZE(str);
+}
+
+uint64_t StringViewFindSpanReject(StringView str, StringView chars) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+    if (StringViewFindChar(chars, str.begin[i]) != chars.end) {
+      return i;
+    }
+  }
+  return SPAN_SIZE(str);
+}
+
+const char* StringViewFindBreak(StringView str, StringView breaks) {
+  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+    if (StringViewFindChar(breaks, str.begin[i]) != breaks.end) {
+      return &str.begin[i];
+    }
+  }
+  return str.end;
+}
+
+StringView StringViewFind(StringView str, StringView sub) {
+  if (SPAN_SIZE(sub) > SPAN_SIZE(str)) {
+    return (StringView){0};
+  }
+  for (size_t i = 0; i <= SPAN_SIZE(str) - SPAN_SIZE(sub); ++i) {
+    if (str.begin[i] == sub.begin[0] &&
+        memcmp(&str.begin[i], sub.begin, SPAN_SIZE(sub)) == 0) {
+      return (StringView){
+          .begin = &str.begin[i],
+          .end = &str.begin[i + SPAN_SIZE(sub)],
+      };
+    }
+  }
+  return (StringView){0};
+}
+
+StringView StringViewTokenize(StringView str,
+                              StringView breaks,
+                              StringView* save) {
+  if (save && save->begin) {
+    str = *save;
+    uint64_t begin = StringViewFindSpan(str, breaks);
+    if (begin == SPAN_SIZE(str)) {
+      *save = (StringView){0};
+      return (StringView){0};
+    }
+    str = (StringView){
+        .begin = &str.begin[begin],
+        .end = str.end,
+    };
+  }
+  const char* break_pos = StringViewFindBreak(str, breaks);
+  if (save) {
+    *save = (StringView){
+        .begin = break_pos,
+        .end = str.end,
+    };
+  }
+  if (break_pos == str.end) {
+    return (StringView){0};
+  }
+  return (StringView){
+      .begin = str.begin,
+      .end = break_pos,
+  };
+}
+
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
   if (begin >= SPAN_SIZE(str) || end > SPAN_SIZE(str) || begin >= end) {
     // An invalid range was specified. Return something sane.
