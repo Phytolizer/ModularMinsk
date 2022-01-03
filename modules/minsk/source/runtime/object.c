@@ -74,6 +74,21 @@ MskRuntimeObject MskRuntimeObjectDuplicate(MskRuntimeObject* object) {
   }
 }
 
+bool MskRuntimeObjectEquals(MskRuntimeObject* a, MskRuntimeObject* b) {
+  if (a->kind != b->kind) {
+    return false;
+  }
+  switch (a->kind) {
+    case kMskObjectKindInteger:
+      return a->value.integer == b->value.integer;
+    case kMskObjectKindBoolean:
+      return a->value.boolean == b->value.boolean;
+    case kMskObjectKindNull:
+    default:
+      return true;
+  }
+}
+
 void FreeInteger(MskRuntimeObject* i) {
   // integers don't need to be freed
   (void)i;

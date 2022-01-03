@@ -34,5 +34,6 @@ MskRuntimeObject MskRuntimeObjectNewBoolean(bool value);
 void MskRuntimeObjectFree(MskRuntimeObject* object) ANNOTATE_NONNULL(1);
 void MskRuntimeObjectPrint(MskRuntimeObject* object, FILE* fp);
 MskRuntimeObject MskRuntimeObjectDuplicate(MskRuntimeObject* object);
+bool MskRuntimeObjectEquals(MskRuntimeObject* a, MskRuntimeObject* b);
 
 #endif  // MINSK_RUNTIME_OBJECT_H_

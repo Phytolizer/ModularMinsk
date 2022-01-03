@@ -94,31 +94,9 @@ MskRuntimeObject EvaluateBinaryExpression(
       return MskRuntimeObjectNewBoolean(left.value.boolean ||
                                         right.value.boolean);
     case kMskBoundBinaryOperatorKindEquality:
-      if (left.kind == kMskObjectKindInteger &&
-          right.kind == kMskObjectKindInteger) {
-        return MskRuntimeObjectNewBoolean(left.value.integer ==
-                                          right.value.integer);
-      } else if (left.kind == kMskObjectKindBoolean &&
-                 right.kind == kMskObjectKindBoolean) {
-        return MskRuntimeObjectNewBoolean(left.value.boolean ==
-                                          right.value.boolean);
-      } else {
-        assert(false && "invalid binary operator");
-        return (MskRuntimeObject){0};
-      }
+      return MskRuntimeObjectNewBoolean(MskRuntimeObjectEquals(&left, &right));
     case kMskBoundBinaryOperatorKindInequality:
-      if (left.kind == kMskObjectKindInteger &&
-          right.kind == kMskObjectKindInteger) {
-        return MskRuntimeObjectNewBoolean(left.value.integer !=
-                                          right.value.integer);
-      } else if (left.kind == kMskObjectKindBoolean &&
-                 right.kind == kMskObjectKindBoolean) {
-        return MskRuntimeObjectNewBoolean(left.value.boolean !=
-                                          right.value.boolean);
-      } else {
-        assert(false && "invalid binary operator");
-        return (MskRuntimeObject){0};
-      }
+      return MskRuntimeObjectNewBoolean(!MskRuntimeObjectEquals(&left, &right));
     default:
       assert(false && "corrupt binary operator kind");
       return (MskRuntimeObject){0};
