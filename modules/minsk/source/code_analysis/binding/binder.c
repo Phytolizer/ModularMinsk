@@ -55,8 +55,7 @@ void MskBinderFree(MskBinder* binder) {
 MskBoundExpression* BindLiteralExpression(MskBinder* binder,
                                           MskExpressionSyntax* syntax) {
   MskLiteralExpressionSyntax* lit = (MskLiteralExpressionSyntax*)syntax;
-  return (MskBoundExpression*)MskBoundLiteralExpressionNew(
-      lit->literal_token.value);
+  return (MskBoundExpression*)MskBoundLiteralExpressionNew(lit->value);
 }
 
 MskBoundExpression* BindUnaryExpression(MskBinder* binder,

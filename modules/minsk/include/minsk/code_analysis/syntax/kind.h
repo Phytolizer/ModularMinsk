@@ -23,6 +23,10 @@
   X(OpenParenthesisToken)    \
   X(CloseParenthesisToken)   \
                              \
+  /* Keywords. */            \
+  X(TrueKeyword)             \
+  X(FalseKeyword)            \
+                             \
   /* Syntax tree nodes. */   \
   X(LiteralExpression)       \
   X(BinaryExpression)        \

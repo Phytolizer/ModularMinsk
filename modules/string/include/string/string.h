@@ -37,6 +37,8 @@ uint64_t StringViewSize(StringView view);
 StringView StringViewFindSubstring(StringView haystack, StringView needle);
 /// Returns a StringView over 'size' bytes of memory starting at 'ptr'.
 StringView StringViewFromPtr(const char* ptr, uint64_t size);
+/// Returns true if the StringView is equal to the C string.
+bool StringViewEqualC(StringView view, const char* cstr);
 
 // String functions.
 

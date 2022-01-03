@@ -5,9 +5,11 @@
 
 static void FreeInteger(MskRuntimeObject* i);
 static void FreeNull(MskRuntimeObject* n);
+static void FreeBoolean(MskRuntimeObject* b);
 
 static void PrintInteger(MskRuntimeObject* i, FILE* fp);
 static void PrintNull(MskRuntimeObject* n, FILE* fp);
+static void PrintBoolean(MskRuntimeObject* b, FILE* fp);
 
 static const char* const kMskObjectKindNames[] = {
 #define X(x) [kMskObjectKind##x] = #x,
@@ -23,6 +25,13 @@ MskRuntimeObject MskRuntimeObjectNewInteger(int64_t value) {
   return (MskRuntimeObject){
       .kind = kMskObjectKindInteger,
       .value = {.integer = value},
+  };
+}
+
+MskRuntimeObject MskRuntimeObjectNewBoolean(bool value) {
+  return (MskRuntimeObject){
+      .kind = kMskObjectKindBoolean,
+      .value = {.boolean = value},
   };
 }
 
@@ -75,10 +84,19 @@ void FreeNull(MskRuntimeObject* n) {
   (void)n;
 }
 
+void FreeBoolean(MskRuntimeObject* b) {
+  // booleans don't need to be freed
+  (void)b;
+}
+
 void PrintInteger(MskRuntimeObject* i, FILE* fp) {
   fprintf(fp, "%" PRId64, i->value.integer);
 }
 
 void PrintNull(MskRuntimeObject* n, FILE* fp) {
   fprintf(fp, "<Null>");
+}
+
+void PrintBoolean(MskRuntimeObject* b, FILE* fp) {
+  fprintf(fp, "%s", b->value.boolean ? "true" : "false");
 }

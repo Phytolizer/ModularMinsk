@@ -70,6 +70,11 @@ StringView StringViewFromPtr(const char* ptr, uint64_t size) {
   };
 }
 
+bool StringViewEqualC(StringView view, const char* cstr) {
+  return StringViewSize(view) == strlen(cstr) &&
+         memcmp(view.begin, cstr, StringViewSize(view)) == 0;
+}
+
 String StringFromC(const char* cstr) {
   String s = {0};
   VEC_APPEND(&s, cstr, strlen(cstr));

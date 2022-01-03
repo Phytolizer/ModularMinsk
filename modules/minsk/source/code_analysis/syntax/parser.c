@@ -149,6 +149,14 @@ MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser) {
     return (MskExpressionSyntax*)MskParenthesizedExpressionSyntaxNew(
         open_parenthesis_token, expression, close_parenthesis_token);
   }
+  if (Current(parser)->kind == kMskSyntaxKindTrueKeyword ||
+      Current(parser)->kind == kMskSyntaxKindFalseKeyword) {
+    MskSyntaxToken keyword_token = NextToken(parser);
+    bool value = keyword_token.kind == kMskSyntaxKindTrueKeyword;
+    return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(
+        keyword_token, MskRuntimeObjectNewBoolean(value));
+  }
   MskSyntaxToken number_token = MatchToken(parser, kMskSyntaxKindNumberToken);
-  return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(number_token);
+  return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(
+      number_token, MSK_RUNTIME_OBJECT_NULL);
 }

@@ -8,7 +8,8 @@
 
 #define MSK__OBJECT_KINDS \
   X(Null)                 \
-  X(Integer)
+  X(Integer)              \
+  X(Boolean)
 
 typedef enum {
   kMskObjectKindInvalid,
@@ -23,11 +24,13 @@ typedef struct {
   MskRuntimeObjectKind kind;
   union {
     int64_t integer;
+    bool boolean;
   } value;
 } MskRuntimeObject;
 
 #define MSK_RUNTIME_OBJECT_NULL ((MskRuntimeObject){.kind = kMskObjectKindNull})
 MskRuntimeObject MskRuntimeObjectNewInteger(int64_t value);
+MskRuntimeObject MskRuntimeObjectNewBoolean(bool value);
 void MskRuntimeObjectFree(MskRuntimeObject* object) ANNOTATE_NONNULL(1);
 void MskRuntimeObjectPrint(MskRuntimeObject* object, FILE* fp);
 MskRuntimeObject MskRuntimeObjectDuplicate(MskRuntimeObject* object);

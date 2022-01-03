@@ -24,3 +24,13 @@ uint64_t MskSyntaxFactsUnaryOperatorPrecedence(MskSyntaxKind kind) {
       return 0;
   }
 }
+
+MskSyntaxKind MskSyntaxFactsKeywordKind(StringView text) {
+  if (StringViewEqualC(text, "true")) {
+    return kMskSyntaxKindTrueKeyword;
+  } else if (StringViewEqualC(text, "false")) {
+    return kMskSyntaxKindFalseKeyword;
+  } else {
+    return kMskSyntaxKindBadToken;
+  }
+}

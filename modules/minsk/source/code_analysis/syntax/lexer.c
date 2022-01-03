@@ -5,9 +5,12 @@
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/runtime/object.h"
+#include "minsk_private/code_analysis/syntax/facts.h"
 #include "string/string.h"
 
 static char Cur(MskSyntaxLexer* lexer);
+static bool IsLetter(char c);
+static bool IsLetterOrDigit(char c);
 
 MskSyntaxLexer MskNewSyntaxLexer(StringView text) {
   return (MskSyntaxLexer){
@@ -87,9 +90,18 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
       lexer->position++;
       break;
     default:
-      VEC_PUSH(&lexer->diagnostics,
-               StringFormat("Unexpected character '%c'", Cur(lexer)));
-      lexer->position++;
+      if (IsLetter(Cur(lexer))) {
+        while (IsLetterOrDigit(Cur(lexer))) {
+          lexer->position++;
+        }
+        text = StringFromView(
+            StringViewSubstring(lexer->text, position, lexer->position));
+        kind = MskSyntaxFactsKeywordKind(StringAsView(text));
+      } else {
+        VEC_PUSH(&lexer->diagnostics,
+                 StringFormat("Unexpected character '%c'", Cur(lexer)));
+        lexer->position++;
+      }
       break;
   }
 
@@ -113,4 +125,12 @@ char Cur(MskSyntaxLexer* lexer) {
     return '\0';
   }
   return lexer->text.begin[lexer->position];
+}
+
+bool IsLetter(char c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
+bool IsLetterOrDigit(char c) {
+  return IsLetter(c) || (c >= '0' && c <= '9');
 }
