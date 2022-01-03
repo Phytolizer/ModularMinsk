@@ -27,14 +27,6 @@ static MskBoundExpression* BindParenthesizedExpression(
     MskBinder* binder,
     MskExpressionSyntax* syntax);
 
-static MskBoundUnaryOperatorKind BindUnaryOperatorKind(
-    MskSyntaxKind kind,
-    MskRuntimeObjectKind operand_type);
-static MskBoundBinaryOperatorKind BindBinaryOperatorKind(
-    MskSyntaxKind kind,
-    MskRuntimeObjectKind left_type,
-    MskRuntimeObjectKind right_type);
-
 MskBoundExpression* MskBinderBindExpression(MskBinder* binder,
                                             MskExpressionSyntax* syntax) {
   switch (syntax->cls) {
@@ -106,61 +98,4 @@ MskBoundExpression* BindParenthesizedExpression(MskBinder* binder,
   MskParenthesizedExpressionSyntax* paren =
       (MskParenthesizedExpressionSyntax*)syntax;
   return MskBinderBindExpression(binder, paren->expression);
-}
-
-MskBoundUnaryOperatorKind BindUnaryOperatorKind(
-    MskSyntaxKind kind,
-    MskRuntimeObjectKind operand_type) {
-  if (operand_type == kMskObjectKindInteger) {
-    switch (kind) {
-      case kMskSyntaxKindPlusToken:
-        return kMskBoundUnaryOperatorKindIdentity;
-      case kMskSyntaxKindMinusToken:
-        return kMskBoundUnaryOperatorKindNegation;
-      default:
-        return kMskBoundUnaryOperatorKindInvalid;
-    }
-  }
-  if (operand_type == kMskObjectKindBoolean) {
-    switch (kind) {
-      case kMskSyntaxKindBangToken:
-        return kMskBoundUnaryOperatorKindLogicalNegation;
-      default:
-        return kMskBoundUnaryOperatorKindInvalid;
-    }
-  }
-  return kMskBoundUnaryOperatorKindInvalid;
-}
-
-MskBoundBinaryOperatorKind BindBinaryOperatorKind(
-    MskSyntaxKind kind,
-    MskRuntimeObjectKind left_type,
-    MskRuntimeObjectKind right_type) {
-  if (left_type == kMskObjectKindInteger &&
-      right_type == kMskObjectKindInteger) {
-    switch (kind) {
-      case kMskSyntaxKindPlusToken:
-        return kMskBoundBinaryOperatorKindAddition;
-      case kMskSyntaxKindMinusToken:
-        return kMskBoundBinaryOperatorKindSubtraction;
-      case kMskSyntaxKindStarToken:
-        return kMskBoundBinaryOperatorKindMultiplication;
-      case kMskSyntaxKindSlashToken:
-        return kMskBoundBinaryOperatorKindDivision;
-      default:
-        return kMskBoundBinaryOperatorKindInvalid;
-    }
-  }
-  if (left_type == kMskObjectKindBoolean &&
-      right_type == kMskObjectKindBoolean) {
-    switch (kind) {
-      case kMskSyntaxKindAmpersandAmpersandToken:
-        return kMskBoundBinaryOperatorKindLogicalAnd;
-      case kMskSyntaxKindPipePipeToken:
-        return kMskBoundBinaryOperatorKindLogicalOr;
-      default:
-        return kMskBoundBinaryOperatorKindInvalid;
-    }
-  }
-  return kMskBoundBinaryOperatorKindInvalid;
 }
