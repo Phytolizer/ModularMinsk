@@ -59,6 +59,9 @@ StringView StringViewFindSubstring(StringView haystack, StringView needle);
 StringView StringViewFromPtr(const char* ptr, uint64_t size);
 /// Returns true if the StringView is equal to the C string.
 bool StringViewEqualC(StringView view, const char* cstr);
+/// Returns a C string with the same contents as the StringView, but null
+/// terminated. It must be freed by the caller.
+char* StringViewToC(StringView view);
 
 // String functions.
 

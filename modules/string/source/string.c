@@ -89,105 +89,21 @@ StringConversionResultU64 StringViewToU64(StringView str) {
 #define GET(str, i) ((i) >= SPAN_SIZE(&str) ? '\0' : str.begin[i])
 
 StringConversionResultF32 StringViewToF32(StringView str) {
-  uint64_t cursor = 0;
-  float value = 0;
-  bool negative = false;
-  if (GET(str, cursor) == '-') {
-    negative = true;
-    ++cursor;
-  }
-  // decimal part
-  while (isdigit(GET(str, cursor))) {
-    value = value * 10 + (GET(str, cursor) - '0');
-    ++cursor;
-  }
-  if (GET(str, cursor) == '.') {
-    ++cursor;
-    float factor = 0.1;
-    while (isdigit(GET(str, cursor))) {
-      value += (GET(str, cursor) - '0') * factor;
-      factor *= 0.1;
-      ++cursor;
-    }
-  }
-
-  // exponent part
-  if (GET(str, cursor) == 'e' || GET(str, cursor) == 'E') {
-    ++cursor;
-    bool exponent_negative = false;
-    if (GET(str, cursor) == '-') {
-      exponent_negative = true;
-      ++cursor;
-    } else if (GET(str, cursor) == '+') {
-      ++cursor;
-    }
-    uint64_t exponent = 0;
-    while (isdigit(GET(str, cursor))) {
-      exponent = exponent * 10 + (GET(str, cursor) - '0');
-      ++cursor;
-    }
-    if (exponent_negative) {
-      value /= PowerU64(10, exponent);
-    } else {
-      value *= PowerU64(10, exponent);
-    }
-  }
-
-  if (negative) {
-    value = -value;
-  }
-  return (StringConversionResultF32){.success = true, .value = value};
+  char* text = StringViewToC(str);
+  char* end;
+  float value = strtof(text, &end);
+  bool success = end != text && *end == '\0';
+  free(text);
+  return (StringConversionResultF32){.success = success, .value = value};
 }
 
 StringConversionResultF64 StringViewToF64(StringView str) {
-  uint64_t cursor = 0;
-  double value = 0;
-  bool negative = false;
-  if (GET(str, cursor) == '-') {
-    negative = true;
-    ++cursor;
-  }
-  // decimal part
-  while (isdigit(GET(str, cursor))) {
-    value = value * 10 + (GET(str, cursor) - '0');
-    ++cursor;
-  }
-  if (GET(str, cursor) == '.') {
-    ++cursor;
-    double factor = 0.1;
-    while (isdigit(GET(str, cursor))) {
-      value += (GET(str, cursor) - '0') * factor;
-      factor *= 0.1;
-      ++cursor;
-    }
-  }
-
-  // exponent part
-  if (GET(str, cursor) == 'e' || GET(str, cursor) == 'E') {
-    ++cursor;
-    bool exponent_negative = false;
-    if (GET(str, cursor) == '-') {
-      exponent_negative = true;
-      ++cursor;
-    } else if (GET(str, cursor) == '+') {
-      ++cursor;
-    }
-    uint64_t exponent = 0;
-    while (isdigit(GET(str, cursor))) {
-      exponent = exponent * 10 + (GET(str, cursor) - '0');
-      ++cursor;
-    }
-    if (exponent_negative) {
-      value /= PowerU64(10, exponent);
-    } else {
-      value *= PowerU64(10, exponent);
-    }
-  }
-
-  if (negative) {
-    value = -value;
-  }
-  return (StringConversionResultF64){.success = true, .value = value};
+  char* text = StringViewToC(str);
+  char* end;
+  double value = strtod(text, &end);
+  bool success = end != text && *end == '\0';
+  free(text);
+  return (StringConversionResultF64){.success = success, .value = value};
 }
 
 #undef GET
@@ -237,6 +153,13 @@ StringView StringViewFromPtr(const char* ptr, uint64_t size) {
 bool StringViewEqualC(StringView view, const char* cstr) {
   return StringViewSize(view) == strlen(cstr) &&
          memcmp(view.begin, cstr, StringViewSize(view)) == 0;
+}
+
+char* StringViewToC(StringView view) {
+  char* cstr = malloc(StringViewSize(view) + 1);
+  memcpy(cstr, view.begin, StringViewSize(view));
+  cstr[StringViewSize(view)] = '\0';
+  return cstr;
 }
 
 String StringFromC(const char* cstr) {
