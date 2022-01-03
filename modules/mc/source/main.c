@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string/string.h>
 
+#include "minsk/code_analysis/diagnostics.h"
+
 int main(void) {
   bool show_tree = false;
   while (true) {
@@ -47,23 +49,36 @@ int main(void) {
     }
 
     MskSyntaxTree syntax_tree = MskSyntaxTreeParse(StringAsView(text));
+    MskDiagnostics diagnostics = syntax_tree.diagnostics;
+    syntax_tree.diagnostics = (MskDiagnostics){0};
     if (show_tree) {
       MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
     }
-    if (syntax_tree.diagnostics.size > 0) {
+    bool show_diagnostics = false;
+    if (diagnostics.size > 0) {
+      show_diagnostics = true;
+    } else {
+      MskEvaluator evaluator = MskEvaluatorNew(syntax_tree.root);
+      MskEvaluationResult result = MskEvaluatorEvaluate(&evaluator);
+      if (result.kind == kMskEvaluationResultFailure) {
+        show_diagnostics = true;
+        VEC_APPEND(&diagnostics, result.value.err.data, result.value.err.size);
+        VEC_FREE(&result.value.err);
+      } else {
+        MskRuntimeObjectPrint(&result.value.ok, stdout);
+        printf("\n");
+        MskRuntimeObjectFree(&result.value.ok);
+      }
+    }
+    if (show_diagnostics) {
       printf("\n");
       printf(ANSI_ESC_DIM ANSI_ESC_FG_RED);
-      for (size_t i = 0; i < syntax_tree.diagnostics.size; ++i) {
-        String diagnostic = syntax_tree.diagnostics.data[i];
+      for (size_t i = 0; i < diagnostics.size; ++i) {
+        String diagnostic = diagnostics.data[i];
         printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic));
       }
       printf(ANSI_ESC_RESET);
-    } else {
-      MskEvaluator evaluator = MskEvaluatorNew(syntax_tree.root);
-      MskRuntimeObject result = MskEvaluatorEvaluate(&evaluator);
-      MskEvaluatorFree(&evaluator);
-      MskRuntimeObjectPrint(&result, stdout);
-      printf("\n");
+      MskDiagnosticsFree(&diagnostics);
     }
     MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);

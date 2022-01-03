@@ -18,13 +18,6 @@
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 #include "minsk_private/code_analysis/binding/unary_operator_kind.h"
 
-struct MskEvaluatorImpl {
-  MskBoundExpression* root;
-};
-
-static MskEvaluatorImpl* MskEvaluatorImplNew(MskExpressionSyntax* root);
-static void MskEvaluatorImplFree(MskEvaluatorImpl* impl);
-
 static MskRuntimeObject EvaluateExpression(MskBoundExpression* expression);
 static MskRuntimeObject EvaluateLiteralExpression(
     MskBoundLiteralExpression* expression);
@@ -35,32 +28,27 @@ static MskRuntimeObject EvaluateUnaryExpression(
 
 MskEvaluator MskEvaluatorNew(MskExpressionSyntax* root) {
   return (MskEvaluator){
-      .impl = MskEvaluatorImplNew(root),
+      .root = root,
   };
 }
 
-MskRuntimeObject MskEvaluatorEvaluate(MskEvaluator* evaluator) {
-  return EvaluateExpression(evaluator->impl->root);
-}
-
-void MskEvaluatorFree(MskEvaluator* e) {
-  MskEvaluatorImplFree(e->impl);
-  free(e->impl);
-  e->impl = NULL;
-}
-
-MskEvaluatorImpl* MskEvaluatorImplNew(MskExpressionSyntax* root) {
+MskEvaluationResult MskEvaluatorEvaluate(MskEvaluator* evaluator) {
   MskBinder binder = {0};
-  MskBoundExpression* bound_root = MskBinderBindExpression(&binder, root);
-  MskBinderFree(&binder);
-  MskEvaluatorImpl* impl = calloc(1, sizeof(MskEvaluatorImpl));
-  impl->root = bound_root;
-  return impl;
-}
-
-void MskEvaluatorImplFree(MskEvaluatorImpl* impl) {
-  MskBoundNodeFree(&impl->root->base);
-  free(impl->root);
+  MskBoundExpression* bound_expression =
+      MskBinderBindExpression(&binder, evaluator->root);
+  if (binder.diagnostics.size > 0) {
+    MskBoundNodeFree(&bound_expression->base);
+    return (MskEvaluationResult){
+        .kind = kMskEvaluationResultFailure,
+        .value = {.err = binder.diagnostics},
+    };
+  }
+  MskRuntimeObject result = EvaluateExpression(bound_expression);
+  MskBoundNodeFree(&bound_expression->base);
+  return (MskEvaluationResult){
+      .kind = kMskEvaluationResultSuccess,
+      .value = {.ok = result},
+  };
 }
 
 MskRuntimeObject EvaluateExpression(MskBoundExpression* expression) {
