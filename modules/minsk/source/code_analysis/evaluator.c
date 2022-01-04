@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "minsk/code_analysis/symbol_table.h"
-#include "minsk/runtime/object.h"
 #include "minsk/code_analysis/binding/assignment_expression.h"
 #include "minsk/code_analysis/binding/binary_expression.h"
 #include "minsk/code_analysis/binding/binary_operator_kind.h"
@@ -15,6 +13,8 @@
 #include "minsk/code_analysis/binding/unary_expression.h"
 #include "minsk/code_analysis/binding/unary_operator_kind.h"
 #include "minsk/code_analysis/binding/variable_expression.h"
+#include "minsk/code_analysis/symbol_table.h"
+#include "minsk/runtime/object.h"
 
 static MskRuntimeObject EvaluateExpression(MskEvaluator* evaluator,
                                            MskBoundExpression* expression);
@@ -121,17 +121,16 @@ MskRuntimeObject EvaluateUnaryExpression(MskEvaluator* evaluator,
 MskRuntimeObject EvaluateVariableExpression(
     MskEvaluator* evaluator,
     MskBoundVariableExpression* expression) {
-  MskRuntimeObject value = {0};
-  MskSymbolTableLookup(evaluator->symbols, StringAsView(expression->name),
-                       &value);
-  return value;
+  MskSymbolTableEntry entry = {0};
+  MskSymbolTableLookup(evaluator->symbols,
+                       StringAsView(expression->variable.name), &entry);
+  return entry.value;
 }
 
 MskRuntimeObject EvaluateAssignmentExpression(
     MskEvaluator* evaluator,
     MskBoundAssignmentExpression* expression) {
   MskRuntimeObject value = EvaluateExpression(evaluator, expression->value);
-  MskSymbolTableInsert(evaluator->symbols, StringAsView(expression->name),
-                       value);
+  MskSymbolTableInsert(evaluator->symbols, expression->variable, value);
   return value;
 }

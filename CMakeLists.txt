@@ -157,6 +157,7 @@ declare_module(
           code_analysis/text/diagnostic_bag.c
           code_analysis/text/diagnostic.c
           code_analysis/text/span.c
+          code_analysis/variable_symbol.c
           runtime/object.c
   DEPENDS vec span string hash annotate ansi_esc
   INTERNAL_INCLUDE

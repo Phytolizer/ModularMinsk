@@ -4,15 +4,21 @@
 #include <hash/hash.h>
 #include <stdbool.h>
 
+#include "minsk/code_analysis/variable_symbol.h"
 #include "minsk/runtime/object.h"
 
-typedef HASH_TYPE(MskRuntimeObject) MskSymbolTable;
+typedef struct {
+  MskVariableSymbol variable;
+  MskRuntimeObject value;
+} MskSymbolTableEntry;
+
+typedef HASH_TYPE(MskSymbolTableEntry) MskSymbolTable;
 
 bool MskSymbolTableLookup(MskSymbolTable* table,
                           StringView name,
-                          MskRuntimeObject* out_value);
+                          MskSymbolTableEntry* out_value);
 void MskSymbolTableInsert(MskSymbolTable* table,
-                          StringView name,
+                          MskVariableSymbol variable,
                           MskRuntimeObject value);
 void MskSymbolTableFree(MskSymbolTable* table);
 

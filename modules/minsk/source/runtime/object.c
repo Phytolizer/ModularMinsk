@@ -12,6 +12,7 @@ static void PrintNull(MskRuntimeObject* n, FILE* fp);
 static void PrintBoolean(MskRuntimeObject* b, FILE* fp);
 
 static const char* const kMskObjectKindNames[] = {
+    [kMskObjectKindInvalid] = "Invalid",
 #define X(x) [kMskObjectKind##x] = #x,
     MSK__OBJECT_KINDS
 #undef X

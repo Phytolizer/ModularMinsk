@@ -6,13 +6,11 @@
 #include "minsk/code_analysis/binding/node.h"
 
 MskBoundVariableExpression* MskBoundVariableExpressionNew(
-    String name,
-    MskRuntimeObjectKind type) {
+    MskVariableSymbol variable) {
   MskBoundVariableExpression* exp =
       calloc(sizeof(MskBoundVariableExpression), 1);
   exp->base.base.cls = kMskBoundNodeClassExpression;
   exp->base.cls = kMskBoundExpressionClassVariable;
-  exp->name = name;
-  exp->type = type;
+  exp->variable = variable;
   return exp;
 }

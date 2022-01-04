@@ -56,6 +56,9 @@ void HashFree(HashUnpacked hash) {
 }
 
 bool HashGet(HashUnpacked hash, HashKeyView key, uint8_t* out_value) {
+  if (*hash.capacity == 0) {
+    return false;
+  }
   uint64_t index = key.hash % *hash.capacity;
   while ((*hash.keys)[index].vec.size != 0) {
     if ((*hash.keys)[index].hash == key.hash &&

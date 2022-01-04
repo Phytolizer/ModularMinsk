@@ -1,18 +1,9 @@
 #include "minsk/code_analysis/binding/binder.h"
 
 #include <assert.h>
+#include <stdint.h>
 
 #include "hash/hash.h"
-#include "minsk/code_analysis/symbol_table.h"
-#include "minsk/code_analysis/syntax/assignment_expression.h"
-#include "minsk/code_analysis/syntax/binary_expression.h"
-#include "minsk/code_analysis/syntax/kind.h"
-#include "minsk/code_analysis/syntax/literal_expression.h"
-#include "minsk/code_analysis/syntax/name_expression.h"
-#include "minsk/code_analysis/syntax/parenthesized_expression.h"
-#include "minsk/code_analysis/syntax/unary_expression.h"
-#include "minsk/code_analysis/text/diagnostic_bag.h"
-#include "minsk/runtime/object.h"
 #include "minsk/code_analysis/binding/assignment_expression.h"
 #include "minsk/code_analysis/binding/binary_expression.h"
 #include "minsk/code_analysis/binding/binary_operator_kind.h"
@@ -22,6 +13,17 @@
 #include "minsk/code_analysis/binding/unary_expression.h"
 #include "minsk/code_analysis/binding/unary_operator_kind.h"
 #include "minsk/code_analysis/binding/variable_expression.h"
+#include "minsk/code_analysis/symbol_table.h"
+#include "minsk/code_analysis/syntax/assignment_expression.h"
+#include "minsk/code_analysis/syntax/binary_expression.h"
+#include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/literal_expression.h"
+#include "minsk/code_analysis/syntax/name_expression.h"
+#include "minsk/code_analysis/syntax/parenthesized_expression.h"
+#include "minsk/code_analysis/syntax/unary_expression.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
+#include "minsk/code_analysis/variable_symbol.h"
+#include "minsk/runtime/object.h"
 #include "string/string.h"
 
 static MskBoundExpression* BindLiteralExpression(MskBinder* binder,
@@ -112,7 +114,12 @@ MskBoundExpression* BindAssignmentExpression(MskBinder* binder,
   String name = StringDuplicate(assignment->identifier_token.text);
   MskBoundExpression* bound_expression =
       MskBinderBindExpression(binder, assignment->expression);
-  return (MskBoundExpression*)MskBoundAssignmentExpressionNew(name,
+  MskRuntimeObjectKind type = MskBoundExpressionGetType(bound_expression);
+  MskVariableSymbol variable = {
+      .name = name,
+      .type = type,
+  };
+  return (MskBoundExpression*)MskBoundAssignmentExpressionNew(variable,
                                                               bound_expression);
 }
 
@@ -120,13 +127,12 @@ MskBoundExpression* BindNameExpression(MskBinder* binder,
                                        MskExpressionSyntax* syntax) {
   MskNameExpressionSyntax* name = (MskNameExpressionSyntax*)syntax;
   StringView name_text = StringAsView(name->identifier_token.text);
-  MskRuntimeObject value;
-  if (!MskSymbolTableLookup(binder->symbols, name_text, &value)) {
+  MskSymbolTableEntry entry = {0};
+  if (!MskSymbolTableLookup(binder->symbols, name_text, &entry)) {
     MskDiagnosticBagReportUndefinedName(
         &binder->diagnostics, MskSyntaxTokenGetSpan(name->identifier_token),
         name_text);
   }
-  MskRuntimeObjectKind kind = value.kind;
-  return (MskBoundExpression*)MskBoundVariableExpressionNew(
-      StringFromView(name_text), kind);
+  MskVariableSymbol variable = entry.variable;
+  return (MskBoundExpression*)MskBoundVariableExpressionNew(variable);
 }

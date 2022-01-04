@@ -3,28 +3,34 @@
 #include <stdint.h>
 
 #include "hash/hash.h"
+#include "minsk/code_analysis/variable_symbol.h"
+#include "string/string.h"
 
-static HashKeySpan CreateHashKeySpan(StringView view);
+static HashKeySpan CreateHashKeySpan(StringView name);
 
 bool MskSymbolTableLookup(MskSymbolTable* table,
                           StringView name,
-                          MskRuntimeObject* out_value) {
+                          MskSymbolTableEntry* out_value) {
   return HASH_GET(table, CreateHashKeySpan(name), out_value);
 }
 
 void MskSymbolTableInsert(MskSymbolTable* table,
-                          StringView name,
+                          MskVariableSymbol variable,
                           MskRuntimeObject value) {
-  HASH_ADD(table, CreateHashKeySpan(name), value);
+  MskSymbolTableEntry entry = {
+      .variable = variable,
+      .value = value,
+  };
+  HASH_ADD(table, CreateHashKeySpan(StringAsView(variable.name)), entry);
 }
 
 void MskSymbolTableFree(MskSymbolTable* table) {
   HASH_FREE(table);
 }
 
-HashKeySpan CreateHashKeySpan(StringView view) {
+HashKeySpan CreateHashKeySpan(StringView name) {
   return (HashKeySpan){
-      .begin = (const uint8_t*)view.begin,
-      .end = (const uint8_t*)view.end,
+      .begin = (const uint8_t*)name.begin,
+      .end = (const uint8_t*)name.end,
   };
 }

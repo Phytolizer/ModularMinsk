@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 
-#include "minsk/runtime/object.h"
 #include "minsk/code_analysis/binding/assignment_expression.h"
 #include "minsk/code_analysis/binding/binary_expression.h"
 #include "minsk/code_analysis/binding/expression.h"
@@ -10,6 +9,7 @@
 #include "minsk/code_analysis/binding/literal_expression.h"
 #include "minsk/code_analysis/binding/unary_expression.h"
 #include "minsk/code_analysis/binding/variable_expression.h"
+#include "minsk/runtime/object.h"
 
 static MskBoundNodeKind GetExpressionKind(MskBoundNode* node);
 static void FreeExpression(MskBoundNode* node);
@@ -101,12 +101,12 @@ void FreeBinaryExpression(MskBoundExpression* exp) {
 
 void FreeVariableExpression(MskBoundExpression* exp) {
   MskBoundVariableExpression* variable = (MskBoundVariableExpression*)exp;
-  StringFree(&variable->name);
+  StringFree(&variable->variable.name);
 }
 
 void FreeAssignmentExpression(MskBoundExpression* exp) {
   MskBoundAssignmentExpression* assignment = (MskBoundAssignmentExpression*)exp;
-  StringFree(&assignment->name);
+  StringFree(&assignment->variable.name);
   FreeExpression(&assignment->value->base);
   free(assignment->value);
   assignment->value = NULL;
