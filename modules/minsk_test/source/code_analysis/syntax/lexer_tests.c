@@ -11,10 +11,12 @@
 
 static TEST_FUNC(LexerLexesToken);
 static TEST_FUNC(LexerLexesTokenPairs);
+static TEST_FUNC(LexerLexesTokenPairsWithSeparator);
 
 TEST_SUITE_FUNC(LexerTests) {
   TEST_RUN(LexerLexesToken);
   TEST_RUN(LexerLexesTokenPairs);
+  TEST_RUN(LexerLexesTokenPairsWithSeparator);
 }
 
 typedef struct {
@@ -25,11 +27,6 @@ typedef struct {
 static const TestToken kTokens[] = {
     {kMskSyntaxKindIdentifierToken, "a"},
     {kMskSyntaxKindIdentifierToken, "abc"},
-    // {kMskSyntaxKindWhitespaceToken, " "},
-    // {kMskSyntaxKindWhitespaceToken, "  "},
-    // {kMskSyntaxKindWhitespaceToken, "\r"},
-    // {kMskSyntaxKindWhitespaceToken, "\n"},
-    // {kMskSyntaxKindWhitespaceToken, "\r\n"},
 
     {kMskSyntaxKindNumberToken, "1"},
     {kMskSyntaxKindNumberToken, "123"},
@@ -47,6 +44,14 @@ static const TestToken kTokens[] = {
     {kMskSyntaxKindPipePipeToken, "||"},
     {kMskSyntaxKindTrueKeyword, "true"},
     {kMskSyntaxKindFalseKeyword, "false"},
+};
+
+static const TestToken kSeparators[] = {
+    {kMskSyntaxKindWhitespaceToken, " "},
+    {kMskSyntaxKindWhitespaceToken, "  "},
+    {kMskSyntaxKindWhitespaceToken, "\r"},
+    {kMskSyntaxKindWhitespaceToken, "\n"},
+    {kMskSyntaxKindWhitespaceToken, "\r\n"},
 };
 
 typedef struct {
@@ -92,6 +97,29 @@ static TestTokenPairs GetTokenPairs(void) {
   return pairs;
 }
 
+typedef struct {
+  TestTokenPair pair;
+  TestToken separator;
+} TestTokenPairWithSeparator;
+
+typedef VEC_TYPE(TestTokenPairWithSeparator) TestTokenPairsWithSeparator;
+
+static TestTokenPairsWithSeparator GetTokenPairsWithSeparator(void) {
+  TestTokenPairsWithSeparator pairs = {0};
+  for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); i++) {
+    for (size_t j = i + 1; j < sizeof(kTokens) / sizeof(TestToken); j++) {
+      if (RequiresSeparator(kTokens[i].kind, kTokens[j].kind)) {
+        for (size_t k = 0; k < sizeof(kSeparators) / sizeof(TestToken); k++) {
+          TestTokenPairWithSeparator pair = {{kTokens[i], kTokens[j]},
+                                             kSeparators[k]};
+          VEC_PUSH(&pairs, pair);
+        }
+      }
+    }
+  }
+  return pairs;
+}
+
 #define CLEANUP_TOKENS()                       \
   do {                                         \
     for (size_t i = 0; i < tokens.size; ++i) { \
@@ -101,8 +129,11 @@ static TestTokenPairs GetTokenPairs(void) {
   } while (false)
 
 TEST_FUNC(LexerLexesToken) {
-  for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); ++i) {
-    const TestToken* tok = &kTokens[i];
+  size_t num_tokens = sizeof(kTokens) / sizeof(TestToken);
+  for (size_t i = 0; i < num_tokens + sizeof(kSeparators) / sizeof(TestToken);
+       ++i) {
+    const TestToken* tok =
+        i < num_tokens ? &kTokens[i] : &kSeparators[i - num_tokens];
     MskSyntaxTokens tokens =
         MskSyntaxTreeParseTokens(StringViewFromC(tok->text));
     TEST_ASSERT(tokens.size == 1, CLEANUP_TOKENS(),
@@ -143,5 +174,50 @@ TEST_FUNC(LexerLexesTokenPairs) {
                 STRING_PRINT(actual1->text));
     CLEANUP_TOKENS();
   }
+  VEC_FREE(&pairs);
+  TEST_PASS();
+}
+
+TEST_FUNC(LexerLexesTokenPairsWithSeparator) {
+  TestTokenPairsWithSeparator pairs = GetTokenPairsWithSeparator();
+  for (uint64_t i = 0; i < pairs.size; ++i) {
+    const TestTokenPairWithSeparator* pair = &pairs.data[i];
+    String text = {0};
+    StringAppendC(&text, pair->pair.t1.text);
+    StringAppendC(&text, pair->separator.text);
+    StringAppendC(&text, pair->pair.t2.text);
+    MskSyntaxTokens tokens = MskSyntaxTreeParseTokens(StringAsView(text));
+    StringFree(&text);
+    TEST_ASSERT(tokens.size == 3, CLEANUP_TOKENS(),
+                "['%s' '%s' '%s'] Expected 3 tokens, got %" PRIu64,
+                pair->pair.t1.text, pair->separator.text, pair->pair.t2.text,
+                tokens.size);
+    MskSyntaxToken* actual1 = &tokens.data[0];
+    MskSyntaxToken* actual2 = &tokens.data[1];
+    MskSyntaxToken* actual3 = &tokens.data[2];
+    TEST_ASSERT(actual1->kind == pair->pair.t1.kind, CLEANUP_TOKENS(),
+                "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
+                STRING_VIEW_PRINT(MskSyntaxKindName(pair->pair.t1.kind)),
+                STRING_VIEW_PRINT(MskSyntaxKindName(actual1->kind)));
+    TEST_ASSERT(StringEqualC(actual1->text, pair->pair.t1.text),
+                CLEANUP_TOKENS(), "Expected text '%s', got '%" STRING_FMT "'",
+                pair->pair.t1.text, STRING_PRINT(actual1->text));
+    TEST_ASSERT(actual2->kind == pair->separator.kind, CLEANUP_TOKENS(),
+                "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
+                STRING_VIEW_PRINT(MskSyntaxKindName(pair->separator.kind)),
+                STRING_VIEW_PRINT(MskSyntaxKindName(actual2->kind)));
+    TEST_ASSERT(StringEqualC(actual2->text, pair->separator.text),
+                CLEANUP_TOKENS(), "Expected text '%s', got '%" STRING_FMT "'",
+                pair->separator.text, STRING_PRINT(actual2->text));
+    TEST_ASSERT(actual3->kind == pair->pair.t2.kind, CLEANUP_TOKENS(),
+                "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
+                STRING_VIEW_PRINT(MskSyntaxKindName(pair->pair.t2.kind)),
+                STRING_VIEW_PRINT(MskSyntaxKindName(actual3->kind)));
+    TEST_ASSERT(StringEqualC(actual3->text, pair->pair.t2.text),
+                CLEANUP_TOKENS(), "Expected text '%s', got '%" STRING_FMT "'",
+                pair->pair.t2.text, STRING_PRINT(actual3->text));
+    CLEANUP_TOKENS();
+  }
+  VEC_FREE(&pairs);
   TEST_PASS();
 }
