@@ -7,19 +7,22 @@
 
 #include "minsk_test/code_analysis/syntax/lexer_tests.h"
 
-char* RunAllTests(uint64_t* test_count) {
-  TEST_RUN_SUITE(LexerTests, test_count);
-  return NULL;
+void RunAllTests(TestState* test_state) {
+  TEST_RUN_SUITE(LexerTests, test_state);
 }
 
 int main(void) {
-  uint64_t test_count = 0;
-  char* message = RunAllTests(&test_count);
-  printf("%" PRIu64 " tests passed\n", test_count);
-  if (message != NULL) {
-    fprintf(stderr, ANSI_ESC_FG_RED "FAIL" ANSI_ESC_RESET ": %s\n", message);
-    free(message);
-    return 1;
-  }
+  TestState test_state = {0};
+  RunAllTests(&test_state);
+  printf("==============\n");
+  printf(" TEST SUMMARY \n");
+  printf("==============\n");
+  printf("%" PRIu64 " tests " ANSI_ESC_FG_GREEN "passed" ANSI_ESC_RESET "\n",
+         test_state.tests_passed);
+  printf("%" PRIu64 " tests " ANSI_ESC_FG_RED "failed" ANSI_ESC_RESET "\n",
+         test_state.tests_failed);
+  printf("%" PRIu64 " assertions made" ANSI_ESC_RESET "\n",
+         test_state.assert_count);
+
   return 0;
 }

@@ -22,7 +22,6 @@ TEST_FUNC(LexerLexesToken);
 
 TEST_SUITE_FUNC(LexerTests) {
   TEST_RUN(LexerLexesToken);
-  TEST_SUITE_PASS();
 }
 
 TEST_FUNC(LexerLexesToken) {
