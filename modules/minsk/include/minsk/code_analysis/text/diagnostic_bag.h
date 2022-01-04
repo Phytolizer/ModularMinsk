@@ -34,5 +34,8 @@ void MskDiagnosticBagReportUndefinedBinaryOperator(
     StringView operator_name,
     MskRuntimeObjectKind left_type,
     MskRuntimeObjectKind right_type);
+void MskDiagnosticBagReportUndefinedName(MskDiagnosticBag* diagnostics,
+                                         MskTextSpan span,
+                                         StringView name);
 
 #endif  // MINSK_CODE_ANALYSIS_DIAGNOSTIC_H_

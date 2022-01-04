@@ -19,6 +19,6 @@ typedef struct {
 
 void MskSyntaxTokenFree(MskSyntaxToken* token);
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token);
-MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken* token);
+MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_TOKEN_H_

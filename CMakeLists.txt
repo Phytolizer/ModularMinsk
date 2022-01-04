@@ -127,7 +127,8 @@ declare_module(ansi_esc KIND interface)
 declare_module(
   minsk
   KIND library
-  SOURCES code_analysis/binding/binary_expression.c
+  SOURCES code_analysis/binding/assignment_expression.c
+          code_analysis/binding/binary_expression.c
           code_analysis/binding/binary_operator.c
           code_analysis/binding/binder.c
           code_analysis/binding/expression.c
@@ -135,14 +136,18 @@ declare_module(
           code_analysis/binding/node.c
           code_analysis/binding/unary_expression.c
           code_analysis/binding/unary_operator.c
+          code_analysis/binding/variable_expression.c
           code_analysis/compilation.c
           code_analysis/evaluator.c
+          code_analysis/symbol_table.c
+          code_analysis/syntax/assignment_expression.c
           code_analysis/syntax/binary_expression.c
           code_analysis/syntax/expression.c
           code_analysis/syntax/facts.c
           code_analysis/syntax/kind.c
           code_analysis/syntax/lexer.c
           code_analysis/syntax/literal_expression.c
+          code_analysis/syntax/name_expression.c
           code_analysis/syntax/node.c
           code_analysis/syntax/parenthesized_expression.c
           code_analysis/syntax/parser.c

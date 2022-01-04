@@ -13,5 +13,6 @@ typedef struct {
 MskUnaryExpressionSyntax* MskUnaryExpressionSyntaxNew(
     MskSyntaxToken operator_token,
     MskExpressionSyntax* operand);
+void MskUnaryExpressionSyntaxFree(MskUnaryExpressionSyntax* syntax);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_UNARY_EXPRESSION_H_

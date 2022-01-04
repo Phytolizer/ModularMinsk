@@ -2,6 +2,7 @@
 #define MINSK_CODE_ANALYSIS_COMPILATION_H_
 
 #include "minsk/code_analysis/evaluation_result.h"
+#include "minsk/code_analysis/symbol_table.h"
 #include "minsk/code_analysis/syntax/tree.h"
 
 typedef struct {
@@ -9,6 +10,7 @@ typedef struct {
 } MskCompilation;
 
 MskCompilation MskCompilationNew(MskSyntaxTree syntax);
-MskEvaluationResult MskCompilationEvaluate(MskCompilation* compilation);
+MskEvaluationResult MskCompilationEvaluate(MskCompilation* compilation,
+                                           MskSymbolTable* symbols);
 
 #endif  // MINSK_CODE_ANALYSIS_COMPILATION_H_

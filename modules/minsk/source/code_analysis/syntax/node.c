@@ -3,10 +3,12 @@
 #include <ansi_esc/ansi_esc.h>
 #include <stdint.h>
 
+#include "minsk/code_analysis/syntax/assignment_expression.h"
 #include "minsk/code_analysis/syntax/binary_expression.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
+#include "minsk/code_analysis/syntax/name_expression.h"
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/code_analysis/syntax/unary_expression.h"
@@ -24,11 +26,6 @@ StringView MskSyntaxNodeClassName(MskSyntaxNodeClass kind) {
 
 static MskSyntaxKind GetExpressionKind(MskSyntaxNode* node);
 static MskSyntaxKind GetTokenKind(MskSyntaxNode* node);
-static MskSyntaxKind GetBinaryExpressionKind(MskExpressionSyntax* syntax);
-static MskSyntaxKind GetLiteralExpressionKind(MskExpressionSyntax* syntax);
-static MskSyntaxKind GetParenthesizedExpressionKind(
-    MskExpressionSyntax* syntax);
-static MskSyntaxKind GetUnaryExpressionKind(MskExpressionSyntax* syntax);
 
 static MskSyntaxNodeChildren GetExpressionChildren(MskSyntaxNode* node);
 static MskSyntaxNodeChildren GetTokenChildren(MskSyntaxNode* node);
@@ -39,6 +36,10 @@ static MskSyntaxNodeChildren GetLiteralExpressionChildren(
 static MskSyntaxNodeChildren GetParenthesizedExpressionChildren(
     MskExpressionSyntax* syntax);
 static MskSyntaxNodeChildren GetUnaryExpressionChildren(
+    MskExpressionSyntax* syntax);
+static MskSyntaxNodeChildren GetNameExpressionChildren(
+    MskExpressionSyntax* syntax);
+static MskSyntaxNodeChildren GetAssignmentExpressionChildren(
     MskExpressionSyntax* syntax);
 
 static void PrettyPrint(MskSyntaxNode* node,
@@ -80,7 +81,7 @@ MskSyntaxKind GetExpressionKind(MskSyntaxNode* node) {
   switch (syntax->cls) {
 #define X(x)                         \
   case kMskSyntaxExpressionClass##x: \
-    return Get##x##ExpressionKind(syntax);
+    return kMskSyntaxKind##x##Expression;
     MSK__EXPRESSION_CLASSES
 #undef X
     default:
@@ -91,26 +92,6 @@ MskSyntaxKind GetExpressionKind(MskSyntaxNode* node) {
 MskSyntaxKind GetTokenKind(MskSyntaxNode* node) {
   MskSyntaxToken* syntax = (MskSyntaxToken*)node;
   return syntax->kind;
-}
-
-MskSyntaxKind GetBinaryExpressionKind(MskExpressionSyntax* syntax) {
-  (void)syntax;
-  return kMskSyntaxKindBinaryExpression;
-}
-
-MskSyntaxKind GetLiteralExpressionKind(MskExpressionSyntax* syntax) {
-  (void)syntax;
-  return kMskSyntaxKindLiteralExpression;
-}
-
-MskSyntaxKind GetParenthesizedExpressionKind(MskExpressionSyntax* syntax) {
-  (void)syntax;
-  return kMskSyntaxKindParenthesizedExpression;
-}
-
-MskSyntaxKind GetUnaryExpressionKind(MskExpressionSyntax* syntax) {
-  (void)syntax;
-  return kMskSyntaxKindUnaryExpression;
 }
 
 MskSyntaxNodeChildren GetExpressionChildren(MskSyntaxNode* node) {
@@ -163,6 +144,24 @@ MskSyntaxNodeChildren GetUnaryExpressionChildren(MskExpressionSyntax* syntax) {
   MskSyntaxNodeChildren children = {0};
   VEC_PUSH(&children, &unary->operator_token.base);
   VEC_PUSH(&children, &unary->operand->base);
+  return children;
+}
+
+MskSyntaxNodeChildren GetNameExpressionChildren(MskExpressionSyntax* syntax) {
+  MskNameExpressionSyntax* name = (MskNameExpressionSyntax*)syntax;
+  MskSyntaxNodeChildren children = {0};
+  VEC_PUSH(&children, &name->identifier_token.base);
+  return children;
+}
+
+MskSyntaxNodeChildren GetAssignmentExpressionChildren(
+    MskExpressionSyntax* syntax) {
+  MskAssignmentExpressionSyntax* assignment =
+      (MskAssignmentExpressionSyntax*)syntax;
+  MskSyntaxNodeChildren children = {0};
+  VEC_PUSH(&children, &assignment->identifier_token.base);
+  VEC_PUSH(&children, &assignment->equals_token.base);
+  VEC_PUSH(&children, &assignment->expression->base);
   return children;
 }
 

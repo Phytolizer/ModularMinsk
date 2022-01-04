@@ -11,11 +11,13 @@
 #include <stdlib.h>
 #include <string/string.h>
 
+#include "minsk/code_analysis/symbol_table.h"
 #include "minsk/code_analysis/text/diagnostic.h"
 #include "minsk/code_analysis/text/span.h"
 
 int main(void) {
   bool show_tree = false;
+  MskSymbolTable symbols = {0};
   while (true) {
     printf("minsk> ");
     fflush(stdout);
@@ -61,7 +63,8 @@ int main(void) {
       show_diagnostics = true;
     } else {
       MskCompilation compilation = MskCompilationNew(syntax_tree);
-      MskEvaluationResult result = MskCompilationEvaluate(&compilation);
+      MskEvaluationResult result =
+          MskCompilationEvaluate(&compilation, &symbols);
       if (result.kind == kMskEvaluationResultFailure) {
         show_diagnostics = true;
         VEC_APPEND(&diagnostics, result.value.err.data, result.value.err.size);
@@ -97,4 +100,5 @@ int main(void) {
     MskSyntaxTreeFree(&syntax_tree);
     StringFree(&text);
   }
+  MskSymbolTableFree(&symbols);
 }

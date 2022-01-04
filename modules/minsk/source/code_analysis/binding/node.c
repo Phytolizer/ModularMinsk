@@ -3,11 +3,13 @@
 #include <stdlib.h>
 
 #include "minsk/runtime/object.h"
+#include "minsk_private/code_analysis/binding/assignment_expression.h"
 #include "minsk_private/code_analysis/binding/binary_expression.h"
 #include "minsk_private/code_analysis/binding/expression.h"
 #include "minsk_private/code_analysis/binding/kind.h"
 #include "minsk_private/code_analysis/binding/literal_expression.h"
 #include "minsk_private/code_analysis/binding/unary_expression.h"
+#include "minsk_private/code_analysis/binding/variable_expression.h"
 
 static MskBoundNodeKind GetExpressionKind(MskBoundNode* node);
 static void FreeExpression(MskBoundNode* node);
@@ -15,6 +17,8 @@ static void FreeExpression(MskBoundNode* node);
 static void FreeLiteralExpression(MskBoundExpression* exp);
 static void FreeUnaryExpression(MskBoundExpression* exp);
 static void FreeBinaryExpression(MskBoundExpression* exp);
+static void FreeVariableExpression(MskBoundExpression* exp);
+static void FreeAssignmentExpression(MskBoundExpression* exp);
 
 MskBoundNodeKind MskBoundNodeGetKind(MskBoundNode* node) {
   switch (node->cls) {
@@ -93,4 +97,17 @@ void FreeBinaryExpression(MskBoundExpression* exp) {
   free(binary->right);
   binary->left = NULL;
   binary->right = NULL;
+}
+
+void FreeVariableExpression(MskBoundExpression* exp) {
+  MskBoundVariableExpression* variable = (MskBoundVariableExpression*)exp;
+  StringFree(&variable->name);
+}
+
+void FreeAssignmentExpression(MskBoundExpression* exp) {
+  MskBoundAssignmentExpression* assignment = (MskBoundAssignmentExpression*)exp;
+  StringFree(&assignment->name);
+  FreeExpression(&assignment->value->base);
+  free(assignment->value);
+  assignment->value = NULL;
 }

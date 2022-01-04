@@ -15,5 +15,7 @@ MskParenthesizedExpressionSyntax* MskParenthesizedExpressionSyntaxNew(
     MskSyntaxToken open_parenthesis_token,
     MskExpressionSyntax* expression,
     MskSyntaxToken close_parenthesis_token);
+void MskParenthesizedExpressionSyntaxFree(
+    MskParenthesizedExpressionSyntax* syntax);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_PARENTHESIZED_EXPRESSION_H_

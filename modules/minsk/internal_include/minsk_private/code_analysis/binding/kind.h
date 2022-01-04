@@ -5,7 +5,9 @@
   X(Invalid)                    \
   X(BinaryExpression)           \
   X(LiteralExpression)          \
-  X(UnaryExpression)
+  X(UnaryExpression)            \
+  X(VariableExpression)         \
+  X(AssignmentExpression)
 
 /// The concrete node kind.
 ///

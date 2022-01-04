@@ -7,7 +7,9 @@
 #define MINSK__BOUND_EXPRESSION_CLASSES \
   X(Literal)                            \
   X(Binary)                             \
-  X(Unary)
+  X(Unary)                              \
+  X(Variable)                           \
+  X(Assignment)
 
 typedef enum {
   kMskBoundExpressionClassInvalid,

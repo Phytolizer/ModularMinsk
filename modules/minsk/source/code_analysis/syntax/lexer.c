@@ -114,6 +114,9 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
       if (Peek(lexer) == '=') {
         kind = kMskSyntaxKindEqualsEqualsToken;
         lexer->position += 2;
+      } else {
+        kind = kMskSyntaxKindEqualsToken;
+        lexer->position++;
       }
     default:
       if (IsLetter(Cur(lexer))) {

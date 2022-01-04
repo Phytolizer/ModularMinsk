@@ -39,6 +39,6 @@ MskSyntaxKind MskSyntaxFactsKeywordKind(StringView text) {
   } else if (StringViewEqualC(text, "false")) {
     return kMskSyntaxKindFalseKeyword;
   } else {
-    return kMskSyntaxKindBadToken;
+    return kMskSyntaxKindIdentifierToken;
   }
 }

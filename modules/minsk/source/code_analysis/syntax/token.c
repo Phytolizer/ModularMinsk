@@ -16,9 +16,9 @@ MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
   return duplicate;
 }
 
-MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken* token) {
+MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token) {
   return (MskTextSpan){
-      .start = token->position,
-      .length = token->text.size,
+      .start = token.position,
+      .length = token.text.size,
   };
 }

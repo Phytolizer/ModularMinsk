@@ -14,3 +14,9 @@ MskUnaryExpressionSyntax* MskUnaryExpressionSyntaxNew(
   syntax->operand = operand;
   return syntax;
 }
+
+void MskUnaryExpressionSyntaxFree(MskUnaryExpressionSyntax* syntax) {
+  MskSyntaxTokenFree(&syntax->operator_token);
+  MskExpressionSyntaxFree(syntax->operand);
+  free(syntax->operand);
+}

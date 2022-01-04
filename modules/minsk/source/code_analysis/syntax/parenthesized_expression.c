@@ -4,6 +4,7 @@
 
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/node.h"
+#include "minsk/code_analysis/syntax/token.h"
 
 MskParenthesizedExpressionSyntax* MskParenthesizedExpressionSyntaxNew(
     MskSyntaxToken open_parenthesis_token,
@@ -17,4 +18,12 @@ MskParenthesizedExpressionSyntax* MskParenthesizedExpressionSyntaxNew(
   syntax->expression = expression;
   syntax->close_parenthesis_token = close_parenthesis_token;
   return syntax;
+}
+
+void MskParenthesizedExpressionSyntaxFree(
+    MskParenthesizedExpressionSyntax* syntax) {
+  MskSyntaxTokenFree(&syntax->open_parenthesis_token);
+  MskExpressionSyntaxFree(syntax->expression);
+  free(syntax->expression);
+  MskSyntaxTokenFree(&syntax->close_parenthesis_token);
 }

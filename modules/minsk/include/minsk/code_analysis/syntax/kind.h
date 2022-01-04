@@ -14,6 +14,7 @@
   /* "Dynamic" tokens. */    \
   X(NumberToken)             \
   X(WhitespaceToken)         \
+  X(IdentifierToken)         \
                              \
   /* "Static" tokens. */     \
   X(PlusToken)               \
@@ -27,6 +28,7 @@
   X(PipePipeToken)           \
   X(EqualsEqualsToken)       \
   X(BangEqualsToken)         \
+  X(EqualsToken)             \
                              \
   /* Keywords. */            \
   X(TrueKeyword)             \
@@ -36,7 +38,9 @@
   X(LiteralExpression)       \
   X(BinaryExpression)        \
   X(ParenthesizedExpression) \
-  X(UnaryExpression)
+  X(UnaryExpression)         \
+  X(NameExpression)          \
+  X(AssignmentExpression)
 
 /// The concrete syntax kind.
 ///

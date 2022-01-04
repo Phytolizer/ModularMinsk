@@ -4,10 +4,12 @@
 #include "minsk/code_analysis/syntax/node.h"
 
 #define MSK__EXPRESSION_CLASSES \
-  X(Binary)                   \
-  X(Literal)                  \
-  X(Parenthesized)            \
-  X(Unary)
+  X(Binary)                     \
+  X(Literal)                    \
+  X(Parenthesized)              \
+  X(Unary)                      \
+  X(Name)                       \
+  X(Assignment)
 
 typedef enum {
 #define X(x) kMskSyntaxExpressionClass##x,

@@ -3,12 +3,9 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "minsk/code_analysis/syntax/binary_expression.h"
-#include "minsk/code_analysis/syntax/expression.h"
-#include "minsk/code_analysis/syntax/literal_expression.h"
-#include "minsk/code_analysis/syntax/parenthesized_expression.h"
-#include "minsk/code_analysis/syntax/unary_expression.h"
+#include "minsk/code_analysis/symbol_table.h"
 #include "minsk/runtime/object.h"
+#include "minsk_private/code_analysis/binding/assignment_expression.h"
 #include "minsk_private/code_analysis/binding/binary_expression.h"
 #include "minsk_private/code_analysis/binding/binary_operator_kind.h"
 #include "minsk_private/code_analysis/binding/binder.h"
@@ -17,33 +14,47 @@
 #include "minsk_private/code_analysis/binding/node.h"
 #include "minsk_private/code_analysis/binding/unary_expression.h"
 #include "minsk_private/code_analysis/binding/unary_operator_kind.h"
+#include "minsk_private/code_analysis/binding/variable_expression.h"
 
-static MskRuntimeObject EvaluateExpression(MskBoundExpression* expression);
+static MskRuntimeObject EvaluateExpression(MskEvaluator* evaluator,
+                                           MskBoundExpression* expression);
 static MskRuntimeObject EvaluateLiteralExpression(
+    MskEvaluator* evaluator,
     MskBoundLiteralExpression* expression);
 static MskRuntimeObject EvaluateBinaryExpression(
+    MskEvaluator* evaluator,
     MskBoundBinaryExpression* expression);
 static MskRuntimeObject EvaluateUnaryExpression(
+    MskEvaluator* evaluator,
     MskBoundUnaryExpression* expression);
+static MskRuntimeObject EvaluateVariableExpression(
+    MskEvaluator* evaluator,
+    MskBoundVariableExpression* expression);
+static MskRuntimeObject EvaluateAssignmentExpression(
+    MskEvaluator* evaluator,
+    MskBoundAssignmentExpression* expression);
 
-MskEvaluator MskEvaluatorNew(MskBoundExpression* root) {
+MskEvaluator MskEvaluatorNew(MskBoundExpression* root,
+                             MskSymbolTable* symbols) {
   return (MskEvaluator){
       .root = root,
+      .symbols = symbols,
   };
 }
 
 MskRuntimeObject MskEvaluatorEvaluate(MskEvaluator* evaluator) {
-  return EvaluateExpression(evaluator->root);
+  return EvaluateExpression(evaluator, evaluator->root);
 }
 
-MskRuntimeObject EvaluateExpression(MskBoundExpression* expression) {
+MskRuntimeObject EvaluateExpression(MskEvaluator* evaluator,
+                                    MskBoundExpression* expression) {
   switch (expression->cls) {
-    case kMskBoundExpressionClassLiteral:
-      return EvaluateLiteralExpression((MskBoundLiteralExpression*)expression);
-    case kMskBoundExpressionClassBinary:
-      return EvaluateBinaryExpression((MskBoundBinaryExpression*)expression);
-    case kMskBoundExpressionClassUnary:
-      return EvaluateUnaryExpression((MskBoundUnaryExpression*)expression);
+#define X(x)                                  \
+  case kMskBoundExpressionClass##x:           \
+    return Evaluate##x##Expression(evaluator, \
+                                   (MskBound##x##Expression*)expression);
+    MINSK__BOUND_EXPRESSION_CLASSES
+#undef X
     default:
       assert(false && "corrupt bound expression");
       return (MskRuntimeObject){0};
@@ -51,14 +62,17 @@ MskRuntimeObject EvaluateExpression(MskBoundExpression* expression) {
 }
 
 MskRuntimeObject EvaluateLiteralExpression(
+    MskEvaluator* evaluator,
     MskBoundLiteralExpression* expression) {
+  (void)evaluator;
   return expression->value;
 }
 
 MskRuntimeObject EvaluateBinaryExpression(
+    MskEvaluator* evaluator,
     MskBoundBinaryExpression* expression) {
-  MskRuntimeObject left = EvaluateExpression(expression->left);
-  MskRuntimeObject right = EvaluateExpression(expression->right);
+  MskRuntimeObject left = EvaluateExpression(evaluator, expression->left);
+  MskRuntimeObject right = EvaluateExpression(evaluator, expression->right);
   switch (expression->op.kind) {
     case kMskBoundBinaryOperatorKindAddition:
       return MskRuntimeObjectNewInteger(left.value.integer +
@@ -88,8 +102,9 @@ MskRuntimeObject EvaluateBinaryExpression(
   }
 }
 
-MskRuntimeObject EvaluateUnaryExpression(MskBoundUnaryExpression* expression) {
-  MskRuntimeObject operand = EvaluateExpression(expression->operand);
+MskRuntimeObject EvaluateUnaryExpression(MskEvaluator* evaluator,
+                                         MskBoundUnaryExpression* expression) {
+  MskRuntimeObject operand = EvaluateExpression(evaluator, expression->operand);
   switch (expression->op.kind) {
     case kMskBoundUnaryOperatorKindIdentity:
       return MskRuntimeObjectNewInteger(operand.value.integer);
@@ -101,4 +116,22 @@ MskRuntimeObject EvaluateUnaryExpression(MskBoundUnaryExpression* expression) {
       assert(false && "corrupt unary operator kind");
       return (MskRuntimeObject){0};
   }
+}
+
+MskRuntimeObject EvaluateVariableExpression(
+    MskEvaluator* evaluator,
+    MskBoundVariableExpression* expression) {
+  MskRuntimeObject value = {0};
+  MskSymbolTableLookup(evaluator->symbols, StringAsView(expression->name),
+                       &value);
+  return value;
+}
+
+MskRuntimeObject EvaluateAssignmentExpression(
+    MskEvaluator* evaluator,
+    MskBoundAssignmentExpression* expression) {
+  MskRuntimeObject value = EvaluateExpression(evaluator, expression->value);
+  MskSymbolTableInsert(evaluator->symbols, StringAsView(expression->name),
+                       value);
+  return value;
 }

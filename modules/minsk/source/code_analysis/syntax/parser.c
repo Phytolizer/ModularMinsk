@@ -3,10 +3,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "minsk/code_analysis/syntax/assignment_expression.h"
 #include "minsk/code_analysis/syntax/binary_expression.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
+#include "minsk/code_analysis/syntax/name_expression.h"
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/syntax/parenthesized_expression.h"
 #include "minsk/code_analysis/syntax/token.h"
@@ -22,6 +24,7 @@ static MskSyntaxToken* Current(MskSyntaxParser* parser);
 static MskSyntaxToken NextToken(MskSyntaxParser* parser);
 static MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind);
 static MskExpressionSyntax* ParseExpression(MskSyntaxParser* parser);
+static MskExpressionSyntax* ParseAssignmentExpression(MskSyntaxParser* parser);
 static MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser,
                                                   uint64_t parent_precedence);
 static MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser);
@@ -70,7 +73,7 @@ MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset) {
     // EOF tokens.
     return &parser->tokens.data[parser->tokens.size - 1];
   }
-  if (offset > parser->position) {
+  if (offset < -(int64_t)parser->position) {
     // Return NULL, as we want to crash if the caller tries to peek past the
     // beginning of the stream.
     return NULL;
@@ -93,7 +96,7 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
     return NextToken(parser);
   }
   MskDiagnosticBagReportUnexpectedToken(&parser->diagnostics,
-                                        MskSyntaxTokenGetSpan(Current(parser)),
+                                        MskSyntaxTokenGetSpan(*Current(parser)),
                                         kind, Current(parser)->kind);
   return (MskSyntaxToken){
       .base = {.cls = kMskSyntaxNodeClassToken},
@@ -105,6 +108,19 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
 }
 
 MskExpressionSyntax* ParseExpression(MskSyntaxParser* parser) {
+  return ParseAssignmentExpression(parser);
+}
+
+MskExpressionSyntax* ParseAssignmentExpression(MskSyntaxParser* parser) {
+  if (Current(parser)->kind == kMskSyntaxKindIdentifierToken &&
+      Peek(parser, 1)->kind == kMskSyntaxKindEqualsToken) {
+    MskSyntaxToken identifier_token =
+        MatchToken(parser, kMskSyntaxKindIdentifierToken);
+    MskSyntaxToken equals_token = MatchToken(parser, kMskSyntaxKindEqualsToken);
+    MskExpressionSyntax* right = ParseAssignmentExpression(parser);
+    return (MskExpressionSyntax*)MskAssignmentExpressionSyntaxNew(
+        identifier_token, equals_token, right);
+  }
   return ParseBinaryExpression(parser, 0);
 }
 
@@ -153,6 +169,10 @@ MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser) {
     bool value = keyword_token.kind == kMskSyntaxKindTrueKeyword;
     return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(
         keyword_token, MskRuntimeObjectNewBoolean(value));
+  }
+  if (Current(parser)->kind == kMskSyntaxKindIdentifierToken) {
+    MskSyntaxToken identifier_token = NextToken(parser);
+    return (MskExpressionSyntax*)MskNameExpressionSyntaxNew(identifier_token);
   }
   MskSyntaxToken number_token = MatchToken(parser, kMskSyntaxKindNumberToken);
   return (MskExpressionSyntax*)MskLiteralExpressionSyntaxNew(

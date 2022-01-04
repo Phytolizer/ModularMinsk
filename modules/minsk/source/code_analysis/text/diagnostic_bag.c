@@ -75,6 +75,15 @@ void MskDiagnosticBagReportUndefinedBinaryOperator(
   Report(diagnostics, span, message);
 }
 
+void MskDiagnosticBagReportUndefinedName(MskDiagnosticBag* diagnostics,
+                                         MskTextSpan span,
+                                         StringView name) {
+  String message =
+      StringFormat("The name '%" STRING_VIEW_FMT "' isn't defined.",
+                   STRING_VIEW_PRINT(name));
+  Report(diagnostics, span, message);
+}
+
 void Report(MskDiagnosticBag* diagnostics, MskTextSpan span, String message) {
   MskDiagnostic diagnostic = {
       .span = span,
