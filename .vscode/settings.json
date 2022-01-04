@@ -4,5 +4,6 @@
   },
   "[c]": {
     "editor.tabSize": 2
-  }
+  },
+  "cmake.ctestArgs": ["--output-on-failure"]
 }
