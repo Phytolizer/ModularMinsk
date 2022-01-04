@@ -290,6 +290,20 @@ StringView StringViewFindSubstring(StringView haystack, StringView needle) {
   return (StringView){0};
 }
 
+bool StringViewEndsWith(StringView haystack, StringView needle) {
+  uint64_t haystack_size = StringViewSize(haystack);
+  uint64_t needle_size = StringViewSize(needle);
+  if (needle_size == 0) {
+    // Empty needle.
+    return true;
+  }
+  if (haystack_size < needle_size) {
+    // Needle is longer than haystack.
+    return false;
+  }
+  return memcmp(haystack.end - needle_size, needle.begin, needle_size) == 0;
+}
+
 StringView StringViewFromPtr(const char* ptr, uint64_t size) {
   return (StringView){
       .begin = ptr,

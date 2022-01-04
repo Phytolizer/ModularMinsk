@@ -88,6 +88,8 @@ void StringViewPrint(StringView view);
 uint64_t StringViewSize(StringView view);
 /// Returns a StringView of the found substring, or an empty view if no match.
 StringView StringViewFindSubstring(StringView haystack, StringView needle);
+/// Returns true if the string ends with the substring.
+bool StringViewEndsWith(StringView haystack, StringView needle);
 /// Returns a StringView over 'size' bytes of memory starting at 'ptr'.
 StringView StringViewFromPtr(const char* ptr, uint64_t size);
 /// Returns true if the StringView is equal to the C string.
