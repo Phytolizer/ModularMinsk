@@ -97,7 +97,8 @@ declare_module(
 
 # Test framework
 declare_module(
-  test TARGET_NAME testlib
+  test
+  TARGET_NAME testlib
   KIND interface
   DEPENDS nonstd
 )
@@ -185,6 +186,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     KIND executable
     SOURCES main.c code_analysis/syntax/lexer_tests.c
             code_analysis/syntax/facts_tests.c
+            code_analysis/syntax/parser_tests.c
     DEPENDS minsk testlib
   )
   enable_testing()

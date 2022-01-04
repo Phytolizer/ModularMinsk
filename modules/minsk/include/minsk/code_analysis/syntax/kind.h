@@ -2,6 +2,7 @@
 #define MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_
 
 #include <string/string.h>
+#include <vec/vec.h>
 
 #define MSK__SYNTAX_KINDS    \
   /* The zero value. */      \
@@ -52,6 +53,9 @@ typedef enum {
 #undef X
 } MskSyntaxKind;
 
+typedef VEC_TYPE(MskSyntaxKind) MskSyntaxKinds;
+
+MskSyntaxKinds MskSyntaxKindsGetAll(void);
 StringView MskSyntaxKindName(MskSyntaxKind kind);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_

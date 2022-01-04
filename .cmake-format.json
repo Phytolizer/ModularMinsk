@@ -10,6 +10,7 @@
         "kwargs": {
           "KIND": 1,
           "OUTPUT_NAME": 1,
+          "TARGET_NAME": 1,
           "SOURCES": "*",
           "ABSOLUTE_SOURCES": "*",
           "DEPENDS": "*",

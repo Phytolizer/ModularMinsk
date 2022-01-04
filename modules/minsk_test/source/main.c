@@ -7,10 +7,12 @@
 
 #include "minsk_test/code_analysis/syntax/facts_tests.h"
 #include "minsk_test/code_analysis/syntax/lexer_tests.h"
+#include "minsk_test/code_analysis/syntax/parser_tests.h"
 
 void RunAllTests(TestState* test_state) {
   TEST_RUN_SUITE(LexerTests, test_state);
   TEST_RUN_SUITE(SyntaxFactsTests, test_state);
+  TEST_RUN_SUITE(ParserTests, test_state);
 }
 
 int main(void) {

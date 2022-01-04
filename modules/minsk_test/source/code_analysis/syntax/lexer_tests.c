@@ -182,41 +182,43 @@ TEST_FUNC(LexerLexesTokenPairsWithSeparator) {
     StringAppendC(&text, pair->pair.t2.text);
     MskSyntaxTokens tokens = MskSyntaxTreeParseTokens(StringAsView(text));
     StringFree(&text);
-    TEST_ASSERT(tokens.size == 3, MskSyntaxTokensFree(&tokens),
+
+#define CLEANUP()                 \
+  do {                            \
+    MskSyntaxTokensFree(&tokens); \
+    VEC_FREE(&pairs);             \
+  } while (false)
+
+    TEST_ASSERT(tokens.size == 3, CLEANUP(),
                 "['%s' '%s' '%s'] Expected 3 tokens, got %" PRIu64,
                 pair->pair.t1.text, pair->separator.text, pair->pair.t2.text,
                 tokens.size);
     MskSyntaxToken* actual1 = &tokens.data[0];
     MskSyntaxToken* actual2 = &tokens.data[1];
     MskSyntaxToken* actual3 = &tokens.data[2];
-    TEST_ASSERT(actual1->kind == pair->pair.t1.kind,
-                MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(actual1->kind == pair->pair.t1.kind, CLEANUP(),
                 "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
                 STRING_VIEW_PRINT(MskSyntaxKindName(pair->pair.t1.kind)),
                 STRING_VIEW_PRINT(MskSyntaxKindName(actual1->kind)));
-    TEST_ASSERT(StringEqualC(actual1->text, pair->pair.t1.text),
-                MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(StringEqualC(actual1->text, pair->pair.t1.text), CLEANUP(),
                 "Expected text '%s', got '%" STRING_FMT "'", pair->pair.t1.text,
                 STRING_PRINT(actual1->text));
-    TEST_ASSERT(actual2->kind == pair->separator.kind,
-                MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(actual2->kind == pair->separator.kind, CLEANUP(),
                 "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
                 STRING_VIEW_PRINT(MskSyntaxKindName(pair->separator.kind)),
                 STRING_VIEW_PRINT(MskSyntaxKindName(actual2->kind)));
-    TEST_ASSERT(StringEqualC(actual2->text, pair->separator.text),
-                MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(StringEqualC(actual2->text, pair->separator.text), CLEANUP(),
                 "Expected text '%s', got '%" STRING_FMT "'",
                 pair->separator.text, STRING_PRINT(actual2->text));
-    TEST_ASSERT(actual3->kind == pair->pair.t2.kind,
-                MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(actual3->kind == pair->pair.t2.kind, CLEANUP(),
                 "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
                 STRING_VIEW_PRINT(MskSyntaxKindName(pair->pair.t2.kind)),
                 STRING_VIEW_PRINT(MskSyntaxKindName(actual3->kind)));
-    TEST_ASSERT(StringEqualC(actual3->text, pair->pair.t2.text),
-                MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(StringEqualC(actual3->text, pair->pair.t2.text), CLEANUP(),
                 "Expected text '%s', got '%" STRING_FMT "'", pair->pair.t2.text,
                 STRING_PRINT(actual3->text));
     MskSyntaxTokensFree(&tokens);
+#undef CLEANUP
   }
   VEC_FREE(&pairs);
   TEST_PASS();
