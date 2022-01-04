@@ -42,3 +42,38 @@ MskSyntaxKind MskSyntaxFactsKeywordKind(StringView text) {
     return kMskSyntaxKindIdentifierToken;
   }
 }
+
+StringView MskSyntaxFactsGetText(MskSyntaxKind kind) {
+  switch (kind) {
+    case kMskSyntaxKindPlusToken:
+      return StringViewFromC("+");
+    case kMskSyntaxKindMinusToken:
+      return StringViewFromC("-");
+    case kMskSyntaxKindStarToken:
+      return StringViewFromC("*");
+    case kMskSyntaxKindSlashToken:
+      return StringViewFromC("/");
+    case kMskSyntaxKindOpenParenthesisToken:
+      return StringViewFromC("(");
+    case kMskSyntaxKindCloseParenthesisToken:
+      return StringViewFromC(")");
+    case kMskSyntaxKindBangToken:
+      return StringViewFromC("!");
+    case kMskSyntaxKindBangEqualsToken:
+      return StringViewFromC("!=");
+    case kMskSyntaxKindEqualsToken:
+      return StringViewFromC("=");
+    case kMskSyntaxKindEqualsEqualsToken:
+      return StringViewFromC("==");
+    case kMskSyntaxKindAmpersandAmpersandToken:
+      return StringViewFromC("&&");
+    case kMskSyntaxKindPipePipeToken:
+      return StringViewFromC("||");
+    case kMskSyntaxKindTrueKeyword:
+      return StringViewFromC("true");
+    case kMskSyntaxKindFalseKeyword:
+      return StringViewFromC("false");
+    default:
+      return (StringView){0};
+  }
+}

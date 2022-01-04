@@ -9,6 +9,13 @@ void MskSyntaxTokenFree(MskSyntaxToken* token) {
   MskRuntimeObjectFree(&token->value);
 }
 
+void MskSyntaxTokensFree(MskSyntaxTokens* tokens) {
+  for (size_t i = 0; i < tokens->size; ++i) {
+    MskSyntaxTokenFree(&tokens->data[i]);
+  }
+  VEC_FREE(tokens);
+}
+
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
   MskSyntaxToken duplicate = token;
   duplicate.text = StringDuplicate(token.text);

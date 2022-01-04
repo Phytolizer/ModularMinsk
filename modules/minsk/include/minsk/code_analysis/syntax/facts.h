@@ -8,5 +8,6 @@
 uint64_t MskSyntaxFactsBinaryOperatorPrecedence(MskSyntaxKind kind);
 uint64_t MskSyntaxFactsUnaryOperatorPrecedence(MskSyntaxKind kind);
 MskSyntaxKind MskSyntaxFactsKeywordKind(StringView text);
+StringView MskSyntaxFactsGetText(MskSyntaxKind kind);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_FACTS_H_

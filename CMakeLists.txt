@@ -184,6 +184,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     minsk_test
     KIND executable
     SOURCES main.c code_analysis/syntax/lexer_tests.c
+            code_analysis/syntax/facts_tests.c
     DEPENDS minsk testlib
   )
   enable_testing()

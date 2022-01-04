@@ -20,6 +20,7 @@ typedef struct {
 typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
 
 void MskSyntaxTokenFree(MskSyntaxToken* token);
+void MskSyntaxTokensFree(MskSyntaxTokens* tokens);
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token);
 MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token);
 

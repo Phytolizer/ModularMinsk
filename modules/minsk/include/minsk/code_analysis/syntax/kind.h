@@ -50,7 +50,6 @@ typedef enum {
 #define X(x) kMskSyntaxKind##x,
   MSK__SYNTAX_KINDS
 #undef X
-      kMskSyntaxKindCount
 } MskSyntaxKind;
 
 StringView MskSyntaxKindName(MskSyntaxKind kind);
