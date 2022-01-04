@@ -10,8 +10,6 @@
 #include "minsk/code_analysis/syntax/tree.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 
-typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
-
 typedef struct {
   MskSyntaxTokens tokens;
   uint64_t position;

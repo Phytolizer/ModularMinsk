@@ -19,24 +19,23 @@
 
 #define TEST_FAIL(...) TEST_ASSERT(false, (void)0, __VA_ARGS__)
 
-#define TEST_RUN_SUITE(Name, Count)            \
-  do {                                         \
-    char* message = TestSuite##Name(Count);    \
-    if (message != NULL) {                     \
-      fprintf(stderr, "[FAIL] %s\n", message); \
-      free(message);                           \
-      exit(EXIT_FAILURE);                      \
-    }                                          \
+#define TEST_RUN_SUITE(Name, Count)         \
+  do {                                      \
+    fprintf(stderr, "SUITE " #Name "\n");   \
+    char* message = TestSuite##Name(Count); \
+    if (message != NULL) {                  \
+      return message;                       \
+    }                                       \
   } while (false)
 
-#define TEST_RUN(Name)                         \
-  do {                                         \
-    fprintf(stderr, "Running " #Name "...\n"); \
-    char* message = Test##Name();              \
-    ++(*test_count);                           \
-    if (message != NULL) {                     \
-      return message;                          \
-    }                                          \
+#define TEST_RUN(Name)                    \
+  do {                                    \
+    fprintf(stderr, " TEST " #Name "\n"); \
+    char* message = Test##Name();         \
+    ++(*test_count);                      \
+    if (message != NULL) {                \
+      return message;                     \
+    }                                     \
   } while (false)
 
 #define TEST_RUN_SUBTEST(Name, Cleanup, ...)        \
@@ -48,10 +47,11 @@
     }                                               \
   } while (false)
 
-#define TEST_SUBTEST_FUNC(Name, ...) char* TestSubtest##Name(__VA_ARGS__)
-#define TEST_FUNC(Name) char* Test##Name(void)
 #define TEST_SUITE_FUNC(Name) char* TestSuite##Name(uint64_t* test_count)
-#define TEST_PASS() return NULL
+#define TEST_FUNC(Name) char* Test##Name(void)
+#define TEST_SUBTEST_FUNC(Name, ...) char* TestSubtest##Name(__VA_ARGS__)
 #define TEST_SUITE_PASS() return NULL
+#define TEST_PASS() return NULL
+#define TEST_SUBTEST_PASS() return NULL
 
 #endif  // TEST_TEST_H_

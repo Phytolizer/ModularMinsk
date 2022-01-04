@@ -12,6 +12,7 @@ typedef struct {
 } MskSyntaxTree;
 
 MskSyntaxTree MskSyntaxTreeParse(StringView text);
+MskSyntaxTokens MskSyntaxTreeParseTokens(StringView text);
 void MskSyntaxTreeFree(MskSyntaxTree* tree);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_

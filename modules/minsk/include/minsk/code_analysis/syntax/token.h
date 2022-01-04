@@ -17,6 +17,8 @@ typedef struct {
   MskRuntimeObject value;
 } MskSyntaxToken;
 
+typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
+
 void MskSyntaxTokenFree(MskSyntaxToken* token);
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token);
 MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token);

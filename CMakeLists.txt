@@ -170,3 +170,11 @@ declare_module(
   SOURCES main.c
   DEPENDS minsk ansi_esc
 )
+
+# Unit tests
+declare_module(
+  minsk_test
+  KIND executable
+  SOURCES main.c code_analysis/syntax/lexer_tests.c
+  DEPENDS minsk test
+)
