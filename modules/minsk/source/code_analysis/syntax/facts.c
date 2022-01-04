@@ -1,4 +1,4 @@
-#include "minsk_private/code_analysis/syntax/facts.h"
+#include "minsk/code_analysis/syntax/facts.h"
 
 #include "minsk/code_analysis/syntax/kind.h"
 

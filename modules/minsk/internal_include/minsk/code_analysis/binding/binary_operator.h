@@ -3,7 +3,7 @@
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/binding/binary_operator_kind.h"
+#include "minsk/code_analysis/binding/binary_operator_kind.h"
 
 typedef struct {
   MskSyntaxKind syntax_kind;

@@ -1,11 +1,11 @@
-#include "minsk_private/code_analysis/binding/expression.h"
+#include "minsk/code_analysis/binding/expression.h"
 
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/binding/assignment_expression.h"
-#include "minsk_private/code_analysis/binding/binary_expression.h"
-#include "minsk_private/code_analysis/binding/literal_expression.h"
-#include "minsk_private/code_analysis/binding/unary_expression.h"
-#include "minsk_private/code_analysis/binding/variable_expression.h"
+#include "minsk/code_analysis/binding/assignment_expression.h"
+#include "minsk/code_analysis/binding/binary_expression.h"
+#include "minsk/code_analysis/binding/literal_expression.h"
+#include "minsk/code_analysis/binding/unary_expression.h"
+#include "minsk/code_analysis/binding/variable_expression.h"
 
 static MskRuntimeObjectKind UnaryExpressionGetType(
     MskBoundUnaryExpression* exp);

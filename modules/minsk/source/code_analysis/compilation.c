@@ -2,8 +2,8 @@
 
 #include "minsk/code_analysis/evaluation_result.h"
 #include "minsk/code_analysis/symbol_table.h"
-#include "minsk_private/code_analysis/binding/binder.h"
-#include "minsk_private/code_analysis/evaluator.h"
+#include "minsk/code_analysis/binding/binder.h"
+#include "minsk/code_analysis/evaluator.h"
 
 MskCompilation MskCompilationNew(MskSyntaxTree syntax) {
   return (MskCompilation){

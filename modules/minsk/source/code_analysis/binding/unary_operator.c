@@ -1,8 +1,8 @@
-#include "minsk_private/code_analysis/binding/unary_operator.h"
+#include "minsk/code_analysis/binding/unary_operator.h"
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/binding/unary_operator_kind.h"
+#include "minsk/code_analysis/binding/unary_operator_kind.h"
 
 static const MskBoundUnaryOperator kOperators[] = {
     {

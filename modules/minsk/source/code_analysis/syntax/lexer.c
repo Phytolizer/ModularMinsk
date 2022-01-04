@@ -1,4 +1,4 @@
-#include "minsk_private/code_analysis/syntax/lexer.h"
+#include "minsk/code_analysis/syntax/lexer.h"
 
 #include <stdint.h>
 
@@ -6,7 +6,7 @@
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/syntax/facts.h"
+#include "minsk/code_analysis/syntax/facts.h"
 #include "string/string.h"
 
 static char Look(MskSyntaxLexer* lexer, uint64_t offset);

@@ -5,7 +5,7 @@
 
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
-#include "minsk_private/code_analysis/syntax/parser.h"
+#include "minsk/code_analysis/syntax/parser.h"
 
 MskSyntaxTree MskSyntaxTreeParse(StringView text) {
   MskSyntaxParser parser = MskSyntaxParserNew(text);

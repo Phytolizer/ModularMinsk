@@ -1,4 +1,4 @@
-#include "minsk_private/code_analysis/binding/binary_expression.h"
+#include "minsk/code_analysis/binding/binary_expression.h"
 
 MskBoundBinaryExpression* MskBoundBinaryExpressionNew(
     MskBoundExpression* left,

@@ -1,7 +1,7 @@
 #ifndef MINSK_CODE_ANALYSIS_BINDING_NODE_H_
 #define MINSK_CODE_ANALYSIS_BINDING_NODE_H_
 
-#include "minsk_private/code_analysis/binding/kind.h"
+#include "minsk/code_analysis/binding/kind.h"
 
 #define MINSK__BOUND_NODE_CLASSES X(Expression)
 

@@ -1,4 +1,4 @@
-#include "minsk_private/code_analysis/syntax/parser.h"
+#include "minsk/code_analysis/syntax/parser.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -15,8 +15,8 @@
 #include "minsk/code_analysis/syntax/unary_expression.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/syntax/facts.h"
-#include "minsk_private/code_analysis/syntax/lexer.h"
+#include "minsk/code_analysis/syntax/facts.h"
+#include "minsk/code_analysis/syntax/lexer.h"
 #include "string/string.h"
 
 static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);

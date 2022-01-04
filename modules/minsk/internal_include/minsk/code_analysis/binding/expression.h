@@ -2,7 +2,7 @@
 #define MINSK_CODE_ANALYSIS_BINDING_EXPRESSION_H_
 
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/binding/node.h"
+#include "minsk/code_analysis/binding/node.h"
 
 #define MINSK__BOUND_EXPRESSION_CLASSES \
   X(Literal)                            \

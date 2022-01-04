@@ -4,7 +4,7 @@
 #include "minsk/code_analysis/symbol_table.h"
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/binding/expression.h"
+#include "minsk/code_analysis/binding/expression.h"
 
 typedef struct {
   MskBoundExpression* root;

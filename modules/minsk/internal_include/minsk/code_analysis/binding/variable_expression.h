@@ -2,7 +2,7 @@
 #define MINSK_CODE_ANALYSIS_BINDING_VARIABLE_EXPRESSION_H_
 
 #include "minsk/runtime/object.h"
-#include "minsk_private/code_analysis/binding/expression.h"
+#include "minsk/code_analysis/binding/expression.h"
 #include "string/string.h"
 
 typedef struct {

@@ -1,6 +1,6 @@
-#include "minsk_private/code_analysis/binding/unary_expression.h"
+#include "minsk/code_analysis/binding/unary_expression.h"
 
-#include "minsk_private/code_analysis/binding/node.h"
+#include "minsk/code_analysis/binding/node.h"
 
 MskBoundUnaryExpression* MskBoundUnaryExpressionNew(
     MskBoundUnaryOperator op,

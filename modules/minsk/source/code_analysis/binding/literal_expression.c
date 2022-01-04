@@ -1,4 +1,4 @@
-#include "minsk_private/code_analysis/binding/literal_expression.h"
+#include "minsk/code_analysis/binding/literal_expression.h"
 
 MskBoundLiteralExpression* MskBoundLiteralExpressionNew(
     MskRuntimeObject value) {
