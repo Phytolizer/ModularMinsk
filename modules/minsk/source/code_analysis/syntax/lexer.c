@@ -2,11 +2,11 @@
 
 #include <stdint.h>
 
+#include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
-#include "minsk/code_analysis/syntax/facts.h"
 #include "string/string.h"
 
 static char Look(MskSyntaxLexer* lexer, uint64_t offset);
@@ -105,11 +105,13 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
         kind = kMskSyntaxKindAmpersandAmpersandToken;
         lexer->position += 2;
       }
+      break;
     case '|':
       if (Peek(lexer) == '|') {
         kind = kMskSyntaxKindPipePipeToken;
         lexer->position += 2;
       }
+      break;
     case '=':
       if (Peek(lexer) == '=') {
         kind = kMskSyntaxKindEqualsEqualsToken;
@@ -118,6 +120,7 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
         kind = kMskSyntaxKindEqualsToken;
         lexer->position++;
       }
+      break;
     default:
       if (IsLetter(Cur(lexer))) {
         while (IsLetterOrDigit(Cur(lexer))) {

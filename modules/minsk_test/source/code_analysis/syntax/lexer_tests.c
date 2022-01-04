@@ -4,9 +4,16 @@
 #include <minsk/code_analysis/syntax/kind.h>
 #include <minsk/code_analysis/syntax/token.h>
 #include <minsk/code_analysis/syntax/tree.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string/string.h>
+
+static TEST_FUNC(LexerLexesToken);
+
+TEST_SUITE_FUNC(LexerTests) {
+  TEST_RUN(LexerLexesToken);
+}
 
 typedef struct {
   MskSyntaxKind kind;
@@ -16,13 +23,29 @@ typedef struct {
 static const TestToken kTokens[] = {
     {kMskSyntaxKindIdentifierToken, "a"},
     {kMskSyntaxKindIdentifierToken, "abc"},
+    {kMskSyntaxKindWhitespaceToken, " "},
+    {kMskSyntaxKindWhitespaceToken, "  "},
+    {kMskSyntaxKindWhitespaceToken, "\r"},
+    {kMskSyntaxKindWhitespaceToken, "\n"},
+    {kMskSyntaxKindWhitespaceToken, "\r\n"},
+
+    {kMskSyntaxKindNumberToken, "1"},
+    {kMskSyntaxKindNumberToken, "123"},
+    {kMskSyntaxKindPlusToken, "+"},
+    {kMskSyntaxKindMinusToken, "-"},
+    {kMskSyntaxKindStarToken, "*"},
+    {kMskSyntaxKindSlashToken, "/"},
+    {kMskSyntaxKindOpenParenthesisToken, "("},
+    {kMskSyntaxKindCloseParenthesisToken, ")"},
+    {kMskSyntaxKindBangToken, "!"},
+    {kMskSyntaxKindBangEqualsToken, "!="},
+    {kMskSyntaxKindEqualsToken, "="},
+    {kMskSyntaxKindEqualsEqualsToken, "=="},
+    {kMskSyntaxKindAmpersandAmpersandToken, "&&"},
+    {kMskSyntaxKindPipePipeToken, "||"},
+    {kMskSyntaxKindTrueKeyword, "true"},
+    {kMskSyntaxKindFalseKeyword, "false"},
 };
-
-TEST_FUNC(LexerLexesToken);
-
-TEST_SUITE_FUNC(LexerTests) {
-  TEST_RUN(LexerLexesToken);
-}
 
 TEST_FUNC(LexerLexesToken) {
   for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); ++i) {
