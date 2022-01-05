@@ -93,7 +93,7 @@ MskSyntaxKinds MskSyntaxFactsGetBinaryOperators(void) {
 
 MskSyntaxKinds MskSyntaxFactsGetUnaryOperators(void) {
   MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
-  MskSyntaxKinds unary_operators = {0};
+  MskSyntaxKinds unary_operators = VEC_INIT_DEFAULT(MskSyntaxKind);
   for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); i++) {
     MskSyntaxKind kind = all_kinds.data[i];
     if (MskSyntaxFactsUnaryOperatorPrecedence(kind) > 0) {

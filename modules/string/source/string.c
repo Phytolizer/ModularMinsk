@@ -340,7 +340,7 @@ uint64_t StringSize(const String s) {
 }
 
 String StringDuplicate(const String s) {
-  String result = {0};
+  String result = STRING_INIT;
   StringAppendView(&result, StringAsView(s));
   return result;
 }
@@ -362,7 +362,7 @@ String StringFormat(const char* format, ...) {
 }
 
 String StringGetLine(FILE* file) {
-  String result = {0};
+  String result = STRING_INIT;
   char buffer[1024] = {0};
   bool hit_eof = true;
   // Keep reading until we get a newline.

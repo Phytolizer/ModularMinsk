@@ -31,7 +31,7 @@ static MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser);
 
 MskSyntaxParser MskSyntaxParserNew(StringView text) {
   MskSyntaxLexer lexer = MskNewSyntaxLexer(text);
-  MskSyntaxParser parser = {0};
+  MskSyntaxParser parser = MSK_SYNTAX_PARSER_INIT;
   while (true) {
     MskSyntaxToken token = MskSyntaxLexerLex(&lexer);
     if (token.kind != kMskSyntaxKindBadToken &&
@@ -99,7 +99,7 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
       .base = {.cls = kMskSyntaxNodeClassToken},
       .kind = kind,
       .position = Current(parser)->position,
-      .text = {0},
+      .text = STRING_INIT,
       .value = MSK_RUNTIME_OBJECT_NULL,
   };
 }

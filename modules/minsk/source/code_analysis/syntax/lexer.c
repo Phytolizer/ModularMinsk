@@ -24,7 +24,7 @@ MskSyntaxLexer MskNewSyntaxLexer(StringView text) {
 
 MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   MskSyntaxKind kind = kMskSyntaxKindBadToken;
-  String text = {0};
+  String text = STRING_INIT;
   uint64_t position = lexer->position;
   MskRuntimeObject value = MSK_RUNTIME_OBJECT_NULL;
 

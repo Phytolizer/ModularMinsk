@@ -68,12 +68,12 @@ MskSyntaxNodeChildren MskSyntaxNodeGetChildren(MskSyntaxNode* node) {
     MSK__SYNTAX_NODE_CLASSES
 #undef X
     default:
-      return (MskSyntaxNodeChildren){0};
+      return (MskSyntaxNodeChildren)VEC_INIT_DEFAULT(MskSyntaxNode*);
   }
 }
 
 void MskSyntaxNodePrettyPrint(MskSyntaxNode* node, FILE* fp, bool colors) {
-  PrettyPrint(node, fp, colors, (String){0}, true);
+  PrettyPrint(node, fp, colors, STRING_INIT, true);
 }
 
 MskSyntaxKind GetExpressionKind(MskSyntaxNode* node) {
@@ -102,18 +102,18 @@ MskSyntaxNodeChildren GetExpressionChildren(MskSyntaxNode* node) {
     MSK__EXPRESSION_CLASSES
 #undef X
     default:
-      return (MskSyntaxNodeChildren){0};
+      return (MskSyntaxNodeChildren)VEC_INIT_DEFAULT(MskSyntaxNode*);
   }
 }
 
 MskSyntaxNodeChildren GetTokenChildren(MskSyntaxNode* node) {
   (void)node;
-  return (MskSyntaxNodeChildren){0};
+  return (MskSyntaxNodeChildren)VEC_INIT_DEFAULT(MskSyntaxNode*);
 }
 
 MskSyntaxNodeChildren GetBinaryExpressionChildren(MskExpressionSyntax* syntax) {
   MskBinaryExpressionSyntax* binary = (MskBinaryExpressionSyntax*)syntax;
-  MskSyntaxNodeChildren children = {0};
+  MskSyntaxNodeChildren children = VEC_INIT_DEFAULT(MskSyntaxNode*);
   VEC_PUSH(&children, &binary->left->base);
   VEC_PUSH(&children, &binary->operator_token.base);
   VEC_PUSH(&children, &binary->right->base);
@@ -123,7 +123,7 @@ MskSyntaxNodeChildren GetBinaryExpressionChildren(MskExpressionSyntax* syntax) {
 MskSyntaxNodeChildren GetLiteralExpressionChildren(
     MskExpressionSyntax* syntax) {
   MskLiteralExpressionSyntax* literal = (MskLiteralExpressionSyntax*)syntax;
-  MskSyntaxNodeChildren children = {0};
+  MskSyntaxNodeChildren children = VEC_INIT_DEFAULT(MskSyntaxNode*);
   VEC_PUSH(&children, &literal->literal_token.base);
   return children;
 }
@@ -132,7 +132,7 @@ MskSyntaxNodeChildren GetParenthesizedExpressionChildren(
     MskExpressionSyntax* syntax) {
   MskParenthesizedExpressionSyntax* parenthesized =
       (MskParenthesizedExpressionSyntax*)syntax;
-  MskSyntaxNodeChildren children = {0};
+  MskSyntaxNodeChildren children = VEC_INIT_DEFAULT(MskSyntaxNode*);
   VEC_PUSH(&children, &parenthesized->open_parenthesis_token.base);
   VEC_PUSH(&children, &parenthesized->expression->base);
   VEC_PUSH(&children, &parenthesized->close_parenthesis_token.base);
@@ -141,7 +141,7 @@ MskSyntaxNodeChildren GetParenthesizedExpressionChildren(
 
 MskSyntaxNodeChildren GetUnaryExpressionChildren(MskExpressionSyntax* syntax) {
   MskUnaryExpressionSyntax* unary = (MskUnaryExpressionSyntax*)syntax;
-  MskSyntaxNodeChildren children = {0};
+  MskSyntaxNodeChildren children = VEC_INIT_DEFAULT(MskSyntaxNode*);
   VEC_PUSH(&children, &unary->operator_token.base);
   VEC_PUSH(&children, &unary->operand->base);
   return children;
@@ -149,7 +149,7 @@ MskSyntaxNodeChildren GetUnaryExpressionChildren(MskExpressionSyntax* syntax) {
 
 MskSyntaxNodeChildren GetNameExpressionChildren(MskExpressionSyntax* syntax) {
   MskNameExpressionSyntax* name = (MskNameExpressionSyntax*)syntax;
-  MskSyntaxNodeChildren children = {0};
+  MskSyntaxNodeChildren children = VEC_INIT_DEFAULT(MskSyntaxNode*);
   VEC_PUSH(&children, &name->identifier_token.base);
   return children;
 }
@@ -158,7 +158,7 @@ MskSyntaxNodeChildren GetAssignmentExpressionChildren(
     MskExpressionSyntax* syntax) {
   MskAssignmentExpressionSyntax* assignment =
       (MskAssignmentExpressionSyntax*)syntax;
-  MskSyntaxNodeChildren children = {0};
+  MskSyntaxNodeChildren children = VEC_INIT_DEFAULT(MskSyntaxNode*);
   VEC_PUSH(&children, &assignment->identifier_token.base);
   VEC_PUSH(&children, &assignment->equals_token.base);
   VEC_PUSH(&children, &assignment->expression->base);

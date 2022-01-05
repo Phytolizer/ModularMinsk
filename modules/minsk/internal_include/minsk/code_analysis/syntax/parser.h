@@ -16,6 +16,12 @@ typedef struct {
   MskDiagnosticBag diagnostics;
 } MskSyntaxParser;
 
+#define MSK_SYNTAX_PARSER_INIT                                 \
+  (MskSyntaxParser) {                                          \
+    .tokens = VEC_INIT_DEFAULT(MskSyntaxToken), .position = 0, \
+    .diagnostics = VEC_INIT_DEFAULT(MskDiagnostic),            \
+  }
+
 MskSyntaxParser MskSyntaxParserNew(StringView text);
 void MskSyntaxParserFree(MskSyntaxParser* parser);
 MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser);

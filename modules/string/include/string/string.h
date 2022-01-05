@@ -10,7 +10,7 @@
 typedef VEC_TYPE(char) String;
 typedef SPAN_TYPE(char) StringView;
 
-#define STRING_INIT VEC_INIT_DEFAULT(char)
+#define STRING_INIT (String) VEC_INIT_DEFAULT(char)
 
 #ifdef __GNUC__
 #define STRING_ATTR_PRINTF __attribute__((format(printf, 1, 2)))

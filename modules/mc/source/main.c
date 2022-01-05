@@ -13,6 +13,7 @@
 
 #include "minsk/code_analysis/symbol_table.h"
 #include "minsk/code_analysis/text/diagnostic.h"
+#include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/code_analysis/text/span.h"
 
 int main(void) {
@@ -54,7 +55,7 @@ int main(void) {
     MskSyntaxTree syntax_tree = MskSyntaxTreeParse(StringAsView(text));
     // move out the diagnostics because they aren't limited to the syntax tree
     MskDiagnosticBag diagnostics = syntax_tree.diagnostics;
-    syntax_tree.diagnostics = (MskDiagnosticBag){0};
+    syntax_tree.diagnostics = (MskDiagnosticBag)VEC_INIT_DEFAULT(MskDiagnostic);
     if (show_tree) {
       MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
     }
