@@ -10,7 +10,7 @@ static void Report(MskDiagnosticBag* diagnostics,
                    String message);
 
 void MskDiagnosticBagFree(MskDiagnosticBag* diagnostics) {
-  for (uint64_t i = 0; i < diagnostics->size; ++i) {
+  for (uint64_t i = 0; i < VEC_SIZE(diagnostics); ++i) {
     MskDiagnosticFree(&diagnostics->data[i]);
   }
   VEC_FREE(diagnostics);

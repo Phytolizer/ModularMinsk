@@ -24,7 +24,7 @@ TEST_SUITE_FUNC(ParserTests) {
 
 TEST_FUNC(BinaryExpressionHonorsPrecedences) {
   SyntaxKindPairs pairs = GetBinaryOperatorPairs();
-  for (uint64_t i = 0; i < pairs.size; ++i) {
+  for (uint64_t i = 0; i < VEC_SIZE(&pairs); ++i) {
     uint64_t op1_precedence =
         MskSyntaxFactsBinaryOperatorPrecedence(pairs.data[i].op1);
     uint64_t op2_precedence =
@@ -45,10 +45,10 @@ TEST_FUNC(BinaryExpressionHonorsPrecedences) {
 
 SyntaxKindPairs GetBinaryOperatorPairs(void) {
   MskSyntaxKinds ops = MskSyntaxFactsGetBinaryOperators();
-  SyntaxKindPairs pairs = {0};
-  for (size_t i = 0; i < ops.size; ++i) {
+  SyntaxKindPairs pairs = VEC_INIT_DEFAULT(SyntaxKindPair);
+  for (size_t i = 0; i < VEC_SIZE(&ops); ++i) {
     MskSyntaxKind op1 = ops.data[i];
-    for (size_t j = i + 1; j < ops.size; ++j) {
+    for (size_t j = i + 1; j < VEC_SIZE(&ops); ++j) {
       MskSyntaxKind op2 = ops.data[j];
       VEC_PUSH(&pairs, ((SyntaxKindPair){op1, op2}));
     }

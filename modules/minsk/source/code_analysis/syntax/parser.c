@@ -6,7 +6,9 @@
 #include "minsk/code_analysis/syntax/assignment_expression.h"
 #include "minsk/code_analysis/syntax/binary_expression.h"
 #include "minsk/code_analysis/syntax/expression.h"
+#include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/literal_expression.h"
 #include "minsk/code_analysis/syntax/name_expression.h"
 #include "minsk/code_analysis/syntax/node.h"
@@ -15,8 +17,6 @@
 #include "minsk/code_analysis/syntax/unary_expression.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
-#include "minsk/code_analysis/syntax/facts.h"
-#include "minsk/code_analysis/syntax/lexer.h"
 #include "string/string.h"
 
 static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);
@@ -45,15 +45,12 @@ MskSyntaxParser MskSyntaxParserNew(StringView text) {
     }
   }
   VEC_APPEND(&parser.diagnostics, lexer.diagnostics.data,
-             lexer.diagnostics.size);
+             VEC_SIZE(&lexer.diagnostics));
   return parser;
 }
 
 void MskSyntaxParserFree(MskSyntaxParser* parser) {
-  for (size_t i = 0; i < parser->tokens.size; ++i) {
-    MskSyntaxTokenFree(&parser->tokens.data[i]);
-  }
-  VEC_FREE(&parser->tokens);
+  MskSyntaxTokensFree(&parser->tokens);
 }
 
 MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser) {
@@ -68,10 +65,10 @@ MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser) {
 }
 
 MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset) {
-  if (parser->position + offset >= parser->tokens.size) {
+  if (parser->position + offset >= VEC_SIZE(&parser->tokens)) {
     // Return the last token, this makes the parser see an infinite stream of
     // EOF tokens.
-    return &parser->tokens.data[parser->tokens.size - 1];
+    return &parser->tokens.data[VEC_SIZE(&parser->tokens) - 1];
   }
   if (offset < -(int64_t)parser->position) {
     // Return NULL, as we want to crash if the caller tries to peek past the

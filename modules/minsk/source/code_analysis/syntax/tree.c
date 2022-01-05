@@ -18,7 +18,7 @@ MskSyntaxTree MskSyntaxTreeParse(StringView text) {
 
 MskSyntaxTokens MskSyntaxTreeParseTokens(StringView text) {
   MskSyntaxLexer lexer = MskNewSyntaxLexer(text);
-  MskSyntaxTokens tokens = {0};
+  MskSyntaxTokens tokens = VEC_INIT_DEFAULT(MskSyntaxToken);
   while (true) {
     MskSyntaxToken token = MskSyntaxLexerLex(&lexer);
     if (token.kind == kMskSyntaxKindEndOfFileToken) {

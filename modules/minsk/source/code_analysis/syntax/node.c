@@ -206,9 +206,9 @@ void PrettyPrint(MskSyntaxNode* node,
   }
   StringAppendC(&indent, is_last ? "    " : "│   ");
   MskSyntaxNodeChildren children = MskSyntaxNodeGetChildren(node);
-  for (uint64_t i = 0; i < children.size; ++i) {
+  for (uint64_t i = 0; i < VEC_SIZE(&children); ++i) {
     PrettyPrint(children.data[i], fp, colors, StringDuplicate(indent),
-                i == children.size - 1);
+                i == VEC_SIZE(&children) - 1);
   }
   StringFree(&indent);
 }

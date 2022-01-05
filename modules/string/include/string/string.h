@@ -10,6 +10,8 @@
 typedef VEC_TYPE(char) String;
 typedef SPAN_TYPE(char) StringView;
 
+#define STRING_INIT VEC_INIT_DEFAULT(char)
+
 #ifdef __GNUC__
 #define STRING_ATTR_PRINTF __attribute__((format(printf, 1, 2)))
 #else
@@ -104,6 +106,8 @@ char* StringViewToC(StringView view);
 String StringFromC(const char* cstr);
 /// Converts a StringView to an owning String.
 String StringFromView(StringView view);
+/// Returns the length of the String.
+uint64_t StringSize(const String s);
 /// Returns a copy of the String.
 String StringDuplicate(const String s);
 /// Takes printf-like format args and creates a String.
@@ -132,7 +136,7 @@ bool StringEqualC(const String a, const char* b);
 #define STRING_VIEW_PRINT(S) (int)((S).end - (S).begin), (S).begin
 #define STRING_VIEW_FMT ".*s"
 
-#define STRING_PRINT(S) (int)(S).size, (S).data
+#define STRING_PRINT(S) (int)VEC_SIZE(&(S)), (S).data
 #define STRING_FMT ".*s"
 
 #endif  // STRING_STRING_H_

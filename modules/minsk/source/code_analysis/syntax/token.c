@@ -10,7 +10,7 @@ void MskSyntaxTokenFree(MskSyntaxToken* token) {
 }
 
 void MskSyntaxTokensFree(MskSyntaxTokens* tokens) {
-  for (size_t i = 0; i < tokens->size; ++i) {
+  for (size_t i = 0; i < VEC_SIZE(tokens); ++i) {
     MskSyntaxTokenFree(&tokens->data[i]);
   }
   VEC_FREE(tokens);
@@ -26,6 +26,6 @@ MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
 MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token) {
   return (MskTextSpan){
       .start = token.position,
-      .length = token.text.size,
+      .length = StringSize(token.text),
   };
 }

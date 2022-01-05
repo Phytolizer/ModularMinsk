@@ -80,8 +80,8 @@ StringView MskSyntaxFactsGetText(MskSyntaxKind kind) {
 
 MskSyntaxKinds MskSyntaxFactsGetBinaryOperators(void) {
   MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
-  MskSyntaxKinds binary_operators = {0};
-  for (uint64_t i = 0; i < all_kinds.size; i++) {
+  MskSyntaxKinds binary_operators = VEC_INIT_DEFAULT(MskSyntaxKind);
+  for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); i++) {
     MskSyntaxKind kind = all_kinds.data[i];
     if (MskSyntaxFactsBinaryOperatorPrecedence(kind) > 0) {
       VEC_PUSH(&binary_operators, kind);
@@ -94,7 +94,7 @@ MskSyntaxKinds MskSyntaxFactsGetBinaryOperators(void) {
 MskSyntaxKinds MskSyntaxFactsGetUnaryOperators(void) {
   MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
   MskSyntaxKinds unary_operators = {0};
-  for (uint64_t i = 0; i < all_kinds.size; i++) {
+  for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); i++) {
     MskSyntaxKind kind = all_kinds.data[i];
     if (MskSyntaxFactsUnaryOperatorPrecedence(kind) > 0) {
       VEC_PUSH(&unary_operators, kind);

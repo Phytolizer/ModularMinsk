@@ -15,7 +15,7 @@ TEST_SUITE_FUNC(SyntaxFactsTests) {
 
 TEST_FUNC(GetTextRoundTrips) {
   MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
-  for (uint64_t i = 0; i < all_kinds.size; ++i) {
+  for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); ++i) {
     MskSyntaxKind kind = all_kinds.data[i];
     StringView text = MskSyntaxFactsGetText(kind);
     if (StringViewSize(text) > 0) {
@@ -25,7 +25,7 @@ TEST_FUNC(GetTextRoundTrips) {
     MskSyntaxTokensFree(&tokens); \
     VEC_FREE(&all_kinds);         \
   } while (false)
-      TEST_ASSERT(tokens.size == 1, CLEANUP(),
+      TEST_ASSERT(VEC_SIZE(&tokens) == 1, CLEANUP(),
                   "[%" STRING_VIEW_FMT "] Expected 1 token",
                   STRING_VIEW_PRINT(MskSyntaxKindName(kind)));
       TEST_ASSERT(tokens.data[0].kind == kind, CLEANUP(),

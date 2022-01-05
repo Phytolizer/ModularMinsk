@@ -324,15 +324,19 @@ char* StringViewToC(StringView view) {
 }
 
 String StringFromC(const char* cstr) {
-  String s = {0};
+  String s = VEC_INIT_DEFAULT(char);
   VEC_APPEND(&s, cstr, strlen(cstr));
   return s;
 }
 
 String StringFromView(StringView view) {
-  String s = {0};
+  String s = VEC_INIT_DEFAULT(char);
   StringAppendView(&s, view);
   return s;
+}
+
+uint64_t StringSize(const String s) {
+  return VEC_SIZE(&s);
 }
 
 String StringDuplicate(const String s) {
@@ -342,7 +346,7 @@ String StringDuplicate(const String s) {
 }
 
 String StringFormat(const char* format, ...) {
-  String result = {0};
+  String result = STRING_INIT;
   va_list args;
   va_start(args, format);
   int size = vsnprintf(NULL, 0, format, args);
@@ -354,7 +358,6 @@ String StringFormat(const char* format, ...) {
   va_start(args, format);
   vsnprintf(result.data, size + 1, format, args);
   va_end(args);
-  result.size = size;
   return result;
 }
 
@@ -366,7 +369,7 @@ String StringGetLine(FILE* file) {
   while (fgets(buffer, sizeof(buffer), file) != NULL) {
     // buffer is a valid C string, since fgets() guarantees it.
     StringAppendC(&result, buffer);
-    if (result.data[result.size - 1] == '\n') {
+    if (result.data[StringSize(result) - 1] == '\n') {
       hit_eof = false;
       break;
     }
@@ -397,12 +400,12 @@ void StringFree(String* s) {
 StringView StringAsView(const String s) {
   return (StringView){
       .begin = s.data,
-      .end = s.data + s.size,
+      .end = s.data + StringSize(s),
   };
 }
 
 StringView StringAsSubView(const String s, uint64_t begin, uint64_t end) {
-  if (begin >= s.size || end > s.size || begin >= end) {
+  if (begin >= StringSize(s) || end > StringSize(s) || begin >= end) {
     // An invalid range was specified. Return something sane.
     return (StringView){0};
   }
@@ -413,13 +416,15 @@ StringView StringAsSubView(const String s, uint64_t begin, uint64_t end) {
 }
 
 bool StringEqual(const String a, const String b) {
-  return a.size == b.size && memcmp(a.data, b.data, a.size) == 0;
+  return StringSize(a) == StringSize(b) &&
+         memcmp(a.data, b.data, StringSize(a)) == 0;
 }
 
 bool StringEqualView(const String a, StringView b) {
-  return a.size == SPAN_SIZE(b) && memcmp(a.data, b.begin, a.size) == 0;
+  return StringSize(a) == SPAN_SIZE(b) &&
+         memcmp(a.data, b.begin, StringSize(a)) == 0;
 }
 
 bool StringEqualC(const String a, const char* b) {
-  return a.size == strlen(b) && memcmp(a.data, b, a.size) == 0;
+  return StringSize(a) == strlen(b) && memcmp(a.data, b, StringSize(a)) == 0;
 }

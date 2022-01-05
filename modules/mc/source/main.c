@@ -22,7 +22,7 @@ int main(void) {
     printf("minsk> ");
     fflush(stdout);
     String text = StringGetLine(stdin);
-    if (text.size == 0) {
+    if (StringSize(text) == 0) {
       // EOF condition
       // Print a newline so the prompt isn't on the same line as the Bash
       // prompt.
@@ -59,7 +59,7 @@ int main(void) {
       MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
     }
     bool show_diagnostics = false;
-    if (diagnostics.size > 0) {
+    if (VEC_SIZE(&diagnostics) > 0) {
       show_diagnostics = true;
     } else {
       MskCompilation compilation = MskCompilationNew(syntax_tree);
@@ -67,7 +67,8 @@ int main(void) {
           MskCompilationEvaluate(&compilation, &symbols);
       if (result.kind == kMskEvaluationResultFailure) {
         show_diagnostics = true;
-        VEC_APPEND(&diagnostics, result.value.err.data, result.value.err.size);
+        VEC_APPEND(&diagnostics, result.value.err.data,
+                   VEC_SIZE(&result.value.err));
         // shallow free -- the diagnostics vector owns the strings now
         VEC_FREE(&result.value.err);
       } else {
@@ -78,14 +79,14 @@ int main(void) {
     }
     if (show_diagnostics) {
       printf("\n");
-      for (size_t i = 0; i < diagnostics.size; ++i) {
+      for (size_t i = 0; i < VEC_SIZE(&diagnostics); ++i) {
         StringView prefix =
             StringAsSubView(text, 0, diagnostics.data[i].span.start);
         StringView error =
             StringAsSubView(text, diagnostics.data[i].span.start,
                             MskTextSpanEnd(diagnostics.data[i].span));
         StringView suffix = StringAsSubView(
-            text, MskTextSpanEnd(diagnostics.data[i].span), text.size);
+            text, MskTextSpanEnd(diagnostics.data[i].span), VEC_SIZE(&text));
         printf("%" STRING_VIEW_FMT ANSI_ESC_FG_RED
                "%" STRING_VIEW_FMT ANSI_ESC_RESET "%" STRING_VIEW_FMT "\n",
                STRING_VIEW_PRINT(prefix), STRING_VIEW_PRINT(error),

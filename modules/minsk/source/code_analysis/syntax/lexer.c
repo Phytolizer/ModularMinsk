@@ -140,7 +140,7 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   }
 
   // The text could have been created already.
-  if (text.size == 0) {
+  if (StringSize(text) == 0) {
     text = StringFromView(
         StringViewSubstring(lexer->text, position, lexer->position));
   }

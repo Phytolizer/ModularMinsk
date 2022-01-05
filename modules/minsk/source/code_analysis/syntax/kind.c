@@ -12,7 +12,7 @@ MskSyntaxKinds MskSyntaxKindsGetAll(void) {
       MSK__SYNTAX_KINDS
 #undef X
   };
-  MskSyntaxKinds result = {0};
+  MskSyntaxKinds result = VEC_INIT_DEFAULT(MskSyntaxKind);
   VEC_APPEND(&result, kAll, sizeof(kAll) / sizeof(MskSyntaxKind));
   return result;
 }

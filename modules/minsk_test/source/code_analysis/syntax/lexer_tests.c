@@ -85,7 +85,7 @@ static bool RequiresSeparator(MskSyntaxKind t1_kind, MskSyntaxKind t2_kind) {
 }
 
 static TestTokenPairs GetTokenPairs(void) {
-  TestTokenPairs pairs = {0};
+  TestTokenPairs pairs = VEC_INIT_DEFAULT(TestTokenPair);
   for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); i++) {
     for (size_t j = i + 1; j < sizeof(kTokens) / sizeof(TestToken); j++) {
       if (!RequiresSeparator(kTokens[i].kind, kTokens[j].kind)) {
@@ -105,7 +105,8 @@ typedef struct {
 typedef VEC_TYPE(TestTokenPairWithSeparator) TestTokenPairsWithSeparator;
 
 static TestTokenPairsWithSeparator GetTokenPairsWithSeparator(void) {
-  TestTokenPairsWithSeparator pairs = {0};
+  TestTokenPairsWithSeparator pairs =
+      VEC_INIT_DEFAULT(TestTokenPairWithSeparator);
   for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); i++) {
     for (size_t j = i + 1; j < sizeof(kTokens) / sizeof(TestToken); j++) {
       if (RequiresSeparator(kTokens[i].kind, kTokens[j].kind)) {
@@ -128,8 +129,8 @@ TEST_FUNC(LexerLexesToken) {
         i < num_tokens ? &kTokens[i] : &kSeparators[i - num_tokens];
     MskSyntaxTokens tokens =
         MskSyntaxTreeParseTokens(StringViewFromC(tok->text));
-    TEST_ASSERT(tokens.size == 1, MskSyntaxTokensFree(&tokens),
-                "Expected 1 token, got %" PRIu64, tokens.size);
+    TEST_ASSERT(VEC_SIZE(&tokens) == 1, MskSyntaxTokensFree(&tokens),
+                "Expected 1 token, got %" PRIu64, VEC_SIZE(&tokens));
     MskSyntaxToken* actual = &tokens.data[0];
     TEST_ASSERT(actual->kind == tok->kind, MskSyntaxTokensFree(&tokens),
                 "Expected kind %" STRING_VIEW_FMT ", got %" STRING_VIEW_FMT,
@@ -146,16 +147,16 @@ TEST_FUNC(LexerLexesToken) {
 
 TEST_FUNC(LexerLexesTokenPairs) {
   TestTokenPairs pairs = GetTokenPairs();
-  for (uint64_t i = 0; i < pairs.size; ++i) {
+  for (uint64_t i = 0; i < VEC_SIZE(&pairs); ++i) {
     const TestTokenPair* pair = &pairs.data[i];
-    String text = {0};
+    String text = STRING_INIT;
     StringAppendC(&text, pair->t1.text);
     StringAppendC(&text, pair->t2.text);
     MskSyntaxTokens tokens = MskSyntaxTreeParseTokens(StringAsView(text));
     StringFree(&text);
-    TEST_ASSERT(tokens.size == 2, MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(VEC_SIZE(&tokens) == 2, MskSyntaxTokensFree(&tokens),
                 "['%s' '%s'] Expected 2 tokens, got %" PRIu64, pair->t1.text,
-                pair->t2.text, tokens.size);
+                pair->t2.text, VEC_SIZE(&tokens));
     MskSyntaxToken* actual1 = &tokens.data[0];
     MskSyntaxToken* actual2 = &tokens.data[1];
     TEST_ASSERT(actual1->kind == pair->t1.kind, MskSyntaxTokensFree(&tokens),
@@ -174,9 +175,9 @@ TEST_FUNC(LexerLexesTokenPairs) {
 
 TEST_FUNC(LexerLexesTokenPairsWithSeparator) {
   TestTokenPairsWithSeparator pairs = GetTokenPairsWithSeparator();
-  for (uint64_t i = 0; i < pairs.size; ++i) {
+  for (uint64_t i = 0; i < VEC_SIZE(&pairs); ++i) {
     const TestTokenPairWithSeparator* pair = &pairs.data[i];
-    String text = {0};
+    String text = STRING_INIT;
     StringAppendC(&text, pair->pair.t1.text);
     StringAppendC(&text, pair->separator.text);
     StringAppendC(&text, pair->pair.t2.text);
@@ -189,10 +190,10 @@ TEST_FUNC(LexerLexesTokenPairsWithSeparator) {
     VEC_FREE(&pairs);             \
   } while (false)
 
-    TEST_ASSERT(tokens.size == 3, CLEANUP(),
+    TEST_ASSERT(VEC_SIZE(&tokens) == 3, CLEANUP(),
                 "['%s' '%s' '%s'] Expected 3 tokens, got %" PRIu64,
                 pair->pair.t1.text, pair->separator.text, pair->pair.t2.text,
-                tokens.size);
+                VEC_SIZE(&tokens));
     MskSyntaxToken* actual1 = &tokens.data[0];
     MskSyntaxToken* actual2 = &tokens.data[1];
     MskSyntaxToken* actual3 = &tokens.data[2];

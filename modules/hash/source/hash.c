@@ -22,7 +22,7 @@ HashAddResult HashAdd(HashUnpacked hash,
   }
 
   uint64_t index = key.hash % *hash.capacity;
-  while ((*hash.keys)[index].vec.size != 0) {
+  while (VEC_SIZE(&(*hash.keys)[index].vec) != 0) {
     if ((*hash.keys)[index].hash == key.hash &&
         HashKeyVecEqualSpan((*hash.keys)[index].vec, key.span)) {
       memcpy(&(*hash.values)[index * hash.sizeof_value], value,
@@ -47,9 +47,7 @@ HashKeyView HashCreateKey(HashKeySpan key) {
 
 void HashFree(HashUnpacked hash) {
   for (uint64_t i = 0; i < *hash.capacity; i++) {
-    if ((*hash.keys)[i].vec.size != 0) {
-      VEC_FREE(&(*hash.keys)[i].vec);
-    }
+    VEC_FREE(&(*hash.keys)[i].vec);
   }
   free(*hash.keys);
   free(*hash.values);
@@ -60,7 +58,7 @@ bool HashGet(HashUnpacked hash, HashKeyView key, uint8_t* out_value) {
     return false;
   }
   uint64_t index = key.hash % *hash.capacity;
-  while ((*hash.keys)[index].vec.size != 0) {
+  while (VEC_SIZE(&(*hash.keys)[index].vec) != 0) {
     if ((*hash.keys)[index].hash == key.hash &&
         HashKeyVecEqualSpan((*hash.keys)[index].vec, key.span)) {
       memcpy(out_value, &(*hash.values)[index * hash.sizeof_value],
@@ -85,9 +83,9 @@ bool HashRehash(HashUnpacked hash, uint64_t new_capacity) {
   }
 
   for (uint64_t i = 0; i < *hash.capacity; i++) {
-    if ((*hash.keys)[i].vec.size != 0) {
+    if (VEC_SIZE(&(*hash.keys)[i].vec) != 0) {
       uint64_t index = (*hash.keys)[i].hash % new_capacity;
-      while (new_keys[index].vec.size != 0) {
+      while (VEC_SIZE(&new_keys[index].vec) != 0) {
         index = (index + 1) % new_capacity;
       }
       new_keys[index] = (*hash.keys)[i];
@@ -105,7 +103,8 @@ bool HashRehash(HashUnpacked hash, uint64_t new_capacity) {
 }
 
 bool HashKeyVecEqualSpan(HashKeyVec a, HashKeySpan b) {
-  return a.size == SPAN_SIZE(b) && memcmp(a.data, b.begin, a.size) == 0;
+  return VEC_SIZE(&a) == SPAN_SIZE(b) &&
+         memcmp(a.data, b.begin, VEC_SIZE(&a)) == 0;
 }
 
 uint64_t HashKeySpanHash(HashKeySpan key) {
