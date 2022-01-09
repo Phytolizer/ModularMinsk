@@ -392,7 +392,7 @@ StringView StringAsView(const String s) {
 StringView StringAsSubView(const String s, uint64_t begin, uint64_t end) {
   if (begin >= StringSize(s) || end > StringSize(s) || begin >= end) {
     // An invalid range was specified. Return something sane.
-    return (StringView){0};
+    return (StringView)PHYTO_SPAN_EMPTY;
   }
   return (StringView)PHYTO_SPAN_NEW(s.data + begin, s.data + end);
 }
