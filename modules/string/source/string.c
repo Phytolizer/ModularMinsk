@@ -216,10 +216,8 @@ StringView StringViewFind(StringView str, StringView sub) {
   for (size_t i = 0; i <= PHYTO_SPAN_SIZE(str) - PHYTO_SPAN_SIZE(sub); ++i) {
     if (str.begin[i] == sub.begin[0] &&
         memcmp(&str.begin[i], sub.begin, PHYTO_SPAN_SIZE(sub)) == 0) {
-      return (StringView){
-          .begin = &str.begin[i],
-          .end = &str.begin[i + PHYTO_SPAN_SIZE(sub)],
-      };
+      return (StringView)PHYTO_SPAN_NEW(&str.begin[i],
+                                        &str.begin[i + PHYTO_SPAN_SIZE(sub)]);
     }
   }
   return (StringView){0};
@@ -235,34 +233,25 @@ StringView StringViewTokenize(StringView str,
       *save = (StringView){0};
       return (StringView){0};
     }
-    str = (StringView){
-        .begin = &str.begin[begin],
-        .end = str.end,
-    };
+    str = (StringView)PHYTO_SPAN_NEW(&str.begin[begin], str.end);
   }
   const char* break_pos = StringViewFindBreak(str, breaks);
   if (save) {
-    *save = (StringView){
-        .begin = break_pos,
-        .end = str.end,
-    };
+    *save = (StringView)PHYTO_SPAN_NEW(break_pos, str.end);
   }
   if (break_pos == str.end) {
     return (StringView){0};
   }
-  return (StringView){
-      .begin = str.begin,
-      .end = break_pos,
-  };
+  return (StringView)PHYTO_SPAN_NEW(str.begin, break_pos);
 }
 
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
   if (begin >= PHYTO_SPAN_SIZE(str) || end > PHYTO_SPAN_SIZE(str) ||
       begin >= end) {
     // An invalid range was specified. Return something sane.
-    return (StringView){0};
+    return (StringView)PHYTO_SPAN_EMPTY;
   }
-  return (StringView){.begin = str.begin + begin, .end = str.begin + end};
+  return (StringView)PHYTO_SPAN_NEW(str.begin + begin, str.begin + end);
 }
 
 void StringViewPrint(StringView view) {
@@ -307,10 +296,7 @@ bool StringViewEndsWith(StringView haystack, StringView needle) {
 }
 
 StringView StringViewFromPtr(const char* ptr, uint64_t size) {
-  return (StringView){
-      .begin = ptr,
-      .end = ptr + size,
-  };
+  return (StringView)PHYTO_SPAN_NEW(ptr, ptr + size);
 }
 
 bool StringViewEqualC(StringView view, const char* cstr) {
@@ -400,10 +386,7 @@ void StringFree(String* s) {
 }
 
 StringView StringAsView(const String s) {
-  return (StringView){
-      .begin = s.data,
-      .end = s.data + StringSize(s),
-  };
+  return (StringView)PHYTO_SPAN_NEW(s.data, s.data + StringSize(s));
 }
 
 StringView StringAsSubView(const String s, uint64_t begin, uint64_t end) {
@@ -411,10 +394,7 @@ StringView StringAsSubView(const String s, uint64_t begin, uint64_t end) {
     // An invalid range was specified. Return something sane.
     return (StringView){0};
   }
-  return (StringView){
-      .begin = s.data + begin,
-      .end = s.data + end,
-  };
+  return (StringView)PHYTO_SPAN_NEW(s.data + begin, s.data + end);
 }
 
 bool StringEqual(const String a, const String b) {
