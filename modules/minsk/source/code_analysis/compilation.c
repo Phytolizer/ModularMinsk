@@ -12,7 +12,7 @@ MskCompilation MskCompilationNew(MskSyntaxTree syntax) {
 }
 
 MskEvaluationResult MskCompilationEvaluate(MskCompilation* compilation,
-                                           MskSymbolTable* symbols) {
+                                           MskSymbolTable_t* symbols) {
   MskBinder binder = {.symbols = symbols};
   MskBoundExpression* root =
       MskBinderBindExpression(&binder, compilation->syntax.root);

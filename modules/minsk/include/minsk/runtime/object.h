@@ -4,7 +4,7 @@
 #include <annotate/annotate.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string/string.h>
+#include <phyto/string/string.h>
 
 #define MSK__OBJECT_KINDS \
   X(Null)                 \
@@ -18,7 +18,7 @@ typedef enum {
 #undef X
 } MskRuntimeObjectKind;
 
-StringView MskRuntimeObjectKindName(MskRuntimeObjectKind kind);
+phyto_string_span_t MskRuntimeObjectKindName(MskRuntimeObjectKind kind);
 
 typedef struct {
   MskRuntimeObjectKind kind;

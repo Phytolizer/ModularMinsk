@@ -1,8 +1,8 @@
 #ifndef MINSK_CODE_ANALYSIS_SYNTAX_PARSER_H_
 #define MINSK_CODE_ANALYSIS_SYNTAX_PARSER_H_
 
+#include <phyto/string/string.h>
 #include <stdint.h>
-#include <string/string.h>
 #include <vec/vec.h>
 
 #include "minsk/code_analysis/syntax/expression.h"
@@ -22,7 +22,7 @@ typedef struct {
     .diagnostics = VEC_INIT_DEFAULT(MskDiagnostic),            \
   }
 
-MskSyntaxParser MskSyntaxParserNew(StringView text);
+MskSyntaxParser MskSyntaxParserNew(phyto_string_span_t text);
 void MskSyntaxParserFree(MskSyntaxParser* parser);
 MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser);
 

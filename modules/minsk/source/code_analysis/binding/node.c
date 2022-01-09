@@ -10,6 +10,7 @@
 #include "minsk/code_analysis/binding/unary_expression.h"
 #include "minsk/code_analysis/binding/variable_expression.h"
 #include "minsk/runtime/object.h"
+#include "phyto/string/string.h"
 
 static MskBoundNodeKind GetExpressionKind(MskBoundNode* node);
 static void FreeExpression(MskBoundNode* node);
@@ -101,12 +102,12 @@ void FreeBinaryExpression(MskBoundExpression* exp) {
 
 void FreeVariableExpression(MskBoundExpression* exp) {
   MskBoundVariableExpression* variable = (MskBoundVariableExpression*)exp;
-  StringFree(&variable->variable.name);
+  phyto_string_free(&variable->variable.name);
 }
 
 void FreeAssignmentExpression(MskBoundExpression* exp) {
   MskBoundAssignmentExpression* assignment = (MskBoundAssignmentExpression*)exp;
-  StringFree(&assignment->variable.name);
+  phyto_string_free(&assignment->variable.name);
   FreeExpression(&assignment->value->base);
   free(assignment->value);
   assignment->value = NULL;

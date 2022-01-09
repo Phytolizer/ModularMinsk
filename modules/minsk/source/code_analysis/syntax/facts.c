@@ -1,6 +1,7 @@
 #include "minsk/code_analysis/syntax/facts.h"
 
 #include "minsk/code_analysis/syntax/kind.h"
+#include "phyto/string/string.h"
 
 uint64_t MskSyntaxFactsBinaryOperatorPrecedence(MskSyntaxKind kind) {
   switch (kind) {
@@ -33,48 +34,48 @@ uint64_t MskSyntaxFactsUnaryOperatorPrecedence(MskSyntaxKind kind) {
   }
 }
 
-MskSyntaxKind MskSyntaxFactsKeywordKind(StringView text) {
-  if (StringViewEqualC(text, "true")) {
+MskSyntaxKind MskSyntaxFactsKeywordKind(phyto_string_span_t text) {
+  if (phyto_string_span_equal(text, phyto_string_span_from_c("true"))) {
     return kMskSyntaxKindTrueKeyword;
-  } else if (StringViewEqualC(text, "false")) {
+  } else if (phyto_string_span_equal(text, phyto_string_span_from_c("false"))) {
     return kMskSyntaxKindFalseKeyword;
   } else {
     return kMskSyntaxKindIdentifierToken;
   }
 }
 
-StringView MskSyntaxFactsGetText(MskSyntaxKind kind) {
+phyto_string_span_t MskSyntaxFactsGetText(MskSyntaxKind kind) {
   switch (kind) {
     case kMskSyntaxKindPlusToken:
-      return StringViewFromC("+");
+      return phyto_string_span_from_c("+");
     case kMskSyntaxKindMinusToken:
-      return StringViewFromC("-");
+      return phyto_string_span_from_c("-");
     case kMskSyntaxKindStarToken:
-      return StringViewFromC("*");
+      return phyto_string_span_from_c("*");
     case kMskSyntaxKindSlashToken:
-      return StringViewFromC("/");
+      return phyto_string_span_from_c("/");
     case kMskSyntaxKindOpenParenthesisToken:
-      return StringViewFromC("(");
+      return phyto_string_span_from_c("(");
     case kMskSyntaxKindCloseParenthesisToken:
-      return StringViewFromC(")");
+      return phyto_string_span_from_c(")");
     case kMskSyntaxKindBangToken:
-      return StringViewFromC("!");
+      return phyto_string_span_from_c("!");
     case kMskSyntaxKindBangEqualsToken:
-      return StringViewFromC("!=");
+      return phyto_string_span_from_c("!=");
     case kMskSyntaxKindEqualsToken:
-      return StringViewFromC("=");
+      return phyto_string_span_from_c("=");
     case kMskSyntaxKindEqualsEqualsToken:
-      return StringViewFromC("==");
+      return phyto_string_span_from_c("==");
     case kMskSyntaxKindAmpersandAmpersandToken:
-      return StringViewFromC("&&");
+      return phyto_string_span_from_c("&&");
     case kMskSyntaxKindPipePipeToken:
-      return StringViewFromC("||");
+      return phyto_string_span_from_c("||");
     case kMskSyntaxKindTrueKeyword:
-      return StringViewFromC("true");
+      return phyto_string_span_from_c("true");
     case kMskSyntaxKindFalseKeyword:
-      return StringViewFromC("false");
+      return phyto_string_span_from_c("false");
     default:
-      return (StringView){0};
+      return phyto_string_span_empty();
   }
 }
 

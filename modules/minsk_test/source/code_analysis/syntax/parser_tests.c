@@ -1,15 +1,15 @@
 #include "minsk_test/code_analysis/syntax/parser_tests.h"
 
 #include <phyto/collections/dynamic_array.h>
+#include <phyto/string/string.h>
 #include <stdint.h>
+#include <vec/vec.h>
 
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "string/string.h"
-#include "vec/vec.h"
 
 PHYTO_COLLECTIONS_DEQUE_IMPL(FlatSyntaxTree, MskSyntaxNode*);
 PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(SyntaxNodeStack, MskSyntaxNode*);
@@ -82,13 +82,16 @@ static TEST_SUBTEST_FUNC(AssertToken,
   enumerator->index++;
   TEST_ASSERT(node->cls == kMskSyntaxNodeClassToken, (void)0, "Expected token");
   TEST_ASSERT(MskSyntaxNodeGetKind(node) == kind, (void)0,
-              "Expected %" STRING_VIEW_FMT ", not %" STRING_VIEW_FMT,
-              STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
-              STRING_VIEW_PRINT(MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
-  StringView actual_text = StringAsView(((MskSyntaxToken*)node)->text);
-  TEST_ASSERT(StringViewEqualC(actual_text, text), (void)0,
-              "Expected '%s', not '%" STRING_VIEW_FMT "'", text,
-              STRING_VIEW_PRINT(actual_text));
+              "Expected %" PHYTO_STRING_FORMAT ", not %" PHYTO_STRING_FORMAT,
+              PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(kind)),
+              PHYTO_STRING_VIEW_PRINTF_ARGS(
+                  MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
+  phyto_string_span_t actual_text =
+      phyto_string_as_span(((MskSyntaxToken*)node)->text);
+  TEST_ASSERT(
+      phyto_string_span_equal(actual_text, phyto_string_span_from_c(text)),
+      (void)0, "Expected '%s', not '%" PHYTO_STRING_FORMAT "'", text,
+      PHYTO_STRING_VIEW_PRINTF_ARGS(actual_text));
   TEST_SUBTEST_PASS();
 }
 
@@ -102,9 +105,10 @@ static TEST_SUBTEST_FUNC(AssertNode,
   TEST_ASSERT(node->cls != kMskSyntaxNodeClassToken, (void)0,
               "Didn't expect a token here");
   TEST_ASSERT(MskSyntaxNodeGetKind(node) == kind, (void)0,
-              "Expected %" STRING_VIEW_FMT ", not %" STRING_VIEW_FMT,
-              STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
-              STRING_VIEW_PRINT(MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
+              "Expected %" PHYTO_STRING_FORMAT ", not %" PHYTO_STRING_FORMAT,
+              PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(kind)),
+              PHYTO_STRING_VIEW_PRINTF_ARGS(
+                  MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
   TEST_SUBTEST_PASS();
 }
 
@@ -130,15 +134,16 @@ TEST_FUNC(BinaryExpressionHonorsPrecedences) {
         MskSyntaxFactsBinaryOperatorPrecedence(pairs.data[i].op1);
     uint64_t op2_precedence =
         MskSyntaxFactsBinaryOperatorPrecedence(pairs.data[i].op2);
-    StringView op1_text = MskSyntaxFactsGetText(pairs.data[i].op1);
-    StringView op2_text = MskSyntaxFactsGetText(pairs.data[i].op2);
-    String text =
-        StringFormat("a %" STRING_VIEW_FMT " b %" STRING_VIEW_FMT " c",
-                     STRING_VIEW_PRINT(op1_text), STRING_VIEW_PRINT(op2_text));
+    phyto_string_span_t op1_text = MskSyntaxFactsGetText(pairs.data[i].op1);
+    phyto_string_span_t op2_text = MskSyntaxFactsGetText(pairs.data[i].op2);
+    phyto_string_t text = phyto_string_from_sprintf(
+        "a %" PHYTO_STRING_FORMAT " b %" PHYTO_STRING_FORMAT " c",
+        PHYTO_STRING_VIEW_PRINTF_ARGS(op1_text),
+        PHYTO_STRING_VIEW_PRINTF_ARGS(op2_text));
     if (op1_precedence >= op2_precedence) {
     } else {
     }
-    StringFree(&text);
+    phyto_string_free(&text);
   }
   VEC_FREE(&pairs);
   TEST_PASS();

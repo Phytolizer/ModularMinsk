@@ -4,7 +4,6 @@
 #include "minsk/code_analysis/binding/expression.h"
 #include "minsk/code_analysis/variable_symbol.h"
 #include "minsk/runtime/object.h"
-#include "string/string.h"
 
 typedef struct {
   MskBoundExpression base;

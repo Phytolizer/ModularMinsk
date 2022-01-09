@@ -1,6 +1,8 @@
 #ifndef MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_
 #define MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_
 
+#include <phyto/string/string.h>
+
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
@@ -11,8 +13,8 @@ typedef struct {
   MskDiagnosticBag diagnostics;
 } MskSyntaxTree;
 
-MskSyntaxTree MskSyntaxTreeParse(StringView text);
-MskSyntaxTokens MskSyntaxTreeParseTokens(StringView text);
+MskSyntaxTree MskSyntaxTreeParse(phyto_string_span_t text);
+MskSyntaxTokens MskSyntaxTreeParseTokens(phyto_string_span_t text);
 void MskSyntaxTreeFree(MskSyntaxTree* tree);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_

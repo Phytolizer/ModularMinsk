@@ -3,7 +3,6 @@
 
 #include "minsk/code_analysis/binding/expression.h"
 #include "minsk/code_analysis/variable_symbol.h"
-#include "string/string.h"
 
 typedef struct {
   MskBoundExpression base;

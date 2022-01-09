@@ -117,21 +117,27 @@ declare_module(
 )
 declare_module(phyto_span KIND interface)
 declare_module(
-  string
-  KIND library
-  SOURCES string.c
-  DEPENDS phyto_span vec
-)
-declare_module(
-  hash
-  KIND library
-  SOURCES hash.c
-  DEPENDS phyto_span vec
-)
-declare_module(
   phyto_collections
   KIND interface
   DEPENDS phyto_span nonstd
+)
+declare_module(
+  phyto_string
+  KIND library
+  SOURCES string.c
+  DEPENDS phyto_span phyto_collections
+)
+declare_module(
+  phyto_io
+  KIND library
+  SOURCES io.c
+  DEPENDS phyto_string
+)
+declare_module(
+  phyto_hash
+  KIND library
+  SOURCES hash.c
+  DEPENDS phyto_span phyto_string
 )
 declare_module(annotate KIND interface)
 declare_module(ansi_esc KIND interface)
@@ -174,7 +180,7 @@ declare_module(
           code_analysis/text/span.c
           code_analysis/variable_symbol.c
           runtime/object.c
-  DEPENDS vec phyto_span string hash annotate ansi_esc
+  DEPENDS vec phyto_span phyto_string phyto_hash annotate ansi_esc
   INTERNAL_INCLUDE
 )
 
@@ -183,7 +189,7 @@ declare_module(
   mc
   KIND executable
   SOURCES main.c
-  DEPENDS minsk ansi_esc
+  DEPENDS minsk ansi_esc phyto_io
 )
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})

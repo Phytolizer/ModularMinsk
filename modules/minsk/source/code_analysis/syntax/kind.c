@@ -17,6 +17,6 @@ MskSyntaxKinds MskSyntaxKindsGetAll(void) {
   return result;
 }
 
-StringView MskSyntaxKindName(MskSyntaxKind kind) {
-  return StringViewFromC(kMskSyntaxKindNames[kind]);
+phyto_string_span_t MskSyntaxKindName(MskSyntaxKind kind) {
+  return phyto_string_span_from_c(kMskSyntaxKindNames[kind]);
 }

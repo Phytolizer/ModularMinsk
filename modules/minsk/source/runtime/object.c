@@ -1,6 +1,7 @@
 #include "minsk/runtime/object.h"
 
 #include <inttypes.h>
+#include <phyto/string/string.h>
 #include <stdlib.h>
 
 static void FreeInteger(MskRuntimeObject* i);
@@ -18,8 +19,8 @@ static const char* const kMskObjectKindNames[] = {
 #undef X
 };
 
-StringView MskRuntimeObjectKindName(MskRuntimeObjectKind kind) {
-  return StringViewFromC(kMskObjectKindNames[kind]);
+phyto_string_span_t MskRuntimeObjectKindName(MskRuntimeObjectKind kind) {
+  return phyto_string_span_from_c(kMskObjectKindNames[kind]);
 }
 
 MskRuntimeObject MskRuntimeObjectNewInteger(int64_t value) {

@@ -1,7 +1,7 @@
 #ifndef MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_
 #define MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_
 
-#include <string/string.h>
+#include <phyto/string/string.h>
 #include <vec/vec.h>
 
 #define MSK__SYNTAX_KINDS    \
@@ -56,6 +56,6 @@ typedef enum {
 typedef VEC_TYPE(MskSyntaxKind) MskSyntaxKinds;
 
 MskSyntaxKinds MskSyntaxKindsGetAll(void);
-StringView MskSyntaxKindName(MskSyntaxKind kind);
+phyto_string_span_t MskSyntaxKindName(MskSyntaxKind kind);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_

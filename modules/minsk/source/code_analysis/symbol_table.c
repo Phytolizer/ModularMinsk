@@ -1,34 +1,31 @@
 #include "minsk/code_analysis/symbol_table.h"
 
+#include <phyto/hash/hash.h>
+#include <phyto/string/string.h>
 #include <stdint.h>
 
-#include "hash/hash.h"
 #include "minsk/code_analysis/variable_symbol.h"
-#include "string/string.h"
 
-static HashKeySpan CreateHashKeySpan(StringView name);
+PHYTO_HASH_IMPL(MskSymbolTable, MskSymbolTableEntry);
 
-bool MskSymbolTableLookup(MskSymbolTable* table,
-                          StringView name,
+bool MskSymbolTableLookup(MskSymbolTable_t* table,
+                          phyto_string_span_t name,
                           MskSymbolTableEntry* out_value) {
-  return HASH_GET(table, CreateHashKeySpan(name), out_value);
+  *out_value = MskSymbolTable_get(table, name);
+  if (MskSymbolTable_flag(table) == phyto_hash_flag_not_found) {
+    // handled error, reset flag
+    table->flag = phyto_hash_flag_ok;
+    return false;
+  }
+  return true;
 }
 
-void MskSymbolTableInsert(MskSymbolTable* table,
+void MskSymbolTableInsert(MskSymbolTable_t* table,
                           MskVariableSymbol variable,
                           MskRuntimeObject value) {
   MskSymbolTableEntry entry = {
       .variable = variable,
       .value = value,
   };
-  HASH_ADD(table, CreateHashKeySpan(StringAsView(variable.name)), entry);
-}
-
-void MskSymbolTableFree(MskSymbolTable* table) {
-  HASH_FREE(table);
-}
-
-HashKeySpan CreateHashKeySpan(StringView name) {
-  return (HashKeySpan)PHYTO_SPAN_NEW((const uint8_t*)name.begin,
-                                     (const uint8_t*)name.end);
+  MskSymbolTable_insert(table, phyto_string_as_span(variable.name), entry);
 }

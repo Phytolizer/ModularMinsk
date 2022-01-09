@@ -3,9 +3,10 @@
 #include <stdlib.h>
 
 #include "minsk/runtime/object.h"
+#include "phyto/string/string.h"
 
 void MskSyntaxTokenFree(MskSyntaxToken* token) {
-  StringFree(&token->text);
+  phyto_string_free(&token->text);
   MskRuntimeObjectFree(&token->value);
 }
 
@@ -18,7 +19,7 @@ void MskSyntaxTokensFree(MskSyntaxTokens* tokens) {
 
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
   MskSyntaxToken duplicate = token;
-  duplicate.text = StringDuplicate(token.text);
+  duplicate.text = phyto_string_copy(token.text);
   duplicate.value = MskRuntimeObjectDuplicate(&token.value);
   return duplicate;
 }
@@ -26,6 +27,6 @@ MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {
 MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token) {
   return (MskTextSpan){
       .start = token.position,
-      .length = StringSize(token.text),
+      .length = token.text.size,
   };
 }

@@ -15,6 +15,7 @@
 #include "minsk/code_analysis/binding/variable_expression.h"
 #include "minsk/code_analysis/symbol_table.h"
 #include "minsk/runtime/object.h"
+#include "phyto/string/string.h"
 
 static MskRuntimeObject EvaluateExpression(MskEvaluator* evaluator,
                                            MskBoundExpression* expression);
@@ -35,7 +36,7 @@ static MskRuntimeObject EvaluateAssignmentExpression(
     MskBoundAssignmentExpression* expression);
 
 MskEvaluator MskEvaluatorNew(MskBoundExpression* root,
-                             MskSymbolTable* symbols) {
+                             MskSymbolTable_t* symbols) {
   return (MskEvaluator){
       .root = root,
       .symbols = symbols,
@@ -123,7 +124,7 @@ MskRuntimeObject EvaluateVariableExpression(
     MskBoundVariableExpression* expression) {
   MskSymbolTableEntry entry = {0};
   MskSymbolTableLookup(evaluator->symbols,
-                       StringAsView(expression->variable.name), &entry);
+                       phyto_string_as_span(expression->variable.name), &entry);
   return entry.value;
 }
 

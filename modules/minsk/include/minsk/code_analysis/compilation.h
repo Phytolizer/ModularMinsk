@@ -11,6 +11,6 @@ typedef struct {
 
 MskCompilation MskCompilationNew(MskSyntaxTree syntax);
 MskEvaluationResult MskCompilationEvaluate(MskCompilation* compilation,
-                                           MskSymbolTable* symbols);
+                                           MskSymbolTable_t* symbols);
 
 #endif  // MINSK_CODE_ANALYSIS_COMPILATION_H_

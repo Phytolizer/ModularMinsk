@@ -1,5 +1,6 @@
 #include "minsk/code_analysis/syntax/tree.h"
 
+#include <phyto/string/string.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -9,14 +10,14 @@
 #include "minsk/code_analysis/syntax/parser.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 
-MskSyntaxTree MskSyntaxTreeParse(StringView text) {
+MskSyntaxTree MskSyntaxTreeParse(phyto_string_span_t text) {
   MskSyntaxParser parser = MskSyntaxParserNew(text);
   MskSyntaxTree tree = MskSyntaxParserParse(&parser);
   MskSyntaxParserFree(&parser);
   return tree;
 }
 
-MskSyntaxTokens MskSyntaxTreeParseTokens(StringView text) {
+MskSyntaxTokens MskSyntaxTreeParseTokens(phyto_string_span_t text) {
   MskSyntaxLexer lexer = MskNewSyntaxLexer(text);
   MskSyntaxTokens tokens = VEC_INIT_DEFAULT(MskSyntaxToken);
   while (true) {

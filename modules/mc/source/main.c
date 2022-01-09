@@ -6,10 +6,11 @@
 #include <minsk/code_analysis/syntax/token.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/runtime/object.h>
+#include <phyto/io/io.h>
+#include <phyto/string/string.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string/string.h>
 
 #include "minsk/code_analysis/symbol_table.h"
 #include "minsk/code_analysis/text/diagnostic.h"
@@ -18,12 +19,12 @@
 
 int main(void) {
   bool show_tree = false;
-  MskSymbolTable symbols = {0};
+  MskSymbolTable_t symbols = {0};
   while (true) {
     printf("minsk> ");
     fflush(stdout);
-    String text = StringGetLine(stdin);
-    if (StringSize(text) == 0) {
+    phyto_string_t text = phyto_io_read_line(stdin);
+    if (text.size == 0) {
       // EOF condition
       // Print a newline so the prompt isn't on the same line as the Bash
       // prompt.
@@ -31,20 +32,24 @@ int main(void) {
       // Don't need to free an empty string.
       break;
     }
-    if (StringEqualC(text, "#showTree\n")) {
+    if (phyto_string_span_equal(phyto_string_as_span(text),
+                                phyto_string_span_from_c("#showTree\n"))) {
       show_tree = !show_tree;
       printf("showTree is now %s\n", show_tree ? "on" : "off");
       continue;
     }
-    if (StringEqualC(text, "#cls\n")) {
+    if (phyto_string_span_equal(phyto_string_as_span(text),
+                                phyto_string_span_from_c("#cls\n"))) {
       printf(ANSI_ESC_KILL_SCREEN ANSI_ESC_CURSOR_RESET);
       continue;
     }
-    if (StringEqualC(text, "#quit\n")) {
-      StringFree(&text);
+    if (phyto_string_span_equal(phyto_string_as_span(text),
+                                phyto_string_span_from_c("#quit\n"))) {
+      phyto_string_free(&text);
       break;
     }
-    if (StringEqualC(text, "#help\n")) {
+    if (phyto_string_span_equal(phyto_string_as_span(text),
+                                phyto_string_span_from_c("#help\n"))) {
       printf("#showTree - toggle showing the parse tree\n");
       printf("#cls      - clear the screen\n");
       printf("#help     - this message\n");
@@ -52,7 +57,7 @@ int main(void) {
       continue;
     }
 
-    MskSyntaxTree syntax_tree = MskSyntaxTreeParse(StringAsView(text));
+    MskSyntaxTree syntax_tree = MskSyntaxTreeParse(phyto_string_as_span(text));
     // move out the diagnostics because they aren't limited to the syntax tree
     MskDiagnosticBag diagnostics = syntax_tree.diagnostics;
     syntax_tree.diagnostics = (MskDiagnosticBag)VEC_INIT_DEFAULT(MskDiagnostic);
@@ -81,26 +86,30 @@ int main(void) {
     if (show_diagnostics) {
       printf("\n");
       for (size_t i = 0; i < VEC_SIZE(&diagnostics); ++i) {
-        StringView prefix =
-            StringAsSubView(text, 0, diagnostics.data[i].span.start);
-        StringView error =
-            StringAsSubView(text, diagnostics.data[i].span.start,
-                            MskTextSpanEnd(diagnostics.data[i].span));
-        StringView suffix = StringAsSubView(
-            text, MskTextSpanEnd(diagnostics.data[i].span), VEC_SIZE(&text));
-        printf("%" STRING_VIEW_FMT ANSI_ESC_FG_RED
-               "%" STRING_VIEW_FMT ANSI_ESC_RESET "%" STRING_VIEW_FMT "\n",
-               STRING_VIEW_PRINT(prefix), STRING_VIEW_PRINT(error),
-               STRING_VIEW_PRINT(suffix));
+        phyto_string_span_t prefix = phyto_string_span_subspan(
+            phyto_string_as_span(text), 0, diagnostics.data[i].span.start);
+        phyto_string_span_t error = phyto_string_span_subspan(
+            phyto_string_as_span(text), diagnostics.data[i].span.start,
+            MskTextSpanEnd(diagnostics.data[i].span));
+        phyto_string_span_t suffix = phyto_string_span_subspan(
+            phyto_string_as_span(text),
+            MskTextSpanEnd(diagnostics.data[i].span), text.size);
+        printf("%" PHYTO_STRING_FORMAT ANSI_ESC_FG_RED
+               "%" PHYTO_STRING_FORMAT ANSI_ESC_RESET "%" PHYTO_STRING_FORMAT
+               "\n",
+               PHYTO_STRING_VIEW_PRINTF_ARGS(prefix),
+               PHYTO_STRING_VIEW_PRINTF_ARGS(error),
+               PHYTO_STRING_VIEW_PRINTF_ARGS(suffix));
         MskDiagnostic diagnostic = diagnostics.data[i];
         printf(ANSI_ESC_FG_RED);
-        printf("%" STRING_FMT "\n", STRING_PRINT(diagnostic.message));
+        printf("%" PHYTO_STRING_FORMAT "\n",
+               PHYTO_STRING_PRINTF_ARGS(diagnostic.message));
         printf(ANSI_ESC_RESET);
       }
     }
     MskDiagnosticBagFree(&diagnostics);
     MskSyntaxTreeFree(&syntax_tree);
-    StringFree(&text);
+    phyto_string_free(&text);
   }
-  MskSymbolTableFree(&symbols);
+  MskSymbolTable_free(&symbols);
 }

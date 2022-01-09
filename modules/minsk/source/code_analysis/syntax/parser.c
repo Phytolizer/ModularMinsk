@@ -1,5 +1,6 @@
 #include "minsk/code_analysis/syntax/parser.h"
 
+#include <phyto/string/string.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -17,7 +18,6 @@
 #include "minsk/code_analysis/syntax/unary_expression.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
-#include "string/string.h"
 
 static MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset);
 static MskSyntaxToken* Current(MskSyntaxParser* parser);
@@ -29,7 +29,7 @@ static MskExpressionSyntax* ParseBinaryExpression(MskSyntaxParser* parser,
                                                   uint64_t parent_precedence);
 static MskExpressionSyntax* ParsePrimaryExpression(MskSyntaxParser* parser);
 
-MskSyntaxParser MskSyntaxParserNew(StringView text) {
+MskSyntaxParser MskSyntaxParserNew(phyto_string_span_t text) {
   MskSyntaxLexer lexer = MskNewSyntaxLexer(text);
   MskSyntaxParser parser = MSK_SYNTAX_PARSER_INIT;
   while (true) {
@@ -99,7 +99,7 @@ MskSyntaxToken MatchToken(MskSyntaxParser* parser, MskSyntaxKind kind) {
       .base = {.cls = kMskSyntaxNodeClassToken},
       .kind = kind,
       .position = Current(parser)->position,
-      .text = STRING_INIT,
+      .text = phyto_string_new(),
       .value = MSK_RUNTIME_OBJECT_NULL,
   };
 }

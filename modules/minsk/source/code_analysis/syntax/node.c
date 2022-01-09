@@ -1,6 +1,7 @@
 #include "minsk/code_analysis/syntax/node.h"
 
 #include <ansi_esc/ansi_esc.h>
+#include <phyto/string/string.h>
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/assignment_expression.h"
@@ -20,8 +21,8 @@ const char* const kMskSyntaxClassNames[] = {
 #undef X
 };
 
-StringView MskSyntaxNodeClassName(MskSyntaxNodeClass kind) {
-  return StringViewFromC(kMskSyntaxClassNames[kind]);
+phyto_string_span_t MskSyntaxNodeClassName(MskSyntaxNodeClass kind) {
+  return phyto_string_span_from_c(kMskSyntaxClassNames[kind]);
 }
 
 static MskSyntaxKind GetExpressionKind(MskSyntaxNode* node);
@@ -45,7 +46,7 @@ static MskSyntaxNodeChildren GetAssignmentExpressionChildren(
 static void PrettyPrint(MskSyntaxNode* node,
                         FILE* fp,
                         bool colors,
-                        String indent,
+                        phyto_string_t indent,
                         bool is_last);
 
 MskSyntaxKind MskSyntaxNodeGetKind(MskSyntaxNode* node) {
@@ -73,7 +74,7 @@ MskSyntaxNodeChildren MskSyntaxNodeGetChildren(MskSyntaxNode* node) {
 }
 
 void MskSyntaxNodePrettyPrint(MskSyntaxNode* node, FILE* fp, bool colors) {
-  PrettyPrint(node, fp, colors, STRING_INIT, true);
+  PrettyPrint(node, fp, colors, phyto_string_new(), true);
 }
 
 MskSyntaxKind GetExpressionKind(MskSyntaxNode* node) {
@@ -168,14 +169,15 @@ MskSyntaxNodeChildren GetAssignmentExpressionChildren(
 void PrettyPrint(MskSyntaxNode* node,
                  FILE* fp,
                  bool colors,
-                 String indent,
+                 phyto_string_t indent,
                  bool is_last) {
   if (colors) {
     fprintf(fp, ANSI_ESC_DIM ANSI_ESC_FG_WHITE);
   }
-  fprintf(fp, "%" STRING_FMT, STRING_PRINT(indent));
-  StringView marker = StringViewFromC(is_last ? "└── " : "├── ");
-  fprintf(fp, "%" STRING_VIEW_FMT, STRING_VIEW_PRINT(marker));
+  fprintf(fp, "%" PHYTO_STRING_FORMAT, PHYTO_STRING_PRINTF_ARGS(indent));
+  phyto_string_span_t marker =
+      phyto_string_span_from_c(is_last ? "└── " : "├── ");
+  fprintf(fp, "%" PHYTO_STRING_FORMAT, PHYTO_STRING_VIEW_PRINTF_ARGS(marker));
   if (colors) {
     fprintf(fp, ANSI_ESC_RESET);
     if (node->cls == kMskSyntaxNodeClassToken) {
@@ -184,8 +186,9 @@ void PrettyPrint(MskSyntaxNode* node,
       fprintf(fp, ANSI_ESC_FG_BLUE);
     }
   }
-  fprintf(fp, "%" STRING_VIEW_FMT,
-          STRING_VIEW_PRINT(MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
+  fprintf(fp, "%" PHYTO_STRING_FORMAT,
+          PHYTO_STRING_VIEW_PRINTF_ARGS(
+              MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
   if (colors) {
     fprintf(fp, ANSI_ESC_RESET);
   }
@@ -195,8 +198,9 @@ void PrettyPrint(MskSyntaxNode* node,
     if (colors) {
       fprintf(fp, ANSI_ESC_FG_MAGENTA);
     }
-    fprintf(fp, " %" STRING_VIEW_FMT "(",
-            STRING_VIEW_PRINT(MskRuntimeObjectKindName(tok->value.kind)));
+    fprintf(fp, " %" PHYTO_STRING_FORMAT "(",
+            PHYTO_STRING_VIEW_PRINTF_ARGS(
+                MskRuntimeObjectKindName(tok->value.kind)));
     MskRuntimeObjectPrint(&tok->value, fp);
     fprintf(fp, ")");
   }
@@ -204,11 +208,11 @@ void PrettyPrint(MskSyntaxNode* node,
   if (colors) {
     fprintf(fp, ANSI_ESC_RESET);
   }
-  StringAppendC(&indent, is_last ? "    " : "│   ");
+  phyto_string_append_c(&indent, is_last ? "    " : "│   ");
   MskSyntaxNodeChildren children = MskSyntaxNodeGetChildren(node);
   for (uint64_t i = 0; i < VEC_SIZE(&children); ++i) {
-    PrettyPrint(children.data[i], fp, colors, StringDuplicate(indent),
+    PrettyPrint(children.data[i], fp, colors, phyto_string_copy(indent),
                 i == VEC_SIZE(&children) - 1);
   }
-  StringFree(&indent);
+  phyto_string_free(&indent);
 }

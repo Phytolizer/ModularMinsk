@@ -1,13 +1,13 @@
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 
+#include <phyto/string/string.h>
 #include <stdint.h>
-#include <string/string.h>
 
 #include "minsk/code_analysis/syntax/kind.h"
 
 static void Report(MskDiagnosticBag* diagnostics,
                    MskTextSpan span,
-                   String message);
+                   phyto_string_t message);
 
 void MskDiagnosticBagFree(MskDiagnosticBag* diagnostics) {
   for (uint64_t i = 0; i < VEC_SIZE(diagnostics); ++i) {
@@ -18,18 +18,20 @@ void MskDiagnosticBagFree(MskDiagnosticBag* diagnostics) {
 
 void MskDiagnosticBagReportInvalidNumber(MskDiagnosticBag* diagnostics,
                                          MskTextSpan span,
-                                         StringView text,
-                                         StringView type) {
-  String message = StringFormat(
-      "The number %" STRING_VIEW_FMT " isn't a valid %" STRING_VIEW_FMT ".",
-      STRING_VIEW_PRINT(text), STRING_VIEW_PRINT(type));
+                                         phyto_string_span_t text,
+                                         phyto_string_span_t type) {
+  phyto_string_t message = phyto_string_from_sprintf(
+      "The number %" PHYTO_STRING_FORMAT " isn't a valid %" PHYTO_STRING_FORMAT
+      ".",
+      PHYTO_STRING_VIEW_PRINTF_ARGS(text), PHYTO_STRING_VIEW_PRINTF_ARGS(type));
   Report(diagnostics, span, message);
 }
 
 void MskDiagnosticBagReportBadCharacter(MskDiagnosticBag* diagnostics,
                                         uint64_t position,
                                         char ch) {
-  String message = StringFormat("The character '%c' isn't valid here.", ch);
+  phyto_string_t message =
+      phyto_string_from_sprintf("The character '%c' isn't valid here.", ch);
   MskTextSpan span = MskTextSpanNew(position, position + 1);
   Report(diagnostics, span, message);
 }
@@ -38,53 +40,60 @@ void MskDiagnosticBagReportUnexpectedToken(MskDiagnosticBag* diagnostics,
                                            MskTextSpan span,
                                            MskSyntaxKind expected,
                                            MskSyntaxKind actual) {
-  StringView expected_name = MskSyntaxKindName(expected);
-  StringView actual_name = MskSyntaxKindName(actual);
-  String message = StringFormat(
-      "Expected %" STRING_VIEW_FMT " but got %" STRING_VIEW_FMT ".",
-      STRING_VIEW_PRINT(expected_name), STRING_VIEW_PRINT(actual_name));
+  phyto_string_span_t expected_name = MskSyntaxKindName(expected);
+  phyto_string_span_t actual_name = MskSyntaxKindName(actual);
+  phyto_string_t message = phyto_string_from_sprintf(
+      "Expected %" PHYTO_STRING_FORMAT " but got %" PHYTO_STRING_FORMAT ".",
+      PHYTO_STRING_VIEW_PRINTF_ARGS(expected_name),
+      PHYTO_STRING_VIEW_PRINTF_ARGS(actual_name));
   Report(diagnostics, span, message);
 }
 
 void MskDiagnosticBagReportUndefinedUnaryOperator(
     MskDiagnosticBag* diagnostics,
     MskTextSpan span,
-    StringView operator_name,
+    phyto_string_span_t operator_name,
     MskRuntimeObjectKind operand_type) {
-  StringView operand_type_name = MskRuntimeObjectKindName(operand_type);
-  String message = StringFormat("The operator '%" STRING_VIEW_FMT
-                                "' isn't defined for %" STRING_VIEW_FMT ".",
-                                STRING_VIEW_PRINT(operator_name),
-                                STRING_VIEW_PRINT(operand_type_name));
+  phyto_string_span_t operand_type_name =
+      MskRuntimeObjectKindName(operand_type);
+  phyto_string_t message = phyto_string_from_sprintf(
+      "The operator '%" PHYTO_STRING_FORMAT
+      "' isn't defined for %" PHYTO_STRING_FORMAT ".",
+      PHYTO_STRING_VIEW_PRINTF_ARGS(operator_name),
+      PHYTO_STRING_VIEW_PRINTF_ARGS(operand_type_name));
   Report(diagnostics, span, message);
 }
 
 void MskDiagnosticBagReportUndefinedBinaryOperator(
     MskDiagnosticBag* diagnostics,
     MskTextSpan span,
-    StringView operator_name,
+    phyto_string_span_t operator_name,
     MskRuntimeObjectKind left_type,
     MskRuntimeObjectKind right_type) {
-  StringView left_type_name = MskRuntimeObjectKindName(left_type);
-  StringView right_type_name = MskRuntimeObjectKindName(right_type);
-  String message = StringFormat(
-      "The operator '%" STRING_VIEW_FMT "' isn't defined for %" STRING_VIEW_FMT
-      " and %" STRING_VIEW_FMT ".",
-      STRING_VIEW_PRINT(operator_name), STRING_VIEW_PRINT(left_type_name),
-      STRING_VIEW_PRINT(right_type_name));
+  phyto_string_span_t left_type_name = MskRuntimeObjectKindName(left_type);
+  phyto_string_span_t right_type_name = MskRuntimeObjectKindName(right_type);
+  phyto_string_t message =
+      phyto_string_from_sprintf("The operator '%" PHYTO_STRING_FORMAT
+                                "' isn't defined for %" PHYTO_STRING_FORMAT
+                                " and %" PHYTO_STRING_FORMAT ".",
+                                PHYTO_STRING_VIEW_PRINTF_ARGS(operator_name),
+                                PHYTO_STRING_VIEW_PRINTF_ARGS(left_type_name),
+                                PHYTO_STRING_VIEW_PRINTF_ARGS(right_type_name));
   Report(diagnostics, span, message);
 }
 
 void MskDiagnosticBagReportUndefinedName(MskDiagnosticBag* diagnostics,
                                          MskTextSpan span,
-                                         StringView name) {
-  String message =
-      StringFormat("The name '%" STRING_VIEW_FMT "' isn't defined.",
-                   STRING_VIEW_PRINT(name));
+                                         phyto_string_span_t name) {
+  phyto_string_t message = phyto_string_from_sprintf(
+      "The name '%" PHYTO_STRING_FORMAT "' isn't defined.",
+      PHYTO_STRING_VIEW_PRINTF_ARGS(name));
   Report(diagnostics, span, message);
 }
 
-void Report(MskDiagnosticBag* diagnostics, MskTextSpan span, String message) {
+void Report(MskDiagnosticBag* diagnostics,
+            MskTextSpan span,
+            phyto_string_t message) {
   MskDiagnostic diagnostic = {
       .span = span,
       .message = message,

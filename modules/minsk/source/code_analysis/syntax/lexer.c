@@ -1,5 +1,6 @@
 #include "minsk/code_analysis/syntax/lexer.h"
 
+#include <phyto/string/string.h>
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/facts.h"
@@ -7,7 +8,6 @@
 #include "minsk/code_analysis/syntax/node.h"
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/runtime/object.h"
-#include "string/string.h"
 
 static char Look(MskSyntaxLexer* lexer, uint64_t offset);
 static char Cur(MskSyntaxLexer* lexer);
@@ -15,7 +15,7 @@ static char Peek(MskSyntaxLexer* lexer);
 static bool IsLetter(char c);
 static bool IsLetterOrDigit(char c);
 
-MskSyntaxLexer MskNewSyntaxLexer(StringView text) {
+MskSyntaxLexer MskNewSyntaxLexer(phyto_string_span_t text) {
   return (MskSyntaxLexer){
       .text = text,
       .position = 0,
@@ -24,7 +24,7 @@ MskSyntaxLexer MskNewSyntaxLexer(StringView text) {
 
 MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   MskSyntaxKind kind = kMskSyntaxKindBadToken;
-  String text = STRING_INIT;
+  phyto_string_t text = phyto_string_new();
   uint64_t position = lexer->position;
   MskRuntimeObject value = MSK_RUNTIME_OBJECT_NULL;
 
@@ -57,13 +57,14 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
         lexer->position++;
       }
       // Create the text early. It's needed for StringViewToI64.
-      text = StringFromView(
-          StringViewSubstring(lexer->text, position, lexer->position));
-      StringConversionResultI64 result = StringViewToI64(StringAsView(text));
+      text = phyto_string_own(
+          phyto_string_span_subspan(lexer->text, position, lexer->position));
+      phyto_string_conversion_result_i64_t result =
+          phyto_string_to_i64(phyto_string_as_span(text));
       if (!result.success) {
         MskDiagnosticBagReportInvalidNumber(
             &lexer->diagnostics, MskTextSpanNew(position, lexer->position),
-            StringAsView(text), StringViewFromC("int64_t"));
+            phyto_string_as_span(text), phyto_string_span_from_c("int64_t"));
       }
       value = MskRuntimeObjectNewInteger(result.value);
     } break;
@@ -126,9 +127,9 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
         while (IsLetterOrDigit(Cur(lexer))) {
           lexer->position++;
         }
-        text = StringFromView(
-            StringViewSubstring(lexer->text, position, lexer->position));
-        kind = MskSyntaxFactsKeywordKind(StringAsView(text));
+        text = phyto_string_own(
+            phyto_string_span_subspan(lexer->text, position, lexer->position));
+        kind = MskSyntaxFactsKeywordKind(phyto_string_as_span(text));
       }
       break;
   }
@@ -140,9 +141,9 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
   }
 
   // The text could have been created already.
-  if (StringSize(text) == 0) {
-    text = StringFromView(
-        StringViewSubstring(lexer->text, position, lexer->position));
+  if (text.size == 0) {
+    text = phyto_string_own(
+        phyto_string_span_subspan(lexer->text, position, lexer->position));
   }
 
   return (MskSyntaxToken){
@@ -155,7 +156,7 @@ MskSyntaxToken MskSyntaxLexerLex(MskSyntaxLexer* lexer) {
 }
 
 char Look(MskSyntaxLexer* lexer, uint64_t offset) {
-  if (lexer->position + offset >= StringViewSize(lexer->text)) {
+  if (lexer->position + offset >= lexer->text.size) {
     return '\0';
   }
   return lexer->text.begin[lexer->position + offset];

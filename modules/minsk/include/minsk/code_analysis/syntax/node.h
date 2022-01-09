@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <string/string.h>
+#include <phyto/string/string.h>
 
 #include "minsk/code_analysis/syntax/kind.h"
 
@@ -20,7 +20,7 @@ typedef enum {
 #undef X
 } MskSyntaxNodeClass;
 
-StringView MskSyntaxNodeClassName(MskSyntaxNodeClass kind);
+phyto_string_span_t MskSyntaxNodeClassName(MskSyntaxNodeClass kind);
 
 /// This struct is pretty much empty, as it's meant to be inherited from.
 typedef struct {

@@ -1,9 +1,10 @@
 #include "minsk/code_analysis/binding/binder.h"
 
 #include <assert.h>
+#include <phyto/hash/hash.h>
+#include <phyto/string/string.h>
 #include <stdint.h>
 
-#include "hash/hash.h"
 #include "minsk/code_analysis/binding/assignment_expression.h"
 #include "minsk/code_analysis/binding/binary_expression.h"
 #include "minsk/code_analysis/binding/binary_operator_kind.h"
@@ -24,7 +25,6 @@
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 #include "minsk/code_analysis/variable_symbol.h"
 #include "minsk/runtime/object.h"
-#include "string/string.h"
 
 static MskBoundExpression* BindLiteralExpression(MskBinder* binder,
                                                  MskExpressionSyntax* syntax);
@@ -73,7 +73,7 @@ MskBoundExpression* BindUnaryExpression(MskBinder* binder,
   if (op == NULL) {
     MskDiagnosticBagReportUndefinedUnaryOperator(
         &binder->diagnostics, MskSyntaxTokenGetSpan(unary->operator_token),
-        StringAsView(unary->operator_token.text),
+        phyto_string_as_span(unary->operator_token.text),
         MskBoundExpressionGetType(operand));
     return operand;
   }
@@ -91,7 +91,7 @@ MskBoundExpression* BindBinaryExpression(MskBinder* binder,
   if (op == NULL) {
     MskDiagnosticBagReportUndefinedBinaryOperator(
         &binder->diagnostics, MskSyntaxTokenGetSpan(binary->operator_token),
-        StringAsView(binary->operator_token.text),
+        phyto_string_as_span(binary->operator_token.text),
         MskBoundExpressionGetType(left), MskBoundExpressionGetType(right));
     MskBoundNodeFree(&right->base);
     free(right);
@@ -111,7 +111,7 @@ MskBoundExpression* BindAssignmentExpression(MskBinder* binder,
                                              MskExpressionSyntax* syntax) {
   MskAssignmentExpressionSyntax* assignment =
       (MskAssignmentExpressionSyntax*)syntax;
-  String name = StringDuplicate(assignment->identifier_token.text);
+  phyto_string_t name = phyto_string_copy(assignment->identifier_token.text);
   MskBoundExpression* bound_expression =
       MskBinderBindExpression(binder, assignment->expression);
   MskRuntimeObjectKind type = MskBoundExpressionGetType(bound_expression);
@@ -126,7 +126,8 @@ MskBoundExpression* BindAssignmentExpression(MskBinder* binder,
 MskBoundExpression* BindNameExpression(MskBinder* binder,
                                        MskExpressionSyntax* syntax) {
   MskNameExpressionSyntax* name = (MskNameExpressionSyntax*)syntax;
-  StringView name_text = StringAsView(name->identifier_token.text);
+  phyto_string_span_t name_text =
+      phyto_string_as_span(name->identifier_token.text);
   MskSymbolTableEntry entry = {0};
   if (!MskSymbolTableLookup(binder->symbols, name_text, &entry)) {
     MskDiagnosticBagReportUndefinedName(
