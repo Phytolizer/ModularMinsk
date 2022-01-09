@@ -29,8 +29,6 @@ void MskSymbolTableFree(MskSymbolTable* table) {
 }
 
 HashKeySpan CreateHashKeySpan(StringView name) {
-  return (HashKeySpan){
-      .begin = (const uint8_t*)name.begin,
-      .end = (const uint8_t*)name.end,
-  };
+  return (HashKeySpan)PHYTO_SPAN_NEW((const uint8_t*)name.begin,
+                                     (const uint8_t*)name.end);
 }
