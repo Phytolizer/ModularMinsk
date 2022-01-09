@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <phyto/span/span.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -19,7 +20,7 @@ static uint64_t PowerU64(uint64_t base, uint64_t exponent) {
 }
 
 StringView StringViewFromC(const char* cstr) {
-  return (StringView){.begin = cstr, .end = cstr + strlen(cstr)};
+  return (StringView)PHYTO_SPAN_NEW(cstr, cstr + strlen(cstr));
 }
 
 StringConversionResultI32 StringViewToI32(StringView str) {

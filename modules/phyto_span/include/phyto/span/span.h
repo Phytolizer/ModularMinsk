@@ -19,7 +19,7 @@ typedef struct {
   }
 
 #define PHYTO_SPAN_NEW(Begin, End) \
-  { .begin = Begin, .end = End, .size = (End) - (Begin) }
+  { .begin = (Begin), .end = (End), .size = (End) - (Begin) }
 
 #define PHYTO_SPAN_EMPTY \
   { 0 }
