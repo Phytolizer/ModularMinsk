@@ -103,7 +103,7 @@ bool HashRehash(HashUnpacked hash, uint64_t new_capacity) {
 }
 
 bool HashKeyVecEqualSpan(HashKeyVec a, HashKeySpan b) {
-  return VEC_SIZE(&a) == SPAN_SIZE(b) &&
+  return VEC_SIZE(&a) == PHYTO_SPAN_SIZE(b) &&
          memcmp(a.data, b.begin, VEC_SIZE(&a)) == 0;
 }
 
@@ -111,7 +111,7 @@ uint64_t HashKeySpanHash(HashKeySpan key) {
   // FNV-1a 64-bit hash
   // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
   uint64_t hash = 0xcbf29ce484222325;
-  for (uint64_t i = 0; i < SPAN_SIZE(key); i++) {
+  for (uint64_t i = 0; i < PHYTO_SPAN_SIZE(key); i++) {
     hash ^= key.begin[i];
     hash *= 0x100000001b3;
   }
@@ -120,6 +120,6 @@ uint64_t HashKeySpanHash(HashKeySpan key) {
 
 HashKey HashOwnKey(HashKeyView key) {
   HashKey hash_key = {.hash = key.hash};
-  VEC_APPEND(&hash_key.vec, key.span.begin, SPAN_SIZE(key.span));
+  VEC_APPEND(&hash_key.vec, key.span.begin, PHYTO_SPAN_SIZE(key.span));
   return hash_key;
 }

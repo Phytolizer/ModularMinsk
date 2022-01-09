@@ -1,11 +1,112 @@
 #include "minsk_test/code_analysis/syntax/parser_tests.h"
 
+#include <phyto/collections/dynamic_array.h>
 #include <stdint.h>
 
+#include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/node.h"
+#include "minsk/code_analysis/syntax/token.h"
 #include "string/string.h"
 #include "vec/vec.h"
+
+PHYTO_COLLECTIONS_DEQUE_IMPL(FlatSyntaxTree, MskSyntaxNode*);
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(SyntaxNodeStack, MskSyntaxNode*);
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_IMPL(SyntaxNodeStack, MskSyntaxNode*);
+
+static void FreeExpressionNode(MskSyntaxNode* node) {
+  MskExpressionSyntaxFree((MskExpressionSyntax*)node);
+}
+
+static void FreeTokenNode(MskSyntaxNode* node) {
+  MskSyntaxTokenFree((MskSyntaxToken*)node);
+}
+
+static void MskSyntaxNodeFree(MskSyntaxNode** node) {
+  switch ((*node)->cls) {
+#define X(x)                   \
+  case kMskSyntaxNodeClass##x: \
+    Free##x##Node(*node);      \
+    break;
+    MSK__SYNTAX_NODE_CLASSES
+#undef X
+  }
+  free(*node);
+  *node = NULL;
+}
+
+static void MskSyntaxNodePrettyPrintNoColors(MskSyntaxNode* node, FILE* fp) {
+  MskSyntaxNodePrettyPrint(node, fp, false);
+}
+
+// intentionally no free cb as we don't own the nodes
+static const FlatSyntaxTree_callbacks_t kFlatSyntaxTreeCallbacks = {0};
+// ditto for above
+static const SyntaxNodeStack_callbacks_t kSyntaxNodeStackCallbacks = {0};
+
+FlatSyntaxTree_t Flatten(MskSyntaxNode* node) {
+  FlatSyntaxTree_t result = FlatSyntaxTree_new(10, &kFlatSyntaxTreeCallbacks);
+
+  SyntaxNodeStack_t stack = SyntaxNodeStack_init(&kSyntaxNodeStackCallbacks);
+
+  SyntaxNodeStack_append(&stack, node);
+
+  while (stack.size > 0) {
+    MskSyntaxNode* n = stack.data[stack.size - 1];
+    stack.size--;
+    FlatSyntaxTree_push_back(&result, n);
+    MskSyntaxNodeChildren children = MskSyntaxNodeGetChildren(n);
+    for (size_t i = 0; i < VEC_SIZE(&children); i++) {
+      SyntaxNodeStack_append(&stack, children.data[i]);
+    }
+  }
+
+  SyntaxNodeStack_free(&stack);
+  return result;
+}
+
+typedef struct {
+  // "tree"
+  FlatSyntaxTree_t tree;
+  size_t index;
+} AssertingEnumerator;
+
+static TEST_SUBTEST_FUNC(AssertToken,
+                         AssertingEnumerator* enumerator,
+                         MskSyntaxKind kind,
+                         const char* text) {
+  TEST_ASSERT(enumerator->index < enumerator->tree.count, (void)0,
+              "no such node");
+  MskSyntaxNode* node = enumerator->tree.data[enumerator->index];
+  enumerator->index++;
+  TEST_ASSERT(node->cls == kMskSyntaxNodeClassToken, (void)0, "Expected token");
+  TEST_ASSERT(MskSyntaxNodeGetKind(node) == kind, (void)0,
+              "Expected %" STRING_VIEW_FMT ", not %" STRING_VIEW_FMT,
+              STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
+              STRING_VIEW_PRINT(MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
+  StringView actual_text = StringAsView(((MskSyntaxToken*)node)->text);
+  TEST_ASSERT(StringViewEqualC(actual_text, text), (void)0,
+              "Expected '%s', not '%" STRING_VIEW_FMT "'", text,
+              STRING_VIEW_PRINT(actual_text));
+  TEST_SUBTEST_PASS();
+}
+
+static TEST_SUBTEST_FUNC(AssertNode,
+                         AssertingEnumerator* enumerator,
+                         MskSyntaxKind kind) {
+  TEST_ASSERT(enumerator->index < enumerator->tree.count, (void)0,
+              "no such node");
+  MskSyntaxNode* node = enumerator->tree.data[enumerator->index];
+  enumerator->index++;
+  TEST_ASSERT(node->cls != kMskSyntaxNodeClassToken, (void)0,
+              "Didn't expect a token here");
+  TEST_ASSERT(MskSyntaxNodeGetKind(node) == kind, (void)0,
+              "Expected %" STRING_VIEW_FMT ", not %" STRING_VIEW_FMT,
+              STRING_VIEW_PRINT(MskSyntaxKindName(kind)),
+              STRING_VIEW_PRINT(MskSyntaxKindName(MskSyntaxNodeGetKind(node))));
+  TEST_SUBTEST_PASS();
+}
 
 typedef struct {
   MskSyntaxKind op1;

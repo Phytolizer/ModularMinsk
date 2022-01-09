@@ -1,12 +1,12 @@
 #ifndef HASH_HASH_H_
 #define HASH_HASH_H_
 
-#include <span/span.h>
+#include <phyto/span/span.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <vec/vec.h>
 
-typedef SPAN_TYPE(uint8_t) HashKeySpan;
+typedef PHYTO_SPAN_TYPE(uint8_t) HashKeySpan;
 typedef VEC_TYPE(uint8_t) HashKeyVec;
 
 typedef struct {

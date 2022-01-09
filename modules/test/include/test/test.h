@@ -14,15 +14,15 @@ typedef struct {
   uint64_t assert_count;
 } TestState;
 
-#define TEST_ASSERT(Test, Cleanup, ...)                   \
-  do {                                                    \
-    ++test_state->assert_count;                           \
-    if (!(Test)) {                                        \
-      char* message;                                      \
-      NonstdAllocatedStringPrintf(&message, __VA_ARGS__); \
-      Cleanup;                                            \
-      return message;                                     \
-    }                                                     \
+#define TEST_ASSERT(Test, Cleanup, ...)       \
+  do {                                        \
+    ++test_state->assert_count;               \
+    if (!(Test)) {                            \
+      char* message;                          \
+      nonstd_asprintf(&message, __VA_ARGS__); \
+      Cleanup;                                \
+      return message;                         \
+    }                                         \
   } while (false)
 
 #define TEST_FAIL(...) TEST_ASSERT(false, (void)0, __VA_ARGS__)
@@ -46,18 +46,19 @@ typedef struct {
     ++test_state->tests_passed;                                       \
   } while (false)
 
-#define TEST_RUN_SUBTEST(Name, Cleanup, ...)        \
-  do {                                              \
-    char* message = TestSubtest##Name(__VA_ARGS__); \
-    if (message != NULL) {                          \
-      Cleanup;                                      \
-      return message;                               \
-    }                                               \
+#define TEST_RUN_SUBTEST(Name, Cleanup, ...)                    \
+  do {                                                          \
+    char* message = TestSubtest##Name(test_state, __VA_ARGS__); \
+    if (message != NULL) {                                      \
+      Cleanup;                                                  \
+      return message;                                           \
+    }                                                           \
   } while (false)
 
 #define TEST_SUITE_FUNC(Name) void TestSuite##Name(TestState* test_state)
 #define TEST_FUNC(Name) char* Test##Name(TestState* test_state)
-#define TEST_SUBTEST_FUNC(Name, ...) char* TestSubtest##Name(__VA_ARGS__)
+#define TEST_SUBTEST_FUNC(Name, ...) \
+  char* TestSubtest##Name(TestState* test_state, __VA_ARGS__)
 #define TEST_SUITE_PASS() return NULL
 #define TEST_PASS() return NULL
 #define TEST_SUBTEST_PASS() return NULL

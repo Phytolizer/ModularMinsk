@@ -41,7 +41,7 @@ StringConversionResultI32 StringViewToI32(StringView str) {
 
 StringConversionResultI64 StringViewToI64(StringView str) {
   int64_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultI64){.success = false};
     }
@@ -57,7 +57,7 @@ StringConversionResultI64 StringViewToI64(StringView str) {
 
 StringConversionResultU32 StringViewToU32(StringView str) {
   uint32_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultU32){.success = false};
     }
@@ -73,7 +73,7 @@ StringConversionResultU32 StringViewToU32(StringView str) {
 
 StringConversionResultU64 StringViewToU64(StringView str) {
   uint64_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultU64){.success = false};
     }
@@ -87,7 +87,7 @@ StringConversionResultU64 StringViewToU64(StringView str) {
   return (StringConversionResultU64){.success = true, .value = value};
 }
 
-#define GET(str, i) ((i) >= SPAN_SIZE(&str) ? '\0' : str.begin[i])
+#define GET(str, i) ((i) >= PHYTO_SPAN_SIZE(&str) ? '\0' : str.begin[i])
 
 StringConversionResultF32 StringViewToF32(StringView str) {
   char* text = StringViewToC(str);
@@ -119,7 +119,7 @@ StringConversionResultF64 StringViewToF64(StringView str) {
 
 StringConversionResultIMax StringViewToIMax(StringView str) {
   intmax_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultIMax){.success = false};
     }
@@ -135,7 +135,7 @@ StringConversionResultIMax StringViewToIMax(StringView str) {
 
 StringConversionResultUMax StringViewToUMax(StringView str) {
   uintmax_t value = 0;
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (str.begin[i] < '0' || str.begin[i] > '9') {
       return (StringConversionResultUMax){.success = false};
     }
@@ -164,7 +164,7 @@ StringCompareResult StringViewCompare(StringView a, StringView b) {
 }
 
 const char* StringViewFindChar(StringView str, char c) {
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (str.begin[i] == c) {
       return &str.begin[i];
     }
@@ -173,7 +173,7 @@ const char* StringViewFindChar(StringView str, char c) {
 }
 
 const char* StringViewFindCharReverse(StringView str, char c) {
-  for (size_t i = SPAN_SIZE(str); i > 0; --i) {
+  for (size_t i = PHYTO_SPAN_SIZE(str); i > 0; --i) {
     if (str.begin[i - 1] == c) {
       return &str.begin[i - 1];
     }
@@ -182,25 +182,25 @@ const char* StringViewFindCharReverse(StringView str, char c) {
 }
 
 uint64_t StringViewFindSpan(StringView str, StringView chars) {
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (StringViewFindChar(chars, str.begin[i]) == chars.end) {
       return i;
     }
   }
-  return SPAN_SIZE(str);
+  return PHYTO_SPAN_SIZE(str);
 }
 
 uint64_t StringViewFindSpanReject(StringView str, StringView chars) {
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (StringViewFindChar(chars, str.begin[i]) != chars.end) {
       return i;
     }
   }
-  return SPAN_SIZE(str);
+  return PHYTO_SPAN_SIZE(str);
 }
 
 const char* StringViewFindBreak(StringView str, StringView breaks) {
-  for (size_t i = 0; i < SPAN_SIZE(str); ++i) {
+  for (size_t i = 0; i < PHYTO_SPAN_SIZE(str); ++i) {
     if (StringViewFindChar(breaks, str.begin[i]) != breaks.end) {
       return &str.begin[i];
     }
@@ -209,15 +209,15 @@ const char* StringViewFindBreak(StringView str, StringView breaks) {
 }
 
 StringView StringViewFind(StringView str, StringView sub) {
-  if (SPAN_SIZE(sub) > SPAN_SIZE(str)) {
+  if (PHYTO_SPAN_SIZE(sub) > PHYTO_SPAN_SIZE(str)) {
     return (StringView){0};
   }
-  for (size_t i = 0; i <= SPAN_SIZE(str) - SPAN_SIZE(sub); ++i) {
+  for (size_t i = 0; i <= PHYTO_SPAN_SIZE(str) - PHYTO_SPAN_SIZE(sub); ++i) {
     if (str.begin[i] == sub.begin[0] &&
-        memcmp(&str.begin[i], sub.begin, SPAN_SIZE(sub)) == 0) {
+        memcmp(&str.begin[i], sub.begin, PHYTO_SPAN_SIZE(sub)) == 0) {
       return (StringView){
           .begin = &str.begin[i],
-          .end = &str.begin[i + SPAN_SIZE(sub)],
+          .end = &str.begin[i + PHYTO_SPAN_SIZE(sub)],
       };
     }
   }
@@ -230,7 +230,7 @@ StringView StringViewTokenize(StringView str,
   if (save && save->begin) {
     str = *save;
     uint64_t begin = StringViewFindSpan(str, breaks);
-    if (begin == SPAN_SIZE(str)) {
+    if (begin == PHYTO_SPAN_SIZE(str)) {
       *save = (StringView){0};
       return (StringView){0};
     }
@@ -256,7 +256,8 @@ StringView StringViewTokenize(StringView str,
 }
 
 StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
-  if (begin >= SPAN_SIZE(str) || end > SPAN_SIZE(str) || begin >= end) {
+  if (begin >= PHYTO_SPAN_SIZE(str) || end > PHYTO_SPAN_SIZE(str) ||
+      begin >= end) {
     // An invalid range was specified. Return something sane.
     return (StringView){0};
   }
@@ -264,11 +265,11 @@ StringView StringViewSubstring(StringView str, uint64_t begin, uint64_t end) {
 }
 
 void StringViewPrint(StringView view) {
-  fwrite(view.begin, 1, SPAN_SIZE(view), stdout);
+  fwrite(view.begin, 1, PHYTO_SPAN_SIZE(view), stdout);
 }
 
 uint64_t StringViewSize(StringView view) {
-  return SPAN_SIZE(view);
+  return PHYTO_SPAN_SIZE(view);
 }
 
 StringView StringViewFindSubstring(StringView haystack, StringView needle) {
@@ -421,7 +422,7 @@ bool StringEqual(const String a, const String b) {
 }
 
 bool StringEqualView(const String a, StringView b) {
-  return StringSize(a) == SPAN_SIZE(b) &&
+  return StringSize(a) == PHYTO_SPAN_SIZE(b) &&
          memcmp(a.data, b.begin, StringSize(a)) == 0;
 }
 

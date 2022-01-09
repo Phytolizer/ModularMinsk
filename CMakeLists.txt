@@ -84,7 +84,13 @@ declare_module(
 declare_module(
   nonstd
   KIND library
-  SOURCES asprintf.c strdup.c strpbrk.c strspn.c strtok.c
+  SOURCES asprintf.c
+          ctype.c
+          qsort.c
+          strdup.c
+          strpbrk.c
+          strspn.c
+          strtok.c
 )
 
 # Embeds a file as C code
@@ -109,22 +115,23 @@ declare_module(
   KIND library
   SOURCES vec.c
 )
-declare_module(
-  span
-  KIND library
-  SOURCES span.c
-)
+declare_module(phyto_span KIND interface)
 declare_module(
   string
   KIND library
   SOURCES string.c
-  DEPENDS span vec
+  DEPENDS phyto_span vec
 )
 declare_module(
   hash
   KIND library
   SOURCES hash.c
-  DEPENDS span vec
+  DEPENDS phyto_span vec
+)
+declare_module(
+  phyto_collections
+  KIND interface
+  DEPENDS phyto_span nonstd
 )
 declare_module(annotate KIND interface)
 declare_module(ansi_esc KIND interface)
@@ -167,7 +174,7 @@ declare_module(
           code_analysis/text/span.c
           code_analysis/variable_symbol.c
           runtime/object.c
-  DEPENDS vec span string hash annotate ansi_esc
+  DEPENDS vec phyto_span string hash annotate ansi_esc
   INTERNAL_INCLUDE
 )
 
@@ -187,7 +194,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     SOURCES main.c code_analysis/syntax/lexer_tests.c
             code_analysis/syntax/facts_tests.c
             code_analysis/syntax/parser_tests.c
-    DEPENDS minsk testlib
+    DEPENDS minsk testlib phyto_collections
   )
   enable_testing()
   add_test(NAME minsk_test COMMAND minsk_test)

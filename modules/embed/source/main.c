@@ -106,7 +106,7 @@ int main(int argc, const char** argv) {
   fprintf(outp, "#include \"%s\"\n\n", output_path);
   bool symbol_name_malloced = false;
   if (symbol_name == NULL) {
-    symbol_name = NonstdStringDuplicate(argv[0]);
+    symbol_name = nonstd_strdup(argv[0]);
     symbol_name_malloced = true;
     for (char* c = symbol_name; *c != '\0'; ++c) {
       if (!isalnum(*c)) {
@@ -116,9 +116,9 @@ int main(int argc, const char** argv) {
   }
   fprintf(outp, "const char %s[] =\n", symbol_name);
   char* saveptr;
-  for (char* line = NonstdStringTokenizeReentrant(input, "\n", &saveptr);
+  for (char* line = nonstd_strtok_r(input, "\n", &saveptr);
        line != NULL;
-       line = NonstdStringTokenizeReentrant(NULL, "\n", &saveptr)) {
+       line = nonstd_strtok_r(NULL, "\n", &saveptr)) {
     fputs("\"", outp);
     for (char* c = line; *c != '\0'; ++c) {
       if (*c == '"') {

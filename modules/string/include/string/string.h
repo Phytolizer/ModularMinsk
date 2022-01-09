@@ -1,14 +1,14 @@
 #ifndef STRING_STRING_H_
 #define STRING_STRING_H_
 
-#include <span/span.h>
+#include <phyto/span/span.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <vec/vec.h>
 
 typedef VEC_TYPE(char) String;
-typedef SPAN_TYPE(char) StringView;
+typedef PHYTO_SPAN_TYPE(char) StringView;
 
 #define STRING_INIT (String) VEC_INIT_DEFAULT(char)
 

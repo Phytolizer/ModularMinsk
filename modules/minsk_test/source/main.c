@@ -25,8 +25,7 @@ int main(void) {
          test_state.tests_passed);
   printf("%" PRIu64 " tests " ANSI_ESC_FG_RED "failed" ANSI_ESC_RESET "\n",
          test_state.tests_failed);
-  printf("%" PRIu64 " assertions made" ANSI_ESC_RESET "\n",
-         test_state.assert_count);
+  printf("%" PRIu64 " assertions made\n", test_state.assert_count);
 
   return test_state.tests_failed != 0;
 }

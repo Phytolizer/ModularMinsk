@@ -1,37 +1,27 @@
 #include "nonstd/strtok.h"
-#include "nonstd/strpbrk.h"
-#include "nonstd/strspn.h"
+
 #include <stddef.h>
 #include <string.h>
 
-char* NonstdStrtok(char* str, const char* delim)
-{
-    static char* olds;
-    return NonstdStringTokenizeReentrant(str, delim, &olds);
-}
+#include "nonstd/strpbrk.h"
+#include "nonstd/strspn.h"
 
-char* NonstdStringTokenizeReentrant(char* str, const char* delim, char** savep)
-{
-    if (str == NULL)
-    {
+char* nonstd_strtok_r(char* str, const char* delim, char** savep) {
+    if (str == NULL) {
         str = *savep;
     }
 
-    str += NonstdStringSpan(str, delim);
-    if (*str == '\0')
-    {
+    str += nonstd_strspn(str, delim);
+    if (*str == '\0') {
         *savep = str;
         return NULL;
     }
 
     char* token = str;
-    str = NonstdStringPointBreak(token, delim);
-    if (str == NULL)
-    {
+    str = nonstd_strpbrk(token, delim);
+    if (str == NULL) {
         *savep = strchr(token, '\0');
-    }
-    else
-    {
+    } else {
         *str = '\0';
         *savep = str + 1;
     }
