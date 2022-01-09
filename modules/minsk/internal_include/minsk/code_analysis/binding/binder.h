@@ -7,7 +7,7 @@
 #include "minsk/code_analysis/text/diagnostic_bag.h"
 
 typedef struct {
-  MskDiagnosticBag diagnostics;
+  MskDiagnosticBag_t diagnostics;
   MskSymbolTable_t* symbols;
 } MskBinder;
 

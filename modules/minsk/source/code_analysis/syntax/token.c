@@ -5,16 +5,16 @@
 #include "minsk/runtime/object.h"
 #include "phyto/string/string.h"
 
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_IMPL(MskSyntaxTokens, MskSyntaxToken);
+
+const MskSyntaxTokens_callbacks_t kMskSyntaxTokensCallbacks = {
+    .free_cb = MskSyntaxTokenFree,
+    .copy_cb = MskSyntaxTokenDuplicate,
+};
+
 void MskSyntaxTokenFree(MskSyntaxToken* token) {
   phyto_string_free(&token->text);
   MskRuntimeObjectFree(&token->value);
-}
-
-void MskSyntaxTokensFree(MskSyntaxTokens* tokens) {
-  for (size_t i = 0; i < VEC_SIZE(tokens); ++i) {
-    MskSyntaxTokenFree(&tokens->data[i]);
-  }
-  VEC_FREE(tokens);
 }
 
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token) {

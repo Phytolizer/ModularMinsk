@@ -3,7 +3,6 @@
 #include <phyto/collections/dynamic_array.h>
 #include <phyto/string/string.h>
 #include <stdint.h>
-#include <vec/vec.h>
 
 #include "minsk/code_analysis/syntax/expression.h"
 #include "minsk/code_analysis/syntax/facts.h"
@@ -56,8 +55,8 @@ FlatSyntaxTree_t Flatten(MskSyntaxNode* node) {
     MskSyntaxNode* n = stack.data[stack.size - 1];
     stack.size--;
     FlatSyntaxTree_push_back(&result, n);
-    MskSyntaxNodeChildren children = MskSyntaxNodeGetChildren(n);
-    for (size_t i = 0; i < VEC_SIZE(&children); i++) {
+    MskSyntaxNodeChildren_t children = MskSyntaxNodeGetChildren(n);
+    for (size_t i = 0; i < children.size; i++) {
       SyntaxNodeStack_append(&stack, children.data[i]);
     }
   }
@@ -117,19 +116,22 @@ typedef struct {
   MskSyntaxKind op2;
 } SyntaxKindPair;
 
-typedef VEC_TYPE(SyntaxKindPair) SyntaxKindPairs;
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(SyntaxKindPairs, SyntaxKindPair);
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_IMPL(SyntaxKindPairs, SyntaxKindPair);
+
+static const SyntaxKindPairs_callbacks_t kSyntaxKindPairsCallbacks = {0};
 
 static TEST_FUNC(BinaryExpressionHonorsPrecedences);
 
-static SyntaxKindPairs GetBinaryOperatorPairs(void);
+static SyntaxKindPairs_t GetBinaryOperatorPairs(void);
 
 TEST_SUITE_FUNC(ParserTests) {
   TEST_RUN(BinaryExpressionHonorsPrecedences);
 }
 
 TEST_FUNC(BinaryExpressionHonorsPrecedences) {
-  SyntaxKindPairs pairs = GetBinaryOperatorPairs();
-  for (uint64_t i = 0; i < VEC_SIZE(&pairs); ++i) {
+  SyntaxKindPairs_t pairs = GetBinaryOperatorPairs();
+  for (uint64_t i = 0; i < pairs.size; ++i) {
     uint64_t op1_precedence =
         MskSyntaxFactsBinaryOperatorPrecedence(pairs.data[i].op1);
     uint64_t op2_precedence =
@@ -145,20 +147,20 @@ TEST_FUNC(BinaryExpressionHonorsPrecedences) {
     }
     phyto_string_free(&text);
   }
-  VEC_FREE(&pairs);
+  SyntaxKindPairs_free(&pairs);
   TEST_PASS();
 }
 
-SyntaxKindPairs GetBinaryOperatorPairs(void) {
-  MskSyntaxKinds ops = MskSyntaxFactsGetBinaryOperators();
-  SyntaxKindPairs pairs = VEC_INIT_DEFAULT(SyntaxKindPair);
-  for (size_t i = 0; i < VEC_SIZE(&ops); ++i) {
+SyntaxKindPairs_t GetBinaryOperatorPairs(void) {
+  MskSyntaxKinds_t ops = MskSyntaxFactsGetBinaryOperators();
+  SyntaxKindPairs_t pairs = SyntaxKindPairs_init(&kSyntaxKindPairsCallbacks);
+  for (size_t i = 0; i < ops.size; ++i) {
     MskSyntaxKind op1 = ops.data[i];
-    for (size_t j = i + 1; j < VEC_SIZE(&ops); ++j) {
+    for (size_t j = i + 1; j < ops.size; ++j) {
       MskSyntaxKind op2 = ops.data[j];
-      VEC_PUSH(&pairs, ((SyntaxKindPair){op1, op2}));
+      SyntaxKindPairs_append(&pairs, (SyntaxKindPair){op1, op2});
     }
   }
-  VEC_FREE(&ops);
+  MskSyntaxKinds_free(&ops);
   return pairs;
 }

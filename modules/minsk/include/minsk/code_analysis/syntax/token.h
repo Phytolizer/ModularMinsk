@@ -17,10 +17,11 @@ typedef struct {
   MskRuntimeObject value;
 } MskSyntaxToken;
 
-typedef VEC_TYPE(MskSyntaxToken) MskSyntaxTokens;
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(MskSyntaxTokens, MskSyntaxToken);
+
+extern const MskSyntaxTokens_callbacks_t kMskSyntaxTokensCallbacks;
 
 void MskSyntaxTokenFree(MskSyntaxToken* token);
-void MskSyntaxTokensFree(MskSyntaxTokens* tokens);
 MskSyntaxToken MskSyntaxTokenDuplicate(MskSyntaxToken token);
 MskTextSpan MskSyntaxTokenGetSpan(MskSyntaxToken token);
 

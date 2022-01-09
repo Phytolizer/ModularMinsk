@@ -10,11 +10,11 @@
 typedef struct {
   MskExpressionSyntax* root;
   MskSyntaxToken end_of_file_token;
-  MskDiagnosticBag diagnostics;
+  MskDiagnosticBag_t diagnostics;
 } MskSyntaxTree;
 
 MskSyntaxTree MskSyntaxTreeParse(phyto_string_span_t text);
-MskSyntaxTokens MskSyntaxTreeParseTokens(phyto_string_span_t text);
+MskSyntaxTokens_t MskSyntaxTreeParseTokens(phyto_string_span_t text);
 void MskSyntaxTreeFree(MskSyntaxTree* tree);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_TREE_H_

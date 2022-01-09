@@ -27,10 +27,10 @@ typedef struct {
   MskSyntaxNodeClass cls;
 } MskSyntaxNode;
 
-typedef VEC_TYPE(MskSyntaxNode*) MskSyntaxNodeChildren;
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(MskSyntaxNodeChildren, MskSyntaxNode*);
 
 MskSyntaxKind MskSyntaxNodeGetKind(MskSyntaxNode* node);
-MskSyntaxNodeChildren MskSyntaxNodeGetChildren(MskSyntaxNode* node);
+MskSyntaxNodeChildren_t MskSyntaxNodeGetChildren(MskSyntaxNode* node);
 void MskSyntaxNodePrettyPrint(MskSyntaxNode* node, FILE* fp, bool colors);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_NODE_H_

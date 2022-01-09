@@ -59,13 +59,14 @@ int main(void) {
 
     MskSyntaxTree syntax_tree = MskSyntaxTreeParse(phyto_string_as_span(text));
     // move out the diagnostics because they aren't limited to the syntax tree
-    MskDiagnosticBag diagnostics = syntax_tree.diagnostics;
-    syntax_tree.diagnostics = (MskDiagnosticBag)VEC_INIT_DEFAULT(MskDiagnostic);
+    MskDiagnosticBag_t diagnostics = syntax_tree.diagnostics;
+    syntax_tree.diagnostics =
+        MskDiagnosticBag_init(&kMskDiagnosticBagCallbacks);
     if (show_tree) {
       MskSyntaxNodePrettyPrint(&syntax_tree.root->base, stdout, true);
     }
     bool show_diagnostics = false;
-    if (VEC_SIZE(&diagnostics) > 0) {
+    if (diagnostics.size > 0) {
       show_diagnostics = true;
     } else {
       MskCompilation compilation = MskCompilationNew(syntax_tree);
@@ -73,10 +74,10 @@ int main(void) {
           MskCompilationEvaluate(&compilation, &symbols);
       if (result.kind == kMskEvaluationResultFailure) {
         show_diagnostics = true;
-        VEC_APPEND(&diagnostics, result.value.err.data,
-                   VEC_SIZE(&result.value.err));
+        MskDiagnosticBag_extend(&diagnostics,
+                                MskDiagnosticBag_as_span(result.value.err));
         // shallow free -- the diagnostics vector owns the strings now
-        VEC_FREE(&result.value.err);
+        MskDiagnosticBag_free(&result.value.err);
       } else {
         MskRuntimeObjectPrint(&result.value.ok, stdout);
         printf("\n");
@@ -85,7 +86,7 @@ int main(void) {
     }
     if (show_diagnostics) {
       printf("\n");
-      for (size_t i = 0; i < VEC_SIZE(&diagnostics); ++i) {
+      for (size_t i = 0; i < diagnostics.size; ++i) {
         phyto_string_span_t prefix = phyto_string_span_subspan(
             phyto_string_as_span(text), 0, diagnostics.data[i].span.start);
         phyto_string_span_t error = phyto_string_span_subspan(
@@ -107,7 +108,7 @@ int main(void) {
         printf(ANSI_ESC_RESET);
       }
     }
-    MskDiagnosticBagFree(&diagnostics);
+    MskDiagnosticBag_free(&diagnostics);
     MskSyntaxTreeFree(&syntax_tree);
     phyto_string_free(&text);
   }

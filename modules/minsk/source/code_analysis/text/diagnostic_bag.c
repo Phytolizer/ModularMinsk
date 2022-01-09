@@ -4,19 +4,26 @@
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/text/diagnostic.h"
 
-static void Report(MskDiagnosticBag* diagnostics,
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_IMPL(MskDiagnosticBag, MskDiagnostic);
+
+static MskDiagnostic MskDiagnosticCopy(MskDiagnostic diagnostic) {
+  MskDiagnostic copy = diagnostic;
+  copy.message = phyto_string_copy(diagnostic.message);
+  return copy;
+}
+
+const MskDiagnosticBag_callbacks_t kMskDiagnosticBagCallbacks = {
+    .free_cb = MskDiagnosticFree,
+    .copy_cb = MskDiagnosticCopy,
+};
+
+static void Report(MskDiagnosticBag_t* diagnostics,
                    MskTextSpan span,
                    phyto_string_t message);
 
-void MskDiagnosticBagFree(MskDiagnosticBag* diagnostics) {
-  for (uint64_t i = 0; i < VEC_SIZE(diagnostics); ++i) {
-    MskDiagnosticFree(&diagnostics->data[i]);
-  }
-  VEC_FREE(diagnostics);
-}
-
-void MskDiagnosticBagReportInvalidNumber(MskDiagnosticBag* diagnostics,
+void MskDiagnosticBagReportInvalidNumber(MskDiagnosticBag_t* diagnostics,
                                          MskTextSpan span,
                                          phyto_string_span_t text,
                                          phyto_string_span_t type) {
@@ -27,7 +34,7 @@ void MskDiagnosticBagReportInvalidNumber(MskDiagnosticBag* diagnostics,
   Report(diagnostics, span, message);
 }
 
-void MskDiagnosticBagReportBadCharacter(MskDiagnosticBag* diagnostics,
+void MskDiagnosticBagReportBadCharacter(MskDiagnosticBag_t* diagnostics,
                                         uint64_t position,
                                         char ch) {
   phyto_string_t message =
@@ -36,7 +43,7 @@ void MskDiagnosticBagReportBadCharacter(MskDiagnosticBag* diagnostics,
   Report(diagnostics, span, message);
 }
 
-void MskDiagnosticBagReportUnexpectedToken(MskDiagnosticBag* diagnostics,
+void MskDiagnosticBagReportUnexpectedToken(MskDiagnosticBag_t* diagnostics,
                                            MskTextSpan span,
                                            MskSyntaxKind expected,
                                            MskSyntaxKind actual) {
@@ -50,7 +57,7 @@ void MskDiagnosticBagReportUnexpectedToken(MskDiagnosticBag* diagnostics,
 }
 
 void MskDiagnosticBagReportUndefinedUnaryOperator(
-    MskDiagnosticBag* diagnostics,
+    MskDiagnosticBag_t* diagnostics,
     MskTextSpan span,
     phyto_string_span_t operator_name,
     MskRuntimeObjectKind operand_type) {
@@ -65,7 +72,7 @@ void MskDiagnosticBagReportUndefinedUnaryOperator(
 }
 
 void MskDiagnosticBagReportUndefinedBinaryOperator(
-    MskDiagnosticBag* diagnostics,
+    MskDiagnosticBag_t* diagnostics,
     MskTextSpan span,
     phyto_string_span_t operator_name,
     MskRuntimeObjectKind left_type,
@@ -82,7 +89,7 @@ void MskDiagnosticBagReportUndefinedBinaryOperator(
   Report(diagnostics, span, message);
 }
 
-void MskDiagnosticBagReportUndefinedName(MskDiagnosticBag* diagnostics,
+void MskDiagnosticBagReportUndefinedName(MskDiagnosticBag_t* diagnostics,
                                          MskTextSpan span,
                                          phyto_string_span_t name) {
   phyto_string_t message = phyto_string_from_sprintf(
@@ -91,12 +98,12 @@ void MskDiagnosticBagReportUndefinedName(MskDiagnosticBag* diagnostics,
   Report(diagnostics, span, message);
 }
 
-void Report(MskDiagnosticBag* diagnostics,
+void Report(MskDiagnosticBag_t* diagnostics,
             MskTextSpan span,
             phyto_string_t message) {
   MskDiagnostic diagnostic = {
       .span = span,
       .message = message,
   };
-  VEC_PUSH(diagnostics, diagnostic);
+  MskDiagnosticBag_append(diagnostics, diagnostic);
 }

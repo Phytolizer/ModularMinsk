@@ -10,7 +10,7 @@
 typedef struct {
   phyto_string_span_t text;
   uint64_t position;
-  MskDiagnosticBag diagnostics;
+  MskDiagnosticBag_t diagnostics;
 } MskSyntaxLexer;
 
 MskSyntaxLexer MskNewSyntaxLexer(phyto_string_span_t text);

@@ -1,8 +1,8 @@
 #ifndef MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_
 #define MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_
 
+#include <phyto/collections/dynamic_array.h>
 #include <phyto/string/string.h>
-#include <vec/vec.h>
 
 #define MSK__SYNTAX_KINDS    \
   /* The zero value. */      \
@@ -53,9 +53,11 @@ typedef enum {
 #undef X
 } MskSyntaxKind;
 
-typedef VEC_TYPE(MskSyntaxKind) MskSyntaxKinds;
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(MskSyntaxKinds, MskSyntaxKind);
 
-MskSyntaxKinds MskSyntaxKindsGetAll(void);
+extern const MskSyntaxKinds_callbacks_t kMskSyntaxKindsCallbacks;
+
+MskSyntaxKinds_t MskSyntaxKindsGetAll(void);
 phyto_string_span_t MskSyntaxKindName(MskSyntaxKind kind);
 
 #endif  // MINSK_CODE_ANALYSIS_SYNTAX_KIND_H_

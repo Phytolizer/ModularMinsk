@@ -79,28 +79,29 @@ phyto_string_span_t MskSyntaxFactsGetText(MskSyntaxKind kind) {
   }
 }
 
-MskSyntaxKinds MskSyntaxFactsGetBinaryOperators(void) {
-  MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
-  MskSyntaxKinds binary_operators = VEC_INIT_DEFAULT(MskSyntaxKind);
-  for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); i++) {
+MskSyntaxKinds_t MskSyntaxFactsGetBinaryOperators(void) {
+  MskSyntaxKinds_t all_kinds = MskSyntaxKindsGetAll();
+  MskSyntaxKinds_t binary_operators =
+      MskSyntaxKinds_init(&kMskSyntaxKindsCallbacks);
+  for (uint64_t i = 0; i < all_kinds.size; i++) {
     MskSyntaxKind kind = all_kinds.data[i];
     if (MskSyntaxFactsBinaryOperatorPrecedence(kind) > 0) {
-      VEC_PUSH(&binary_operators, kind);
+      MskSyntaxKinds_append(&binary_operators, kind);
     }
   }
-  VEC_FREE(&all_kinds);
+  MskSyntaxKinds_free(&all_kinds);
   return binary_operators;
 }
 
-MskSyntaxKinds MskSyntaxFactsGetUnaryOperators(void) {
-  MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
-  MskSyntaxKinds unary_operators = VEC_INIT_DEFAULT(MskSyntaxKind);
-  for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); i++) {
+MskSyntaxKinds_t MskSyntaxFactsGetUnaryOperators(void) {
+  MskSyntaxKinds_t all_kinds = MskSyntaxKindsGetAll();
+  MskSyntaxKinds_t unary_operators = MskSyntaxKinds_init(&kMskSyntaxKindsCallbacks);
+  for (uint64_t i = 0; i < all_kinds.size; i++) {
     MskSyntaxKind kind = all_kinds.data[i];
     if (MskSyntaxFactsUnaryOperatorPrecedence(kind) > 0) {
-      VEC_PUSH(&unary_operators, kind);
+      MskSyntaxKinds_append(&unary_operators, kind);
     }
   }
-  VEC_FREE(&all_kinds);
+  MskSyntaxKinds_free(&all_kinds);
   return unary_operators;
 }

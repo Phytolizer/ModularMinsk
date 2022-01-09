@@ -36,7 +36,7 @@ MskSyntaxParser MskSyntaxParserNew(phyto_string_span_t text) {
     MskSyntaxToken token = MskSyntaxLexerLex(&lexer);
     if (token.kind != kMskSyntaxKindBadToken &&
         token.kind != kMskSyntaxKindWhitespaceToken) {
-      VEC_PUSH(&parser.tokens, token);
+      MskSyntaxTokens_append(&parser.tokens, token);
     } else {
       MskSyntaxTokenFree(&token);
     }
@@ -44,13 +44,13 @@ MskSyntaxParser MskSyntaxParserNew(phyto_string_span_t text) {
       break;
     }
   }
-  VEC_APPEND(&parser.diagnostics, lexer.diagnostics.data,
-             VEC_SIZE(&lexer.diagnostics));
+  MskDiagnosticBag_extend(&parser.diagnostics,
+                          MskDiagnosticBag_as_span(lexer.diagnostics));
   return parser;
 }
 
 void MskSyntaxParserFree(MskSyntaxParser* parser) {
-  MskSyntaxTokensFree(&parser->tokens);
+  MskSyntaxTokens_free(&parser->tokens);
 }
 
 MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser) {
@@ -65,10 +65,10 @@ MskSyntaxTree MskSyntaxParserParse(MskSyntaxParser* parser) {
 }
 
 MskSyntaxToken* Peek(MskSyntaxParser* parser, int64_t offset) {
-  if (parser->position + offset >= VEC_SIZE(&parser->tokens)) {
+  if (parser->position + offset >= parser->tokens.size) {
     // Return the last token, this makes the parser see an infinite stream of
     // EOF tokens.
-    return &parser->tokens.data[VEC_SIZE(&parser->tokens) - 1];
+    return &parser->tokens.data[parser->tokens.size - 1];
   }
   if (offset < -(int64_t)parser->position) {
     // Return NULL, as we want to crash if the caller tries to peek past the

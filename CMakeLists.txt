@@ -110,11 +110,6 @@ declare_module(
 )
 
 # Useful libraries
-declare_module(
-  vec
-  KIND library
-  SOURCES vec.c
-)
 declare_module(phyto_span KIND interface)
 declare_module(
   phyto_collections
@@ -180,7 +175,7 @@ declare_module(
           code_analysis/text/span.c
           code_analysis/variable_symbol.c
           runtime/object.c
-  DEPENDS vec phyto_span phyto_string phyto_hash annotate ansi_esc
+  DEPENDS phyto_span phyto_string phyto_hash annotate ansi_esc
   INTERNAL_INCLUDE
 )
 

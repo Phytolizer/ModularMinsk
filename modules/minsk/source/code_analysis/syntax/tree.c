@@ -17,15 +17,15 @@ MskSyntaxTree MskSyntaxTreeParse(phyto_string_span_t text) {
   return tree;
 }
 
-MskSyntaxTokens MskSyntaxTreeParseTokens(phyto_string_span_t text) {
+MskSyntaxTokens_t MskSyntaxTreeParseTokens(phyto_string_span_t text) {
   MskSyntaxLexer lexer = MskNewSyntaxLexer(text);
-  MskSyntaxTokens tokens = VEC_INIT_DEFAULT(MskSyntaxToken);
+  MskSyntaxTokens_t tokens = MskSyntaxTokens_init(&kMskSyntaxTokensCallbacks);
   while (true) {
     MskSyntaxToken token = MskSyntaxLexerLex(&lexer);
     if (token.kind == kMskSyntaxKindEndOfFileToken) {
       break;
     }
-    VEC_PUSH(&tokens, token);
+    MskSyntaxTokens_append(&tokens, token);
   }
   return tokens;
 }
@@ -35,5 +35,5 @@ void MskSyntaxTreeFree(MskSyntaxTree* tree) {
   free(tree->root);
   tree->root = NULL;
   MskSyntaxTokenFree(&tree->end_of_file_token);
-  MskDiagnosticBagFree(&tree->diagnostics);
+  MskDiagnosticBag_free(&tree->diagnostics);
 }

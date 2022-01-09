@@ -13,7 +13,7 @@ typedef struct {
   MskEvaluationResultKind kind;
   union {
     MskRuntimeObject ok;
-    MskDiagnosticBag err;
+    MskDiagnosticBag_t err;
   } value;
 } MskEvaluationResult;
 

@@ -16,7 +16,7 @@ MskEvaluationResult MskCompilationEvaluate(MskCompilation* compilation,
   MskBinder binder = {.symbols = symbols};
   MskBoundExpression* root =
       MskBinderBindExpression(&binder, compilation->syntax.root);
-  if (VEC_SIZE(&binder.diagnostics) > 0) {
+  if (binder.diagnostics.size > 0) {
     return (MskEvaluationResult){
         .kind = kMskEvaluationResultFailure,
         .value = {.err = binder.diagnostics},

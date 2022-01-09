@@ -15,18 +15,18 @@ TEST_SUITE_FUNC(SyntaxFactsTests) {
 }
 
 TEST_FUNC(GetTextRoundTrips) {
-  MskSyntaxKinds all_kinds = MskSyntaxKindsGetAll();
-  for (uint64_t i = 0; i < VEC_SIZE(&all_kinds); ++i) {
+  MskSyntaxKinds_t all_kinds = MskSyntaxKindsGetAll();
+  for (uint64_t i = 0; i < all_kinds.size; ++i) {
     MskSyntaxKind kind = all_kinds.data[i];
     phyto_string_span_t text = MskSyntaxFactsGetText(kind);
     if (text.size > 0) {
-      MskSyntaxTokens tokens = MskSyntaxTreeParseTokens(text);
-#define CLEANUP()                 \
-  do {                            \
-    MskSyntaxTokensFree(&tokens); \
-    VEC_FREE(&all_kinds);         \
+      MskSyntaxTokens_t tokens = MskSyntaxTreeParseTokens(text);
+#define CLEANUP()                    \
+  do {                               \
+    MskSyntaxTokens_free(&tokens);   \
+    MskSyntaxKinds_free(&all_kinds); \
   } while (false)
-      TEST_ASSERT(VEC_SIZE(&tokens) == 1, CLEANUP(),
+      TEST_ASSERT(tokens.size == 1, CLEANUP(),
                   "[%" PHYTO_STRING_FORMAT "] Expected 1 token",
                   PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(kind)));
       TEST_ASSERT(tokens.data[0].kind == kind, CLEANUP(),
@@ -44,10 +44,10 @@ TEST_FUNC(GetTextRoundTrips) {
                   PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(kind)),
                   PHYTO_STRING_PRINTF_ARGS(tokens.data[0].text),
                   PHYTO_STRING_VIEW_PRINTF_ARGS(text));
-      MskSyntaxTokensFree(&tokens);
+      MskSyntaxTokens_free(&tokens);
 #undef CLEANUP
     }
   }
-  VEC_FREE(&all_kinds);
+  MskSyntaxKinds_free(&all_kinds);
   TEST_PASS();
 }

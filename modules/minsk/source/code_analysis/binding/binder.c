@@ -55,7 +55,7 @@ MskBoundExpression* MskBinderBindExpression(MskBinder* binder,
 }
 
 void MskBinderFree(MskBinder* binder) {
-  MskDiagnosticBagFree(&binder->diagnostics);
+  MskDiagnosticBag_free(&binder->diagnostics);
 }
 
 MskBoundExpression* BindLiteralExpression(MskBinder* binder,

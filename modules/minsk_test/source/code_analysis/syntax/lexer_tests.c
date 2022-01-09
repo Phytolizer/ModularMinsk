@@ -59,7 +59,10 @@ typedef struct {
   TestToken t2;
 } TestTokenPair;
 
-typedef VEC_TYPE(TestTokenPair) TestTokenPairs;
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(TestTokenPairs, TestTokenPair);
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_IMPL(TestTokenPairs, TestTokenPair);
+
+static const TestTokenPairs_callbacks_t kTestTokenPairsCallbacks = {0};
 
 static bool RequiresSeparator(MskSyntaxKind t1_kind, MskSyntaxKind t2_kind) {
   bool t1_is_keyword = phyto_string_ends_with(
@@ -84,13 +87,13 @@ static bool RequiresSeparator(MskSyntaxKind t1_kind, MskSyntaxKind t2_kind) {
   return false;
 }
 
-static TestTokenPairs GetTokenPairs(void) {
-  TestTokenPairs pairs = VEC_INIT_DEFAULT(TestTokenPair);
+static TestTokenPairs_t GetTokenPairs(void) {
+  TestTokenPairs_t pairs = TestTokenPairs_init(&kTestTokenPairsCallbacks);
   for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); i++) {
     for (size_t j = i + 1; j < sizeof(kTokens) / sizeof(TestToken); j++) {
       if (!RequiresSeparator(kTokens[i].kind, kTokens[j].kind)) {
         TestTokenPair pair = {kTokens[i], kTokens[j]};
-        VEC_PUSH(&pairs, pair);
+        TestTokenPairs_append(&pairs, pair);
       }
     }
   }
@@ -102,18 +105,24 @@ typedef struct {
   TestToken separator;
 } TestTokenPairWithSeparator;
 
-typedef VEC_TYPE(TestTokenPairWithSeparator) TestTokenPairsWithSeparator;
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_DECL(TestTokenPairsWithSeparator,
+                                     TestTokenPairWithSeparator);
+PHYTO_COLLECTIONS_DYNAMIC_ARRAY_IMPL(TestTokenPairsWithSeparator,
+                                     TestTokenPairWithSeparator);
 
-static TestTokenPairsWithSeparator GetTokenPairsWithSeparator(void) {
-  TestTokenPairsWithSeparator pairs =
-      VEC_INIT_DEFAULT(TestTokenPairWithSeparator);
+static const TestTokenPairsWithSeparator_callbacks_t
+    kTestTokenPairsWithSeparatorCallbacks = {0};
+
+static TestTokenPairsWithSeparator_t GetTokenPairsWithSeparator(void) {
+  TestTokenPairsWithSeparator_t pairs =
+      TestTokenPairsWithSeparator_init(&kTestTokenPairsWithSeparatorCallbacks);
   for (size_t i = 0; i < sizeof(kTokens) / sizeof(TestToken); i++) {
     for (size_t j = i + 1; j < sizeof(kTokens) / sizeof(TestToken); j++) {
       if (RequiresSeparator(kTokens[i].kind, kTokens[j].kind)) {
         for (size_t k = 0; k < sizeof(kSeparators) / sizeof(TestToken); k++) {
           TestTokenPairWithSeparator pair = {{kTokens[i], kTokens[j]},
                                              kSeparators[k]};
-          VEC_PUSH(&pairs, pair);
+          TestTokenPairsWithSeparator_append(&pairs, pair);
         }
       }
     }
@@ -127,80 +136,80 @@ TEST_FUNC(LexerLexesToken) {
        ++i) {
     const TestToken* tok =
         i < num_tokens ? &kTokens[i] : &kSeparators[i - num_tokens];
-    MskSyntaxTokens tokens =
+    MskSyntaxTokens_t tokens =
         MskSyntaxTreeParseTokens(phyto_string_span_from_c(tok->text));
-    TEST_ASSERT(VEC_SIZE(&tokens) == 1, MskSyntaxTokensFree(&tokens),
-                "Expected 1 token, got %" PRIu64, VEC_SIZE(&tokens));
+    TEST_ASSERT(tokens.size == 1, MskSyntaxTokens_free(&tokens),
+                "Expected 1 token, got %" PRIu64, tokens.size);
     MskSyntaxToken* actual = &tokens.data[0];
-    TEST_ASSERT(actual->kind == tok->kind, MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(actual->kind == tok->kind, MskSyntaxTokens_free(&tokens),
                 "Expected kind %" PHYTO_STRING_FORMAT
                 ", got %" PHYTO_STRING_FORMAT,
                 PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(tok->kind)),
                 PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(actual->kind)));
     TEST_ASSERT(phyto_string_span_equal(phyto_string_as_span(actual->text),
                                         phyto_string_span_from_c(tok->text)),
-                MskSyntaxTokensFree(&tokens),
+                MskSyntaxTokens_free(&tokens),
                 "Expected text %s, got %" PHYTO_STRING_FORMAT, tok->text,
                 PHYTO_STRING_PRINTF_ARGS(actual->text));
-    MskSyntaxTokensFree(&tokens);
+    MskSyntaxTokens_free(&tokens);
   }
   TEST_PASS();
 }
 
 TEST_FUNC(LexerLexesTokenPairs) {
-  TestTokenPairs pairs = GetTokenPairs();
-  for (uint64_t i = 0; i < VEC_SIZE(&pairs); ++i) {
+  TestTokenPairs_t pairs = GetTokenPairs();
+  for (uint64_t i = 0; i < pairs.size; ++i) {
     const TestTokenPair* pair = &pairs.data[i];
     phyto_string_t text = phyto_string_new();
     phyto_string_append_c(&text, pair->t1.text);
     phyto_string_append_c(&text, pair->t2.text);
-    MskSyntaxTokens tokens =
+    MskSyntaxTokens_t tokens =
         MskSyntaxTreeParseTokens(phyto_string_as_span(text));
     phyto_string_free(&text);
-    TEST_ASSERT(VEC_SIZE(&tokens) == 2, MskSyntaxTokensFree(&tokens),
+    TEST_ASSERT(tokens.size == 2, MskSyntaxTokens_free(&tokens),
                 "['%s' '%s'] Expected 2 tokens, got %" PRIu64, pair->t1.text,
-                pair->t2.text, VEC_SIZE(&tokens));
+                pair->t2.text, tokens.size);
     MskSyntaxToken* actual1 = &tokens.data[0];
     MskSyntaxToken* actual2 = &tokens.data[1];
     TEST_ASSERT(
-        actual1->kind == pair->t1.kind, MskSyntaxTokensFree(&tokens),
+        actual1->kind == pair->t1.kind, MskSyntaxTokens_free(&tokens),
         "Expected kind %" PHYTO_STRING_FORMAT ", got %" PHYTO_STRING_FORMAT,
         PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(pair->t1.kind)),
         PHYTO_STRING_VIEW_PRINTF_ARGS(MskSyntaxKindName(actual1->kind)));
     TEST_ASSERT(
         phyto_string_span_equal(phyto_string_as_span(actual1->text),
                                 phyto_string_span_from_c(pair->t1.text)),
-        MskSyntaxTokensFree(&tokens),
+        MskSyntaxTokens_free(&tokens),
         "Expected text '%s', got '%" PHYTO_STRING_FORMAT "'", pair->t1.text,
         PHYTO_STRING_PRINTF_ARGS(actual1->text));
-    MskSyntaxTokensFree(&tokens);
+    MskSyntaxTokens_free(&tokens);
   }
-  VEC_FREE(&pairs);
+  TestTokenPairs_free(&pairs);
   TEST_PASS();
 }
 
 TEST_FUNC(LexerLexesTokenPairsWithSeparator) {
-  TestTokenPairsWithSeparator pairs = GetTokenPairsWithSeparator();
-  for (uint64_t i = 0; i < VEC_SIZE(&pairs); ++i) {
+  TestTokenPairsWithSeparator_t pairs = GetTokenPairsWithSeparator();
+  for (uint64_t i = 0; i < pairs.size; ++i) {
     const TestTokenPairWithSeparator* pair = &pairs.data[i];
     phyto_string_t text = phyto_string_new();
     phyto_string_append_c(&text, pair->pair.t1.text);
     phyto_string_append_c(&text, pair->separator.text);
     phyto_string_append_c(&text, pair->pair.t2.text);
-    MskSyntaxTokens tokens =
+    MskSyntaxTokens_t tokens =
         MskSyntaxTreeParseTokens(phyto_string_as_span(text));
     phyto_string_free(&text);
 
-#define CLEANUP()                 \
-  do {                            \
-    MskSyntaxTokensFree(&tokens); \
-    VEC_FREE(&pairs);             \
+#define CLEANUP()                             \
+  do {                                        \
+    MskSyntaxTokens_free(&tokens);            \
+    TestTokenPairsWithSeparator_free(&pairs); \
   } while (false)
 
-    TEST_ASSERT(VEC_SIZE(&tokens) == 3, CLEANUP(),
+    TEST_ASSERT(tokens.size == 3, CLEANUP(),
                 "['%s' '%s' '%s'] Expected 3 tokens, got %" PRIu64,
                 pair->pair.t1.text, pair->separator.text, pair->pair.t2.text,
-                VEC_SIZE(&tokens));
+                tokens.size);
     MskSyntaxToken* actual1 = &tokens.data[0];
     MskSyntaxToken* actual2 = &tokens.data[1];
     MskSyntaxToken* actual3 = &tokens.data[2];
@@ -234,9 +243,9 @@ TEST_FUNC(LexerLexesTokenPairsWithSeparator) {
                                 phyto_string_span_from_c(pair->pair.t2.text)),
         CLEANUP(), "Expected text '%s', got '%" PHYTO_STRING_FORMAT "'",
         pair->pair.t2.text, PHYTO_STRING_PRINTF_ARGS(actual3->text));
-    MskSyntaxTokensFree(&tokens);
+    MskSyntaxTokens_free(&tokens);
 #undef CLEANUP
   }
-  VEC_FREE(&pairs);
+  TestTokenPairsWithSeparator_free(&pairs);
   TEST_PASS();
 }
