@@ -1,0 +1,16 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "dev",
+      "binaryDir": "build",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic"
+      }
+    }
+  ],
+  "buildPresets": [{ "name": "dev", "configurePreset": "dev" }]
+}
