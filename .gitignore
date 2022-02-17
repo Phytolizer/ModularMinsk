@@ -1,2 +1,3 @@
 *.x
 /minsk
+/compile_commands.json
