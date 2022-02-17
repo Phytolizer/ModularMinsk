@@ -9,8 +9,8 @@ const char* syntax_kind_to_string(syntax_kind_t kind) {
         return #x;
         SYNTAX_KINDS_X
 #undef X
-    case SYNTAX_KINDS_COUNT:
-    default:
-        assert(false && "corrupt syntax kind");
+        case SYNTAX_KINDS_COUNT:
+        default:
+            assert(false && "corrupt syntax kind");
     }
 }
